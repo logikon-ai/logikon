@@ -24,10 +24,11 @@ import logikon
 # Configure scoring methods
 lgk_config = logikon.Config(
     expert_model = "code-davinci-002",  # expert LLM to use
-    metrics = "REASON_DEPTH",
-    artifacts = "ARGDOWN_SVG",
+    metrics = ["REASON_DEPTH"],
+    artifacts = ["ARGDOWN_SVG"],
 )
 
+# LLM generation
 ...
 
 # Debug and score reasoning
@@ -45,6 +46,7 @@ lgk_config = logikon.Config(
     report_to = ["wandb", "langfuse"]
 )
 
+# LLM generation
 ...
 
 # Debug and score reasoning
