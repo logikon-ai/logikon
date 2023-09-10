@@ -23,7 +23,7 @@ import logikon
 
 # Configure scoring methods
 lgk_config = logikon.Config(
-    expert_model = "code-davinci-002",  # expert LLM to use
+    expert_model = "code-davinci-002",  # expert LLM for logical analysis
     metrics = ["REASON_DEPTH"],
     artifacts = ["ARGDOWN_SVG"],
 )
