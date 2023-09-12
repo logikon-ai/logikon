@@ -1,12 +1,8 @@
 from __future__ import annotations
 from typing import Dict, List, Any, Optional, Tuple
-import os
-import re
-import uuid
 
 from langchain.chains.base import Chain
 from langchain.chains import LLMChain, TransformChain
-from langchain.callbacks.base import BaseCallbackHandler
 from langchain.llms import OpenAI, BaseLLM
 from langchain.prompts import PromptTemplate
 
@@ -142,19 +138,20 @@ class ClaimExtractionChain(Chain):
     n_reasons_ho = 2
     max_words_claim = 25
     verbose = True
-    prompt_registry:Optional[PromptRegistry] = None
+    prompt_registry: Optional[PromptRegistry] = None
+    llm: BaseLLM
 
     #depth = 2
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)        
         self.prompt_registry = PromptRegistryFactory().create()
-
+        self.llm = kwargs["llm"]
 
     @staticmethod
-    def parse_list(inputs: dict) -> List[str]:
+    def parse_list(inputs: dict) -> Dict[str, List[str]]:
         list_items = []
-        list_text = inputs.get("list_text")
+        list_text = inputs.get("list_text", "")
         text = list_text.strip(" \n")
         for line in text.split("\n"):
             line = line.strip()
@@ -174,7 +171,9 @@ class ClaimExtractionChain(Chain):
     def output_keys(self) -> List[str]:
         return ['claims']
 
-    def _call(self, inputs: Dict[str, str]) -> Dict[str, str]:
+    def _call(self, inputs: Dict[str, str]) -> Dict[str, List[str]]:
+
+        assert self.prompt_registry is not None
 
         # subchains
         chain_central_question = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_question"], verbose=self.verbose)
@@ -251,13 +250,15 @@ class ClaimExtractor(AbstractDebugger):
 
         assert debug_results is not None
 
-        if self._debug_config.model_framework == "OpenAI":
+        # add huggingface inference api
+
+        if self._debug_config.llm_framework == "OpenAI":
             llm = OpenAI(model_name=self._debug_config.expert_model, **KWARGS_LLM_FAITHFUL)
         else:
-            raise ValueError(f"Unknown model framework: {self._debug_config.model_framework}")
+            raise ValueError(f"Unknown model framework: {self._debug_config.llm_framework}")
 
         llmchain = ClaimExtractionChain(llm=llm, max_words_claim=25)
-        claims = llmchain.run(prompt=prompt, completion=completion).get("claims",[])
+        claims = llmchain.run(prompt=prompt, completion=completion)
 
         artifact = Artifact(
             id=self._KW_PRODUCT,

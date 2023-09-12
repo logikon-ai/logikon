@@ -26,6 +26,7 @@ classifiers = [
 ]
 dependencies = [
   "langchain",
+  "openai",
   "pydantic",
 ]
 
@@ -41,6 +42,7 @@ path = "src/logikon/__about__.py"
 dependencies = [
   "coverage[toml]>=6.5",
   "pytest",
+  "python-dotenv",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
