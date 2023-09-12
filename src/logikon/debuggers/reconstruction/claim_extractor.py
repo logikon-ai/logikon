@@ -1,9 +1,11 @@
 from __future__ import annotations
 from typing import Dict, List, Any, Optional, Tuple
 
+import copy
+
 from langchain.chains.base import Chain
 from langchain.chains import LLMChain, TransformChain
-from langchain.llms import OpenAI, BaseLLM
+from langchain.llms import OpenAI, BaseLLM, HuggingFaceHub
 from langchain.prompts import PromptTemplate
 
 from logikon.debuggers.base import AbstractDebugger
@@ -254,6 +256,10 @@ class ClaimExtractor(AbstractDebugger):
 
         if self._debug_config.llm_framework == "OpenAI":
             llm = OpenAI(model_name=self._debug_config.expert_model, **KWARGS_LLM_FAITHFUL)
+        elif self._debug_config.llm_framework == "HuggingFaceHub":
+            model_kwargs = copy.deepcopy(KWARGS_LLM_FAITHFUL)
+            model_kwargs["max_length"] = 128
+            llm = HuggingFaceHub(repo_id=self._debug_config.expert_model, model_kwargs=model_kwargs)
         else:
             raise ValueError(f"Unknown model framework: {self._debug_config.llm_framework}")
 

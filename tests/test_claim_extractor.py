@@ -13,7 +13,10 @@ load_dotenv()  # load environment variables from .env file
 
 
 def test_claim_extractor01():
-    config = DebugConfig()
+    config = DebugConfig(
+        llm_framework="OpenAI",
+        expert_model="text-ada-001",
+    )
     print(config)
     debugger = ClaimExtractor(config)
     
