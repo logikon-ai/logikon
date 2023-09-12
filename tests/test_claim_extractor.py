@@ -8,13 +8,12 @@ from logikon.schemas.configs import DebugConfig
 from logikon.schemas.results import DebugResults
 from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
 
-
 load_dotenv()  # load environment variables from .env file
-
 
 def test_claim_extractor01():
     config = DebugConfig(
-        llm_framework="OpenAI",
+        #llm_framework="LlamaCpp",
+        #expert_model="/Users/gregorbetz/git/lmql-tests/llama.cpp/models/7B/Llama-2-7b-orca-v1/ggml-model-q4_0.bin",
         expert_model="text-ada-001",
     )
     print(config)

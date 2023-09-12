@@ -5,8 +5,10 @@ import copy
 
 from langchain.chains.base import Chain
 from langchain.chains import LLMChain, TransformChain
-from langchain.llms import OpenAI, BaseLLM, HuggingFaceHub
+from langchain.llms import OpenAI, BaseLLM, HuggingFaceHub, LlamaCpp
 from langchain.prompts import PromptTemplate
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 from logikon.debuggers.base import AbstractDebugger
 from logikon.schemas.results import DebugResults, Artifact
@@ -258,8 +260,20 @@ class ClaimExtractor(AbstractDebugger):
             llm = OpenAI(model_name=self._debug_config.expert_model, **KWARGS_LLM_FAITHFUL)
         elif self._debug_config.llm_framework == "HuggingFaceHub":
             model_kwargs = copy.deepcopy(KWARGS_LLM_FAITHFUL)
-            model_kwargs["max_length"] = 128
+            model_kwargs["max_length"] = 256
             llm = HuggingFaceHub(repo_id=self._debug_config.expert_model, model_kwargs=model_kwargs)
+        elif self._debug_config.llm_framework == "LlamaCpp":
+            model_kwargs = copy.deepcopy(KWARGS_LLM_FAITHFUL)
+            model_kwargs["max_tokens"] = 256
+            model_kwargs["top_p"] = 1
+            callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+            llm = LlamaCpp(
+                model_path=self._debug_config.expert_model,
+                callback_manager=callback_manager,
+                verbose=True,
+                **model_kwargs
+            )
+
         else:
             raise ValueError(f"Unknown model framework: {self._debug_config.llm_framework}")
 

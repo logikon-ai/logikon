@@ -28,6 +28,7 @@ dependencies = [
   "langchain",
   "openai",
   "huggingface_hub",
+  "llama-cpp-python",
   "pydantic",
 ]
 
