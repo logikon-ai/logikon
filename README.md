@@ -22,7 +22,7 @@ score = logikon.score(prompt=prompt, completion=completion)
 import logikon
 
 # Configure scoring methods
-lgk_config = logikon.Config(
+lgk_config = logikon.DebugConfig(
     expert_model = "code-davinci-002",  # expert LLM for logical analysis
     metrics = ["REASON_DEPTH"],
     artifacts = ["ARGDOWN_SVG"],
@@ -42,7 +42,7 @@ score = logikon.score(config=lgk_config, prompt=prompt, completion=completion)
 import logikon
 
 # Log scores and artifacts to wandb and langfuse
-lgk_config = logikon.Config(
+lgk_config = logikon.DebugConfig(
     report_to = ["wandb", "langfuse"]
 )
 
@@ -64,7 +64,7 @@ from langchain.chains import LLMChain
 import logikon
 
 # Configure logikon debugger
-lgk_handler = logikon.CallbackHandler(config=logikon.Config(report_to=["wandb"]))
+lgk_handler = logikon.CallbackHandler(config=logikon.DebugConfig(report_to=["wandb"]))
 
 # Set up chain and register debugger
 llm = OpenAI()

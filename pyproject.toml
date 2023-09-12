@@ -64,7 +64,7 @@ dependencies = [
   "ruff>=0.0.243",
 ]
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/logikon tests}"
+typing = "mypy --ignore-missing-imports --install-types --non-interactive {args:src/logikon tests}"
 style = [
   "ruff {args:.}",
   "black --check --diff {args:.}",

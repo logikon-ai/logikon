@@ -9,7 +9,7 @@ class DebugConfig(BaseModel):
     """Configuration for scoring."""
 
     metrics: List[str] = []
-    artifacts: List[Any] = []
+    artifacts: List[Any] = ["informal_argmap"]
     report_to: List[str] = []
     
         

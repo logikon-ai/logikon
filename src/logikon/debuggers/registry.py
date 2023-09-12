@@ -3,13 +3,14 @@ from __future__ import annotations
 from typing import Dict, Type
 
 from logikon.debuggers.reconstruction.informal_arg_map import InformalArgMap
+from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
 from logikon.debuggers.base import Debugger
 
 _DEBUGGER_REGISTRY = {
-    "informal_argmap": InformalArgMap, 
+    "informal_argmap": InformalArgMap,
+    "claims": ClaimExtractor,
 }
 
-@staticmethod
 def get_debugger_registry() -> Dict[str, Type[Debugger]]:
     """Get the debugger registry."""
     # sanity checks

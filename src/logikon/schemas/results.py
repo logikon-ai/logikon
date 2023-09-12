@@ -7,16 +7,17 @@ from pydantic import BaseModel
 
 class Artifact(BaseModel):
     """An artifact generated through logical debugging."""
-    name: str
     id: str
+    description: str
     data: Any
+    dtype: Optional[str] = None
     metadata: Optional[Dict] = None
 
 
 class Score(BaseModel):
     """A score for a completion."""
-    name: str
     id: str
+    description: str
     score: Union[float, str]
     comment: Optional[str] = None
     metadata: Optional[Dict] = None

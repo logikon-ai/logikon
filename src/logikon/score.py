@@ -17,12 +17,14 @@ def score(
     if config is None:
         config = DebugConfig()
 
-    debug_results = DebugResults()
+    # TODO: optionally load configuration from yaml config file
 
     # Dynamically construct debugger chain based on config
     debugger = DebuggerFactory().create(config)
+    if not debugger:
+        return DebugResults()
 
     # Debug the completion
-    debugger.handle(prompt, completion, debug_results)
+    debug_results = debugger.handle(prompt=prompt, completion=completion)
 
     return debug_results
