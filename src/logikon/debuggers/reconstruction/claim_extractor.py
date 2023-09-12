@@ -7,14 +7,13 @@ import uuid
 from langchain.chains.base import Chain
 from langchain.chains import LLMChain, TransformChain
 from langchain.callbacks.base import BaseCallbackHandler
-from langchain.llms import OpenAI
+from langchain.llms import OpenAI, BaseLLM
 from langchain.prompts import PromptTemplate
 
 from logikon.debuggers.base import AbstractDebugger
 from logikon.schemas.results import DebugResults, Artifact
 
-KWARGS_LLM_CREATIVE = dict(temperature=0.9)
-KWARGS_LLM_FAITHFUL = dict(temperature=0.4)
+KWARGS_LLM_FAITHFUL = dict(temperature=0.7)
 
 
 class PromptRegistry(Dict):
@@ -108,7 +107,7 @@ class PromptRegistryFactory:
             )
         )
         registry.register("prompt_central_claims_add", PromptTemplate(
-                input_variables=["central_question","prompt","completion","central_claim"],
+                input_variables=["central_question","prompt","completion","central_claims"],
                 template=(
                     "## TASK\n"
                     "Identify additional alternative answers discussed in a text.\n\n"
@@ -116,7 +115,7 @@ class PromptRegistryFactory:
                     "{prompt}\n"
                     "{completion}\n\n"
                     "The above text addresses as central (non-binary) question: {central_question}\n"
-                    "The key claims that represent alternative answers to the central question and which are argued for are: {central_claim}\n\n"
+                    "The key claims that represent alternative answers to the central question and which are argued for are: {central_claims}\n\n"
                     "## INSTRUCTION\n"
                     "Are there any additional direct answers to the central question which are discussed in the text and not listed above?\n"
                     "Hint: Additional key claims are direct answers to the central question: {central_question}.\n"
@@ -136,24 +135,19 @@ class PromptRegistryFactory:
 
 
 
-class ArgumentMiningChain(Chain):
+class ClaimExtractionChain(Chain):
 
     n_reasons_zo = 3
+    max_claims = 10
     n_reasons_ho = 2
     max_words_claim = 25
     verbose = True
-    llm:OpenAI = None
-    llm_faithful:OpenAI = None
-    prompt_registry:PromptRegistry = None
+    prompt_registry:Optional[PromptRegistry] = None
 
     #depth = 2
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        self.llm = OpenAI(model_name="text-davinci-003", **KWARGS_LLM_CREATIVE)
-        self.llm_faithful = OpenAI(model_name="text-davinci-003", **KWARGS_LLM_FAITHFUL)
-
+        super().__init__(**kwargs)        
         self.prompt_registry = PromptRegistryFactory().create()
 
 
@@ -182,12 +176,7 @@ class ArgumentMiningChain(Chain):
 
     def _call(self, inputs: Dict[str, str]) -> Dict[str, str]:
 
-
-        nodelist = []
-        edgelist = []
-
         # subchains
-
         chain_central_question = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_question"], verbose=self.verbose)
         chain_binary_question_q = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_binary_question_q"], verbose=self.verbose)
         chain_central_claim_bin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claim_bin"], verbose=self.verbose)
@@ -220,19 +209,23 @@ class ArgumentMiningChain(Chain):
 
         if not binary:
             central_claims = chain_central_claims_nonbin.run(prompt=prompt, completion=completion, central_question=central_question)
+            print(f"> Answer: {central_claims}")
             claims = parse_chain.run(list_text=central_claims)
             if claims:
-                
-            print(f"> Answer: {central_claims}")
-            claims = central_claims            
+                while len(claims) < self.max_claims:
+                    n = len(claims)
+                    central_claims = chain_central_claims_add.run(
+                        prompt=prompt,
+                        completion=completion,
+                        central_question=central_question,
+                        central_claims="\n* ".join(claims)
+                    )
+                    print(f"> Answer: {central_claims}")
+                    claims.append(parse_chain.run(list_text=central_claims))
+                    if len(claims) == n:
+                        break
 
-        argument_map = dict(
-            nodelist = nodelist,
-            edgelist = edgelist,
-        )
-
-
-        return {"argument_map": argument_map, "text_content_items": text_content_items}        
+        return {"claims": claims}
     
 
 
@@ -254,19 +247,24 @@ class ClaimExtractor(AbstractDebugger):
 
 
     def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
-        """Debug completion."""
+        """Extract central claims tha address and answer key question of trace."""
+
         assert debug_results is not None
-        # Dummy
 
-        llmchain = ArgumentMiningChain(max_words_claim=25)
+        if self._debug_config.model_framework == "OpenAI":
+            llm = OpenAI(model_name=self._debug_config.expert_model, **KWARGS_LLM_FAITHFUL)
+        else:
+            raise ValueError(f"Unknown model framework: {self._debug_config.model_framework}")
 
+        llmchain = ClaimExtractionChain(llm=llm, max_words_claim=25)
+        claims = llmchain.run(prompt=prompt, completion=completion).get("claims",[])
 
-        claims = Artifact(
+        artifact = Artifact(
             id=self._KW_PRODUCT,
             description=self._KW_DESCRIPTION,
-            data=["claim1", "claim2"],
+            data=claims,
         )
 
-        debug_results.artifacts.append(claims)
+        debug_results.artifacts.append(artifact)
 
 
