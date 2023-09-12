@@ -5,9 +5,14 @@ from typing import List, Optional
 import logging
 
 from logikon.schemas.results import DebugResults
+from logikon.schemas.configs import DebugConfig
 
 class Debugger(ABC):
     """Abstract base class for all debuggers."""
+
+    @abstractmethod
+    def __init__(self, debug_config: DebugConfig):
+        pass
 
     @abstractmethod
     def set_next(self, handler):
@@ -42,6 +47,8 @@ class AbstractDebugger(Debugger):
 
     _next_debugger: Optional[Debugger] = None
 
+    def __init__(self, debug_config: DebugConfig):
+        self._debug_config = debug_config
 
     def set_next(self, debugger: Debugger) -> Debugger:
         self._next_debugger = debugger

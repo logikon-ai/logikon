@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Type
+from typing import Type, Mapping
 
 from logikon.debuggers.reconstruction.informal_arg_map import InformalArgMap
 from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
@@ -11,7 +11,7 @@ _DEBUGGER_REGISTRY = {
     "claims": ClaimExtractor,
 }
 
-def get_debugger_registry() -> Dict[str, Type[Debugger]]:
+def get_debugger_registry() -> Mapping[str, Type[Debugger]]:
     """Get the debugger registry."""
     # sanity checks
     for keyword, debugger in _DEBUGGER_REGISTRY.items():

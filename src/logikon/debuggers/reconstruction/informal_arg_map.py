@@ -2,10 +2,10 @@
 from __future__ import annotations
 from typing import List, Optional
 
-from logikon.debuggers.base import Debugger
+from logikon.debuggers.base import AbstractDebugger
 from logikon.schemas.results import DebugResults, Artifact
 
-class InformalArgMap(Debugger):
+class InformalArgMap(AbstractDebugger):
     """InformalArgMap Debugger
     
     This debugger is responsible for extracting informal argument maps from the
