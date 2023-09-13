@@ -328,7 +328,7 @@ class InformalArgMapChain(Chain):
         new_nodes = nodelist
 
         for depth in range(self.argmap_depth):
-            target_nodes = new_nodes
+            target_nodes = copy.deepcopy(new_nodes)
             new_nodes = []
 
             print("###")
