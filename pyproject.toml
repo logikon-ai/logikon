@@ -85,6 +85,9 @@ all = [
   "typing",
 ]
 
+[tool.pytest]
+log_cli=true
+
 [tool.black]
 target-version = ["py37"]
 line-length = 120
