@@ -145,9 +145,7 @@ class PromptRegistryFactory:
 
 class InformalArgMapChain(Chain):
 
-    n_reasons_zo = 3
-    max_claims = 10
-    n_reasons_ho = 2
+    max_words_reason = 25
     max_words_claim = 25
     verbose = True
     prompt_registry: Optional[PromptRegistry] = None
@@ -402,7 +400,7 @@ class InformalArgMap(AbstractDebugger):
         )
 
         llm = init_llm_from_config(self._debug_config)
-        llmchain = InformalArgMapChain(llm=llm, max_words_claim=25)
+        llmchain = InformalArgMapChain(llm=llm)
         argmap = llmchain.run(
             prompt=prompt,
             completion=completion,
