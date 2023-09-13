@@ -417,5 +417,3 @@ class InformalArgMap(AbstractDebugger):
         )
 
         debug_results.artifacts.append(artifact)
-
-        del llm

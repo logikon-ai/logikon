@@ -15,7 +15,7 @@ from langchain.llms import (
 
 from logikon.schemas.configs import DebugConfig
 
-
+_LLM: Optional[VLLM] = None
 
 
 def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
@@ -37,6 +37,8 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
         llm = OpenAI(model_name=debug_config.expert_model, **model_kwargs)
 
     elif debug_config.llm_framework == "VLLM":
+        if _LLM is not None and isinstance(_LLM, VLLM):
+            return _LLM
         huggingface_hub.login(os.environ["HUGGINGFACEHUB_API_TOKEN"])
         model_kwargs["max_new_tokens"] = model_kwargs.pop("max_tokens", 256)
         llm = VLLM(
@@ -44,6 +46,8 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
             trust_remote_code=True,  # mandatory for hf models
             **model_kwargs
         )
+        global _LLM
+        _LLM = llm
 
     else:
         raise ValueError(f"Unknown model framework: {debug_config.llm_framework}")
