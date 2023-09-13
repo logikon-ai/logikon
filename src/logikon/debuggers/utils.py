@@ -40,9 +40,10 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
     elif debug_config.llm_framework == "VLLM":
         huggingface_hub.login(os.environ["HUGGINGFACEHUB_API_TOKEN"])
         model_kwargs["max_new_tokens"] = model_kwargs.pop("max_tokens", 256)
-        llm = VLLM(model="mosaicml/mpt-7b",
-           trust_remote_code=True,  # mandatory for hf models
-           **model_kwargs
+        llm = VLLM(
+            model=debug_config.expert_model,
+            trust_remote_code=True,  # mandatory for hf models
+            **model_kwargs
         )
 
     else:

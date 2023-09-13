@@ -1,15 +1,18 @@
 # test score function
 
 import pytest
+from dotenv import load_dotenv
 
 from logikon.schemas.configs import DebugConfig
 from logikon.score import score
 
 
+load_dotenv()  # load environment variables from .env file
+
 def test_score1():
     config = DebugConfig(
         llm_framework="VLLM",
-        expert_model="OpenAssistant/llama2-13b-orca-8k-3319",
+        expert_model="circulus/Llama-2-7b-orca-v1",
     )
 
     prompt = "Vim or emacs? reason carefully!"

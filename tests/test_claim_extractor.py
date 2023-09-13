@@ -16,7 +16,7 @@ def test_claim_extractor01():
         #expert_model="/Users/gregorbetz/git/lmql-tests/llama.cpp/models/7B/Llama-2-7b-orca-v1/ggml-model-q4_0.bin",
         #expert_model="text-ada-001",
         llm_framework="VLLM",
-        expert_model="OpenAssistant/llama2-13b-orca-8k-3319",
+        expert_model="circulus/Llama-2-7b-orca-v1",
     )
     print(config)
     debugger = ClaimExtractor(config)
