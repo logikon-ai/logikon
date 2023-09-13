@@ -1,19 +1,18 @@
 from __future__ import annotations
 from typing import Dict, List, Any, Optional, Tuple
 
-import copy
 
 from langchain.chains.base import Chain
 from langchain.chains import LLMChain, TransformChain
-from langchain.llms import OpenAI, BaseLLM, HuggingFaceHub, LlamaCpp
+from langchain.llms import BaseLLM
 from langchain.prompts import PromptTemplate
-from langchain.callbacks.manager import CallbackManager
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 from logikon.debuggers.base import AbstractDebugger
 from logikon.schemas.results import DebugResults, Artifact
+from logikon.debuggers.utils import init_llm_from_config
 
-KWARGS_LLM_FAITHFUL = dict(temperature=0.7)
+
+KWARGS_LLM_FAITHFUL = dict(temperature=0.7, max_tokens=256)
 
 
 class PromptRegistry(Dict):
@@ -42,7 +41,7 @@ class PromptRegistryFactory:
                 input_variables=["prompt","completion"],
                 template=(
                     "## TASK\n"
-                    "Identify the key question adressed in the following TEXT.\n\n"
+                    "Identify the key question adressed in the following text (CONTEXT).\n\n"
                     "## CONTEXT\n"
                     "{prompt}\n"
                     "{completion}\n\n"
@@ -58,7 +57,7 @@ class PromptRegistryFactory:
                     "## TASK\n"
                     "Determine whether a question (A) is a binary question or (B) allows for more than two answers.\n\n"
                     "## CONTEXT\n"
-                    "The TEXT addresses the following question: {central_question}\n\n"
+                    "The text addresses the following question: {central_question}\n\n"
                     "## INSTRUCTION\n"
                     "Is the question a binary question (i.e., a question that can be answered with yes or no)?\n"
                     "(A) binary question\n"
@@ -97,7 +96,7 @@ class PromptRegistryFactory:
                     "{completion}\n\n"
                     "## INSTRUCTION\n"
                     "What are the key claims that are argued for, debated, or critically discussed?\n"
-                    "Hint: The key claims are mutually exclusive amd direct answers to the central question: {central_question}.\n"
+                    "Hint: The key claims are mutually exclusive and direct answers to the central question: {central_question}.\n"
                     "State each central claim (one gramatically correct sentence) discussed in the "
                     "texts above in a clear, short and very concise way. Concentrate on the main assertions "
                     "and leave out any reasoning. "
@@ -254,29 +253,7 @@ class ClaimExtractor(AbstractDebugger):
 
         assert debug_results is not None
 
-        # add huggingface inference api
-
-        if self._debug_config.llm_framework == "OpenAI":
-            llm = OpenAI(model_name=self._debug_config.expert_model, **KWARGS_LLM_FAITHFUL)
-        elif self._debug_config.llm_framework == "HuggingFaceHub":
-            model_kwargs = copy.deepcopy(KWARGS_LLM_FAITHFUL)
-            model_kwargs["max_length"] = 256
-            llm = HuggingFaceHub(repo_id=self._debug_config.expert_model, model_kwargs=model_kwargs)
-        elif self._debug_config.llm_framework == "LlamaCpp":
-            model_kwargs = copy.deepcopy(KWARGS_LLM_FAITHFUL)
-            model_kwargs["max_tokens"] = 256
-            model_kwargs["top_p"] = 1
-            callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-            llm = LlamaCpp(
-                model_path=self._debug_config.expert_model,
-                callback_manager=callback_manager,
-                verbose=True,
-                **model_kwargs
-            )
-
-        else:
-            raise ValueError(f"Unknown model framework: {self._debug_config.llm_framework}")
-
+        llm = init_llm_from_config(self._debug_config)
         llmchain = ClaimExtractionChain(llm=llm, max_words_claim=25)
         claims = llmchain.run(prompt=prompt, completion=completion)
 

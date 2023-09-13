@@ -29,6 +29,7 @@ dependencies = [
   "openai",
   "huggingface_hub",
   "llama-cpp-python",
+  "vllm",
   "pydantic",
 ]
 
