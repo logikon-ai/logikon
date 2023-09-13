@@ -44,36 +44,6 @@ class PromptRegistryFactory:
     def create() -> PromptRegistry:
         registry = PromptRegistry()
 
-        registry.register("prompt_pros", PromptTemplate(
-                input_variables=["central_question","central_claim","source_text"],
-                template=(
-                    "You are a helpful assisstant and expert for critical thinking and argumentation analysis.\n\n"
-                    "Your task: Summarize main pro arguments presented in the following text.\n"
-                    "TEXT\n\n{source_text}\n\n"
-                    "TOPIC\n\n{central_question}\n\n"
-                    "CENTRAL CLAIM\n\n{central_claim}\n\n"
-                    "What are the main arguments presented in the TEXT that directly support the CLAIM?\n"
-                    "Try to identify distinct reasons (at most three, but fewer is also ok), and avoid repeating one and the same argument in different words. "
-                    "Sketch each argument in one or two grammatically correct sentences. "
-                    "Enumerate arguments consecutively -- beginning with 1. -- and start each argument with a new line.\n"
-                )
-            )
-        )
-        registry.register("prompt_cons", PromptTemplate(
-                input_variables=["central_question","central_claim","source_text"],
-                template=(
-                    "You are a helpful assisstant and expert for critical thinking and argumentation analysis.\n\n"
-                    "Your task: Summarize main con arguments presented in the following text.\n"
-                    "TEXT\n\n{source_text}\n\n"
-                    "TOPIC\n\n{central_question}\n\n"
-                    "CENTRAL CLAIM\n\n{central_claim}\n\n"
-                    "What are the main arguments presented in the TEXT that directly attack (i.e., refute, speak against or disconfirm) the CLAIM?\n"
-                    "Try to identify distinct reasons (at most three, but fewer is also ok), and avoid repeating one and the same argument in different words. "
-                    "Sketch each argument in one or two grammatically correct sentences. "
-                    "Enumerate arguments consecutively -- beginning with 1. -- and start each argument with a new line.\n"
-                )
-            )
-        )
         registry.register("prompt_q_supported", PromptTemplate(
                 input_variables=["reason", "source_text", "ctype"],
                 template=(
@@ -373,13 +343,13 @@ class InformalArgMapChain(Chain):
                 is_attacked = answer.strip(" \n").lower().startswith("y")
 
                 if is_supported:
-                    pros = chain_pros.run(central_claim=claim, source_text=completion)
+                    pros = chain_pros.run(claim=claim, source_text=completion)
                     print(f"> Answer: {pros}")
                     new_pros = _process_and_add_arguments(pros, target_node=target_node, valence="for")
                     new_nodes.extend(new_pros)
 
                 if is_attacked:
-                    cons = chain_cons.run(central_claim=claim, source_text=completion)
+                    cons = chain_cons.run(claim=claim, source_text=completion)
                     print(f"> Answer: {cons}")
                     new_cons = _process_and_add_arguments(cons, target_node=target_node, valence="against")
                     new_nodes.extend(new_cons)
