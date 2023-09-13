@@ -76,12 +76,13 @@ class PromptRegistryFactory:
                     "TEXT\n\n{source_text}\n\n"
                     "CLAIM\n\n{claim}\n\n"
                     "What are the main arguments presented in the TEXT that directly support the CLAIM?\n"
-                    "Sketch arguments in one or two grammatically correct sentences. "
-                    "Try to identify distinct reasons (at most four, but fewer is also ok), and avoid repeating one and the same argument in different words. "
-                    "Avoid merely restating the CLAIM in different words. "
-                    "Don't invent your own reasons that are not presented or discussed in the text. "                    
-                    "Enumerate arguments consecutively -- beginning with 1. -- and start each argument with a new line. "
-                    "(Write 'None' if the text doesn't contain any such arguments.)\n"
+                    "- Sketch arguments in one or two grammatically correct sentences.\n"
+                    "- Try to identify distinct reasons (at most four, but fewer is also ok), and avoid repeating one and the same argument in different words.\n"
+                    "- Avoid merely restating the CLAIM in different words.\n"
+                    "- IMPORTANT: Don't invent your own reasons. Don't write down arguments neither presented nor discussed in the text.\n"                    
+                    "- Enumerate the text's arguments consecutively -- beginning with 1. -- and start each argument with a new line.\n"
+                    "- (Write 'None' if the text doesn't contain any such arguments.)\n\n"
+                    "I see the following arguments in the TEXT above:\n"
                 )
             )
         )
@@ -93,12 +94,12 @@ class PromptRegistryFactory:
                     "TEXT\n\n{source_text}\n\n"
                     "CLAIM\n\n{claim}\n\n"
                     "What are the main arguments presented in the TEXT that directly attack (i.e., refute, speak against or disconfirm) the CLAIM?\n"
-                    "Sketch arguments in one or two grammatically correct sentences. "
-                    "Try to identify distinct reasons (at most four, but fewer is also ok), and avoid repeating one and the same argument in different words. "
-                    "Avoid merely restating the CLAIM in different words. "
-                    "Don't invent your own reasons that are not presented or discussed in the text. "                    
-                    "Enumerate arguments (at most two) consecutively -- beginning with 1. -- and start each argument with a new line. "
-                    "(Write 'None' if the text doesn't contain any such arguments.)\n"
+                    "- Sketch arguments in one or two grammatically correct sentences.\n"
+                    "- Try to identify distinct reasons (at most four, but fewer is also ok), and avoid repeating one and the same argument in different words.\n"
+                    "- IMPORTANT: Don't invent your own reasons. Don't write down arguments neither presented nor discussed in the text.\n"                    
+                    "- Enumerate the text's arguments consecutively -- beginning with 1. -- and start each argument with a new line.\n"
+                    "- (Write 'None' if the text doesn't contain any such arguments.)\n\n"
+                    "I see the following arguments in the TEXT above:\n"
                 )
             )
         )
@@ -147,6 +148,7 @@ class InformalArgMapChain(Chain):
 
     max_words_reason = 25
     max_words_claim = 25
+    max_parallel_reasons = 2  # max number of parallel reasons
     verbose = True
     prompt_registry: Optional[PromptRegistry] = None
     llm: BaseLLM
@@ -308,6 +310,7 @@ class InformalArgMapChain(Chain):
             new_nodes = []
             claim = target_node["text"]
             reasons_l = _process_reasons(reasons, claim=claim, valence=valence)
+            reasons_l = reasons_l[:self.max_parallel_reasons] # cut off reasons
 
             for reason in reasons_l:
                 headline = chain_headline.run(reason=reason, claim=claim, valence=valence)
@@ -414,3 +417,5 @@ class InformalArgMap(AbstractDebugger):
         )
 
         debug_results.artifacts.append(artifact)
+
+        del llm

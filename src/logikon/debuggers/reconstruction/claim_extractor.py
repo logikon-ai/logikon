@@ -265,4 +265,4 @@ class ClaimExtractor(AbstractDebugger):
 
         debug_results.artifacts.append(artifact)
 
-
+        del llm
