@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Dict, List, Any, Optional, Tuple
 
 import copy
+import os
 
 import huggingface_hub
 from langchain.llms import BaseLLM
