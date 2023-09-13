@@ -37,6 +37,7 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
         llm = OpenAI(model_name=debug_config.expert_model, **model_kwargs)
 
     elif debug_config.llm_framework == "VLLM":
+        global _LLM
         if _LLM is not None and isinstance(_LLM, VLLM):
             return _LLM
         huggingface_hub.login(os.environ["HUGGINGFACEHUB_API_TOKEN"])
@@ -46,7 +47,6 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
             trust_remote_code=True,  # mandatory for hf models
             **model_kwargs
         )
-        global _LLM
         _LLM = llm
 
     else:
