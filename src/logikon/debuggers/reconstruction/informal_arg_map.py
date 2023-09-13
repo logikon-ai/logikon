@@ -331,6 +331,12 @@ class InformalArgMapChain(Chain):
             target_nodes = new_nodes
             new_nodes = []
 
+            print("###")
+            print(f"Mining arguments at depth {depth+1}.")
+            print(f" Number of target nodes: {len(target_nodes)}.")
+            print(f" Number of nodes in argmap: {len(nodelist)}.")
+            print("###")
+
             for target_node in target_nodes:
 
                 claim = target_node["text"]
