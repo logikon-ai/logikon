@@ -70,18 +70,17 @@ class PromptRegistryFactory:
                 input_variables=["central_question","prompt","completion"],
                 template=(
                     "## TASK\n"
-                    "Identify the key claim discussed in a text.\n\n"
+                    "Summarize a text's answer to an overarching question.\n\n"
                     "## CONTEXT\n"
                     "The following text addresses as overarching question: {central_question}\n\n"
                     "{prompt}\n"
                     "{completion}\n\n"
                     "## INSTRUCTION\n"
-                    "What is the key claim that is at issue, argued for, debated, or critically discussed?\n"
-                    "- Hint: The key claim is an answer to the overarching question: {central_question}.\n"
-                    "- State the key claim discussed in the texts above in a clear, short and very concise way.\n"
-                    "- State the key claim as an entire, gramatically correct sentence.\n"
+                    "What is the key claim that answer the overarching question and is at issue, argued for, debated, or critically discussed?\n"
+                    "- Hint: The text's overarching question is: {central_question}.\n"
+                    "- State the key claim discussed in the texts above in a clear, short and very concise way, and as a gramatically correct sentence.\n"
                     "- Concentrate on the main assertion and leave out any reasoning or comments.\n"
-                    "- Provide a SINGLE sentence in one line. \n"
+                    "- Provide a SINGLE sentence in one line.\n"
                     "The key claim of the text is:\n"
                 )
             )
