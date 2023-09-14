@@ -250,28 +250,28 @@ My shortened paraphrase:"""
 You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
-Find a telling name for an argument.
+Find a telling title for an argument.
 
 # Inputs
 Use the following inputs (an ARGUMENT that speaks {valence} a CLAIM) to solve your assignment.
-
-ARGUMENT:
-:::
-{reason}
-:::
 
 CLAIM:
 :::
 {claim}
 :::
 
+ARGUMENT:
+:::
+{reason}
+:::
+
 # Detailed Instructions
-Provide a single concise title for the ARGUMENT (1-4 words).
-Make sure that your title matches specifically the ARGUMENT, and not just the CLAIM.
-Don't provide alternatives, comments or explanations.
+Provide a single, very concise title for the ARGUMENT (1-4 words).
+While keeping it short, make sure that your title captures the specifics of the ARGUMENT (and not just the CLAIM).
+Don't provide alternatives, comments or explanations. Just a good title.
 
 # Answer
-My title for the ARGUMENT:"""
+"""
                 )
             )
         )
@@ -283,6 +283,7 @@ class InformalArgMapChain(Chain):
 
     max_words_reason = 25
     max_words_claim = 25
+    max_words_claim = 6
     max_parallel_reasons = 3  # max number of parallel reasons
     verbose = True
     prompt_registry: PromptRegistry = PromptRegistry()
@@ -472,8 +473,10 @@ class InformalArgMapChain(Chain):
 
 
         for reason in reasons_l:
-            headline = chain_headline.run(reason=reason, claim=claim, valence=valence)
+            headline: str = chain_headline.run(reason=reason, claim=claim, valence=valence)
             headline = headline.strip(" \n")
+            headline = headline.split("\n")[0]
+            headline = " ".join(headline.split()[:self.max_words_title])
             quote = chain_annotation.run(source_text=completion, claim=reason)
             print(f"> Answer: {quote}")
             annotations = self._match_quote(quote, completion)
