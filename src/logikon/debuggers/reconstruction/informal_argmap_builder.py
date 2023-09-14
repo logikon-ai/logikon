@@ -357,7 +357,7 @@ class InformalArgMapChain(Chain):
             for enum, target_node in enumerate(target_nodes):
 
                 print(f"### Processing target node {enum} of {len(target_nodes)} at depth {depth+1}. ###")
-                claim = target_node["text"]
+                claim = target_node.text
 
                 answer = chain_q_supported.run(reason=claim, source_text=completion, ctype="CLAIM")
                 print(f"> Answer: {answer}")
@@ -380,7 +380,7 @@ class InformalArgMapChain(Chain):
                     new_nodes.extend(new_cons)
 
 
-        return {"argmap": argmap.dict()}
+        return {"argmap": argmap.model_dump()}
 
 
 
