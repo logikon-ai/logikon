@@ -13,7 +13,7 @@ class ArgMapNode(BaseModel):
     id: str
     text: str
     label: str
-    annotations: List[AnnotationSpan]     
+    annotations: List[AnnotationSpan] = []
     nodeType: str ="proposition"
 
 class ArgMapEdge(BaseModel):
