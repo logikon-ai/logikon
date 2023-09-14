@@ -293,8 +293,16 @@ class ClaimExtractionChain(Chain):
         print(f"> Answer: {central_question}")
 
         binary = chain_binary_question_q.run(central_question=central_question)
-        binary = binary.strip(" \n()")
         print(f"> Answer: {binary}")
+        binary = binary.strip(" \n").upper()
+        if (
+            binary.startswith("(B") or
+            binary.startswith("B") or
+            ("(B)" in binary and not "(A)" in binary)
+        ):
+            binary = False
+        else:
+            binary = True
         binary = binary.upper()[0]=="A"
 
         if binary:
