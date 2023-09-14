@@ -61,7 +61,7 @@ TEXT:
 {source_text}
 :::
 
-{CTYPE}:
+{ctype}:
 :::
 {reason}
 :::
@@ -93,7 +93,7 @@ TEXT:
 {source_text}
 :::
 
-{CTYPE}:
+{ctype}:
 :::
 {reason}
 :::
