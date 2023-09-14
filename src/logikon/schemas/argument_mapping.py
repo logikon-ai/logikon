@@ -23,4 +23,4 @@ class ArgMapEdge(BaseModel):
 
 class InformalArgMap(BaseModel):
     nodelist: List[ArgMapNode] = []
-    edglist: List[ArgMapEdge] = []
+    edgelist: List[ArgMapEdge] = []

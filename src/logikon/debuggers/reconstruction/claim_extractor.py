@@ -198,8 +198,8 @@ class ClaimExtractionChain(Chain):
 
         binary = chain_binary_question_q.run(central_question=central_question)
         binary = binary.strip(" \n()")
-        binary = binary.upper()[0]=="A"
         print(f"> Answer: {binary}")
+        binary = binary.upper()[0]=="A"
 
         if binary:
             central_claim = chain_central_claim_bin.run(prompt=prompt, completion=completion, central_question=central_question)
