@@ -143,7 +143,6 @@ class ClaimExtractionChain(Chain):
     verbose = True
     prompt_registry: Optional[PromptRegistry] = None
     llm: BaseLLM
-    generation_kwargs: Optional[Dict]
 
     #depth = 2
 
@@ -151,7 +150,6 @@ class ClaimExtractionChain(Chain):
         super().__init__(**kwargs)        
         self.prompt_registry = PromptRegistryFactory().create()
         self.llm = kwargs["llm"]
-        self.generation_kwargs = kwargs.get("generation_kwargs")
 
     @staticmethod
     def parse_list(inputs: dict) -> Dict[str, List[str]]:
@@ -181,11 +179,11 @@ class ClaimExtractionChain(Chain):
         assert self.prompt_registry is not None
 
         # subchains
-        chain_central_question = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_question"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
-        chain_binary_question_q = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_binary_question_q"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
-        chain_central_claim_bin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claim_bin"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
-        chain_central_claims_nonbin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_nonbin"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
-        chain_central_claims_add = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_add"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
+        chain_central_question = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_question"], verbose=self.verbose)
+        chain_binary_question_q = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_binary_question_q"], verbose=self.verbose)
+        chain_central_claim_bin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claim_bin"], verbose=self.verbose)
+        chain_central_claims_nonbin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_nonbin"], verbose=self.verbose)
+        chain_central_claims_add = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_add"], verbose=self.verbose)
         parse_chain = TransformChain(input_variables=["list_text"], output_variables=["list_items"], transform=self.parse_list)
 
 

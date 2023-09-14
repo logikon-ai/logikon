@@ -149,7 +149,6 @@ class InformalArgMapChain(Chain):
     verbose = True
     prompt_registry: PromptRegistry
     llm: BaseLLM
-    generation_kwargs: Optional[Dict]
     argmap_depth = 2
 
 
@@ -157,7 +156,6 @@ class InformalArgMapChain(Chain):
         super().__init__(**kwargs)        
         self.prompt_registry = PromptRegistryFactory().create()
         self.llm = kwargs["llm"]
-        self.generation_kwargs = kwargs.get("generation_kwargs")
 
 
     @property
@@ -217,7 +215,7 @@ class InformalArgMapChain(Chain):
             return reason
         print(f"Word count current reason: {len(reason.split(' '))}")
 
-        chain_shorten = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_shorten"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
+        chain_shorten = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_shorten"], verbose=self.verbose)
         if len(reason.split(" "))>self.max_words_reason:
             gist = chain_shorten.run(reason=reason, valence=valence, claim=claim)
             gist = gist.strip(" \n")
@@ -315,8 +313,8 @@ class InformalArgMapChain(Chain):
         reasons_l = self._process_reasons(reasons, claim=claim, valence=valence)
         reasons_l = reasons_l[:self.max_parallel_reasons] # cut off reasons
 
-        chain_headline = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_headline"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
-        chain_annotation = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_annotation"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
+        chain_headline = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_headline"], verbose=self.verbose)
+        chain_annotation = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_annotation"], verbose=self.verbose)
 
 
         for reason in reasons_l:
@@ -335,10 +333,10 @@ class InformalArgMapChain(Chain):
 
 
         # define subchains
-        chain_pros = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_pros"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
-        chain_cons = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_cons"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
-        chain_q_supported = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_supported"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
-        chain_q_attacked = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_attacked"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
+        chain_pros = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_pros"], verbose=self.verbose)
+        chain_cons = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_cons"], verbose=self.verbose)
+        chain_q_supported = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_supported"], verbose=self.verbose)
+        chain_q_attacked = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_attacked"], verbose=self.verbose)
 
         completion = inputs['completion']
         claims = inputs['claims']
