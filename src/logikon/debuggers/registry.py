@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import Type, Mapping
 
-from logikon.debuggers.reconstruction.informal_arg_map import InformalArgMap
+from logikon.debuggers.reconstruction.informal_argmap_builder import InformalArgMapBuilder
 from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
 from logikon.debuggers.base import Debugger
 
 _DEBUGGER_REGISTRY = {
-    "informal_argmap": InformalArgMap,
+    "informal_argmap": InformalArgMapBuilder,
     "claims": ClaimExtractor,
 }
 

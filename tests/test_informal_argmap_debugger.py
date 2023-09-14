@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from logikon.schemas.configs import DebugConfig
 from logikon.schemas.results import DebugResults, Artifact
-from logikon.debuggers.reconstruction.informal_arg_map import InformalArgMap
+from logikon.debuggers.reconstruction.informal_argmap_builder import InformalArgMapBuilder
 
 load_dotenv()  # load environment variables from .env file
 
@@ -16,10 +16,12 @@ def test_informal_argmap01():
         #expert_model="/Users/gregorbetz/git/lmql-tests/llama.cpp/models/7B/Llama-2-7b-orca-v1/ggml-model-q4_0.bin",
         #expert_model="text-ada-001",
         llm_framework="VLLM",
-        expert_model="circulus/Llama-2-7b-orca-v1",
+        expert_model="Open-Orca/OpenOrca-Platypus2-13B",
+        generation_kwargs=dict(stop=["</s>","<EOS>"]),
+        expert_model_kwargs=dict(temperature=0.9, max_new_tokens=256, trust_remote_code=True),
     )
     print(config)
-    debugger = InformalArgMap(config)
+    debugger = InformalArgMapBuilder(config)
     
     prompt = "Vim or emacs? reason carefully!"
     completion = "Vim is lighter, emacs is stronger. Therefore: Vim."

@@ -143,6 +143,7 @@ class ClaimExtractionChain(Chain):
     verbose = True
     prompt_registry: Optional[PromptRegistry] = None
     llm: BaseLLM
+    generation_kwargs: Dict
 
     #depth = 2
 
@@ -150,6 +151,7 @@ class ClaimExtractionChain(Chain):
         super().__init__(**kwargs)        
         self.prompt_registry = PromptRegistryFactory().create()
         self.llm = kwargs["llm"]
+        self.generation_kwargs = kwargs.get("generation_kwargs")
 
     @staticmethod
     def parse_list(inputs: dict) -> Dict[str, List[str]]:
@@ -179,11 +181,11 @@ class ClaimExtractionChain(Chain):
         assert self.prompt_registry is not None
 
         # subchains
-        chain_central_question = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_question"], verbose=self.verbose)
-        chain_binary_question_q = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_binary_question_q"], verbose=self.verbose)
-        chain_central_claim_bin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claim_bin"], verbose=self.verbose)
-        chain_central_claims_nonbin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_nonbin"], verbose=self.verbose)
-        chain_central_claims_add = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_add"], verbose=self.verbose)
+        chain_central_question = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_question"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
+        chain_binary_question_q = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_binary_question_q"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
+        chain_central_claim_bin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claim_bin"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
+        chain_central_claims_nonbin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_nonbin"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
+        chain_central_claims_add = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_add"], verbose=self.verbose, llm_kwargs=self.generation_kwargs)
         parse_chain = TransformChain(input_variables=["list_text"], output_variables=["list_items"], transform=self.parse_list)
 
 
@@ -254,7 +256,8 @@ class ClaimExtractor(AbstractDebugger):
         assert debug_results is not None
 
         llm = init_llm_from_config(self._debug_config)
-        llmchain = ClaimExtractionChain(llm=llm, max_words_claim=25)
+        generation_kwargs = self._debug_config.generation_kwargs
+        llmchain = ClaimExtractionChain(llm=llm, generation_kwargs=generation_kwargs, max_words_claim=25)
         claims = llmchain.run(prompt=prompt, completion=completion)
 
         artifact = Artifact(

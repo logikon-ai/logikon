@@ -15,39 +15,34 @@ from langchain.llms import (
 
 from logikon.schemas.configs import DebugConfig
 
-_LLM: Optional[VLLM] = None
+_VLLM: Optional[VLLM] = None
 
 
 def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
 
-    model_kwargs = copy.deepcopy(kwargs)
-
     if debug_config.llm_framework == "HuggingFaceHub":
-        model_kwargs["max_length"] = model_kwargs.pop("max_tokens", 256)
-        llm = HuggingFaceHub(repo_id=debug_config.expert_model, model_kwargs=model_kwargs)
+        llm = HuggingFaceHub(repo_id=debug_config.expert_model, model_kwargs=debug_config.expert_model_kwargs)
 
     elif debug_config.llm_framework == "LlamaCpp":
         llm = LlamaCpp(
             model_path=debug_config.expert_model,
             verbose=True,
-            **model_kwargs
+            **debug_config.expert_model_kwargs
         )
 
     elif debug_config.llm_framework == "OpenAI":
-        llm = OpenAI(model_name=debug_config.expert_model, **model_kwargs)
+        llm = OpenAI(model_name=debug_config.expert_model, **debug_config.expert_model_kwargs)
 
     elif debug_config.llm_framework == "VLLM":
-        global _LLM
-        if _LLM is not None and isinstance(_LLM, VLLM):
-            return _LLM
+        global _VLLM
+        if _VLLM is not None and isinstance(_VLLM, VLLM):
+            return _VLLM
         huggingface_hub.login(os.environ["HUGGINGFACEHUB_API_TOKEN"])
-        model_kwargs["max_new_tokens"] = model_kwargs.pop("max_tokens", 256)
         llm = VLLM(
             model=debug_config.expert_model,
-            trust_remote_code=True,  # mandatory for hf models
-            **model_kwargs
+            **debug_config.expert_model_kwargs
         )
-        _LLM = llm
+        _VLLM = llm
 
     else:
         raise ValueError(f"Unknown model framework: {debug_config.llm_framework}")
