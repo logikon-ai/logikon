@@ -199,8 +199,8 @@ class InformalArgMapChain(Chain):
             for claim_b in argmap.nodelist:
                 if claim_a != claim_b:
                     argmap.edgelist.append(ArgMapEdge(
-                        source=claim_a["id"],
-                        target=claim_b["id"],
+                        source=claim_a.id,
+                        target=claim_b.id,
                         valence="con",
                     ))
         return argmap
@@ -256,7 +256,7 @@ class InformalArgMapChain(Chain):
 
         if target_id:
             edge = ArgMapEdge(
-                source=node["id"],
+                source=node.id,
                 target=target_id,
                 valence="pro" if valence=="for" else "con",
             )
@@ -299,7 +299,7 @@ class InformalArgMapChain(Chain):
             argmap: InformalArgMap,
             completion: str,
             reasons:str,
-            target_node:Dict,
+            target_node:ArgMapNode,
             valence:str="for"
         ) -> List[ArgMapNode]:
         """
@@ -309,7 +309,7 @@ class InformalArgMapChain(Chain):
         - returns newly added nodes
         """
         new_nodes = []
-        claim = target_node["text"]
+        claim = target_node.text
         reasons_l = self._process_reasons(reasons, claim=claim, valence=valence)
         reasons_l = reasons_l[:self.max_parallel_reasons] # cut off reasons
 
@@ -323,7 +323,7 @@ class InformalArgMapChain(Chain):
             quote = chain_annotation.run(source_text=completion, claim=reason)
             print(f"> Answer: {quote}")
             annotations = self._match_quote(quote, completion)
-            new_node = self._add_argument(argmap=argmap, reason=reason, label=headline, target_id=target_node["id"], valence=valence, annotations=annotations)
+            new_node = self._add_argument(argmap=argmap, reason=reason, label=headline, target_id=target_node.id, valence=valence, annotations=annotations)
             new_nodes.append(new_node)
 
         return new_nodes
