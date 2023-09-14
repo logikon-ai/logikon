@@ -147,7 +147,7 @@ class InformalArgMapChain(Chain):
     max_words_claim = 25
     max_parallel_reasons = 3  # max number of parallel reasons
     verbose = True
-    prompt_registry: PromptRegistry
+    prompt_registry: PromptRegistry = PromptRegistry()
     llm: BaseLLM
     argmap_depth = 2
 
