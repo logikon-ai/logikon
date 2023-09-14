@@ -183,7 +183,7 @@ The key claims of the TEXT are:"""
 You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
-Identify additional answers to an overarching question discussed in a text.
+Identify additional answers to an overarching question discussed in a text (if any).
 
 # Inputs
 Use the following inputs (a QUESTION, a TEXT, and central CLAIMS) to solve your assignment.
@@ -215,12 +215,12 @@ Are there any additional direct answers to the overarching QUESTION which are di
 - Render each additional key claim as a SINGLE gramatically correct sentence.
 - Don't add comments or explanations.
 - Enumerate any additional key claims (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each claim with a new line.
-- However, just write 'NONE' if there are no additional key claims and the above list of CLAIMS is exhaustive.
+- However, just write 'NONE' if there are no additional answers to the QUESTION and the above list of CLAIMS is exhaustive.
 
 Reminder: The text's overarching question is: {central_question}.
 
 # Answer
-The TEXT discusses the following additional key claims that answer the QUESTION:"""
+"""
                 )
             )
         )
@@ -284,6 +284,7 @@ class ClaimExtractionChain(Chain):
 
         prompt = inputs['prompt']
         completion = inputs['completion']
+        claims: List[str]
 
         central_question = chain_central_question.run(prompt=prompt, completion=completion)
         if "?" in central_question:
@@ -315,10 +316,10 @@ class ClaimExtractionChain(Chain):
                         prompt=prompt,
                         completion=completion,
                         central_question=central_question,
-                        central_claims="\n* ".join(claims)
+                        central_claims="* " + ("\n* ".join(claims))
                     )
                     print(f"> Answer: {central_claims}")
-                    claims.append(parse_chain.run(list_text=central_claims))
+                    claims.extend(parse_chain.run(list_text=central_claims))
                     if len(claims) == n:
                         break
 
