@@ -46,7 +46,7 @@ class PromptRegistryFactory:
                     "{prompt}\n"
                     "{completion}\n\n"
                     "## INSTRUCTION\n"
-                    "What is the key question the above text (CONTEXT) raises and addresses?\n"
+                    "What is the overarching question the above text (CONTEXT) raises and addresses?\n"
                     "State a single main question in a concise way:\n"
                 )
             )
@@ -72,16 +72,17 @@ class PromptRegistryFactory:
                     "## TASK\n"
                     "Identify the key claim discussed in a text.\n\n"
                     "## CONTEXT\n"
-                    "The following text addresses as central question: {central_question}\n\n"
+                    "The following text addresses as overarching question: {central_question}\n\n"
                     "{prompt}\n"
                     "{completion}\n\n"
                     "## INSTRUCTION\n"
-                    "What is the key claim that is argued for, debated, or critically discussed?\n"
-                    "Hint: The key claim is an answer to the central question: {central_question}.\n"
-                    "State the central claim (one gramatically correct sentence) discussed in the "
-                    "texts above in a clear, short and very concise way. Concentrate on the main assertion "
-                    "and leave out any reasoning.\n"
-                    "The central claim discussed in the text is:\n"
+                    "What is the key claim that is at issue, argued for, debated, or critically discussed?\n"
+                    "- Hint: The key claim is an answer to the overarching question: {central_question}.\n"
+                    "- State the key claim discussed in the texts above in a clear, short and very concise way.\n"
+                    "- State the key claim as an entire, gramatically correct sentence.\n"
+                    "- Concentrate on the main assertion and leave out any reasoning or comments.\n"
+                    "- Provide a SINGLE sentence in one line. \n"
+                    "The key claim of the text is:\n"
                 )
             )
         )
@@ -100,7 +101,7 @@ class PromptRegistryFactory:
                     "State each central claim (one gramatically correct sentence) discussed in the "
                     "texts above in a clear, short and very concise way. Concentrate on the main assertions "
                     "and leave out any reasoning. "
-                    "Enumerate key claims (up to 4, fewer are ok) consecutively -- beginning with 1. -- and start each argument with a new line.\n"
+                    "Enumerate key claims (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each argument with a new line.\n"
                     "The key claims, directly answering the central question, are:\n"
                 )
             )
@@ -141,7 +142,7 @@ class ClaimExtractionChain(Chain):
     n_reasons_ho = 2
     max_words_claim = 25
     verbose = True
-    prompt_registry: Optional[PromptRegistry] = None
+    prompt_registry: PromptRegistry = PromptRegistry()
     llm: BaseLLM
 
     #depth = 2
@@ -175,8 +176,6 @@ class ClaimExtractionChain(Chain):
         return ['claims']
 
     def _call(self, inputs: Dict[str, str]) -> Dict[str, List[str]]:
-
-        assert self.prompt_registry is not None
 
         # subchains
         chain_central_question = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_question"], verbose=self.verbose)
