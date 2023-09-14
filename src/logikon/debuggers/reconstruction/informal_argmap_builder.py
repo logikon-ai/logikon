@@ -266,11 +266,13 @@ ARGUMENT:
 :::
 
 # Detailed Instructions
-Provide a single, very concise title for the ARGUMENT (1-4 words).
+Provide a single, very concise title for the ARGUMENT (not more than 4 words).
 While keeping it short, make sure that your title captures the specifics of the ARGUMENT (and not just the CLAIM).
+A good title highlights the argument's key point in a few catchy words. 
 Don't provide alternatives, comments or explanations. Just a good title.
 
 # Answer
+Concise title of the ARGUMENT:
 """
                 )
             )
