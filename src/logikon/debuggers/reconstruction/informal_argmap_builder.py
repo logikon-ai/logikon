@@ -47,93 +47,234 @@ class PromptRegistryFactory:
         registry.register("prompt_q_supported", PromptTemplate(
                 input_variables=["reason", "source_text", "ctype"],
                 template=(
-                    "You are a helpful assisstant and expert for critical thinking and argumentation analysis.\n\n"
-                    "Your task: Assess whether it is argued for a certain {ctype}.\n"
-                    "TEXT:\n\n{source_text}\n\n"
-                    "The TEXT presents the following {ctype}:\n\n{reason}\n\n"
-                    "Does the TEXT, beyond stating the {ctype}, present or discuss a justification for it? "
-                    "That is, are there any arguments in the TEXT which primarily serve to support and back up the {ctype} (y/n)?"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Assess whether it is argued for a certain {ctype}.
+
+# Inputs
+Use the following inputs (a TEXT which contains a certain {ctype}) to solve your assignment.
+
+TEXT:
+:::
+{source_text}
+:::
+
+{CTYPE}:
+:::
+{reason}
+:::
+
+# Detailed Instructions
+Does the TEXT, beyond stating the {ctype}, present or discuss a justification for the {ctype}?
+That is, are there any arguments in the TEXT which primarily serve to support and back up the {ctype}?
+Provide your answer in the form of a single letter (y/n) with out explanations or comments.
+
+# Answer
+My answer is:"""
                 )
             )
         )
         registry.register("prompt_q_attacked", PromptTemplate(
                 input_variables=["reason", "source_text", "ctype"],
                 template=(
-                    "You are a helpful assisstant and expert for critical thinking and argumentation analysis.\n\n"
-                    "Your task: Assess whether it is argued against a certain {ctype}.\n"
-                    "TEXT:\n\n{source_text}\n\n"
-                    "The TEXT presents the following {ctype}:\n\n{reason}\n\n"
-                    "Does the TEXT, beyond stating the {ctype}, present or discuss an objection against it? "
-                    "That is, are there any arguments in the TEXT which primarily serve to refute the {ctype} (y/n)?"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Assess whether it is argued against a certain {ctype}.
+
+# Inputs
+Use the following inputs (a TEXT which contains a certain {ctype}) to solve your assignment.
+
+TEXT:
+:::
+{source_text}
+:::
+
+{CTYPE}:
+:::
+{reason}
+:::
+
+# Detailed Instructions
+Does the TEXT, beyond stating the {ctype}, present or discuss an objection against the {ctype}?
+That is, are there any arguments in the TEXT which primarily serve to refute the {ctype}?
+Provide your answer in the form of a single letter (y/n) without explanations or comments.
+
+# Answer
+My answer is:"""
                 )
             )
         )
         registry.register("prompt_pros", PromptTemplate(
                 input_variables=["claim","source_text"],
                 template=(
-                    "You are a helpful assisstant and expert for critical thinking and argumentation analysis.\n\n"
-                    "Your task: Summarize specific pro arguments presented in the following text.\n"
-                    "TEXT\n\n{source_text}\n\n"
-                    "CLAIM\n\n{claim}\n\n"
-                    "What are the main arguments presented in the TEXT that directly support the CLAIM?\n"
-                    "- Sketch arguments in one or two grammatically correct sentences.\n"
-                    "- Try to identify distinct reasons (at most four, but fewer is also ok), and avoid repeating one and the same argument in different words.\n"
-                    "- Avoid merely restating the CLAIM in different words.\n"
-                    "- IMPORTANT: Don't invent your own reasons. Don't write down arguments neither presented nor discussed in the text.\n"                    
-                    "- Enumerate the text's arguments consecutively -- beginning with 1. -- and start each argument with a new line.\n"
-                    "- (Write 'None' if the text doesn't contain any such arguments.)\n\n"
-                    "I see the following arguments in the TEXT above:\n"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Summarize particular pro arguments presented in a text.
+
+# Inputs
+Use the following inputs (a TEXT which contains a certain CLAIM) to solve your assignment.
+
+TEXT:
+:::
+{source_text}
+:::
+
+CLAIM:
+:::
+{claim}
+:::
+
+# Detailed Instructions
+What are the main arguments presented in the TEXT that directly support the CLAIM?
+
+- Sketch arguments in one or two grammatically correct sentences.
+- Try to identify distinct reasons (at most four, but fewer is also ok), and avoid repeating one and the same argument in different words.
+- Avoid merely restating the CLAIM in different words.
+- IMPORTANT: Stay faithful to the text! Don't invent your own reasons. Don't provide reasons which are neither presented nor discussed in the text.
+- Enumerate the text's arguments consecutively -- beginning with 1. -- and start each argument with a new line.
+- (Write 'None' if the TEXT doesn't contain any such arguments.)
+
+# Answer
+I see the following arguments for the CLAIM in the TEXT above:
+"""
                 )
             )
         )
         registry.register("prompt_cons", PromptTemplate(
                 input_variables=["claim","source_text"],
                 template=(
-                    "You are a helpful assisstant and expert for critical thinking and argumentation analysis.\n\n"
-                    "Your task: Summarize specific con arguments presented in the following text.\n"
-                    "TEXT\n\n{source_text}\n\n"
-                    "CLAIM\n\n{claim}\n\n"
-                    "What are the main arguments presented in the TEXT that directly attack (i.e., refute, speak against or disconfirm) the CLAIM?\n"
-                    "- Sketch arguments in one or two grammatically correct sentences.\n"
-                    "- Try to identify distinct reasons (at most four, but fewer is also ok), and avoid repeating one and the same argument in different words.\n"
-                    "- IMPORTANT: Don't invent your own reasons. Don't write down arguments neither presented nor discussed in the text.\n"                    
-                    "- Enumerate the text's arguments consecutively -- beginning with 1. -- and start each argument with a new line.\n"
-                    "- (Write 'None' if the text doesn't contain any such arguments.)\n\n"
-                    "I see the following arguments in the TEXT above:\n"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Summarize particular con arguments (objections) presented in a text.
+
+# Inputs
+Use the following inputs (a TEXT which contains a certain CLAIM) to solve your assignment.
+
+TEXT:
+:::
+{source_text}
+:::
+
+CLAIM:
+:::
+{claim}
+:::
+
+# Detailed Instructions
+What are the main arguments presented in the TEXT that directly attack (i.e., refute, speak against or disconfirm) the CLAIM?
+
+- Sketch arguments in one or two grammatically correct sentences.
+- Try to identify distinct reasons (at most four, but fewer is also ok), and avoid repeating one and the same argument in different words.
+- Avoid merely negating the CLAIM.
+- IMPORTANT: Stay faithful to the text! Don't invent your own con reasons. Don't provide reasons which are neither presented nor discussed in the text.
+- Enumerate the text's objections against the CLAIM consecutively -- beginning with 1. -- and start each argument with a new line.
+- (Write 'None' if the TEXT doesn't contain any such arguments.)
+
+# Answer
+I see the following arguments against the CLAIM in the TEXT above:
+"""
                 )
             )
         )
         registry.register("prompt_annotation", PromptTemplate(
                 input_variables=["claim","source_text"],
                 template=(
-                    "You are a helpful assisstant and expert for critical thinking and argumentation analysis.\n\n"
-                    "Your task: Identify the paragraph in the TEXT that expresses the CLAIM most clearly.\n"
-                    "TEXT\n\n{source_text}\n\n"
-                    "CLAIM\n\n{claim}\n\n"
-                    "Give a verbatim quote from the TEXT that asserts or presents the CLAIM. Use quotation marks.\n\n"
-                    "Here is my answer, a verbatim quote:"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Identify the text-span in a text that expresses a given claim most clearly.
+
+# Inputs
+Use the following inputs (a TEXT and a certain CLAIM) to solve your assignment.
+
+TEXT:
+:::
+{source_text}
+:::
+
+CLAIM:
+:::
+{claim}
+:::
+
+# Detailed Instructions
+Give a single verbatim quote from the TEXT that asserts or presents the CLAIM most clearly.
+Use quotation marks. Don't provide alternatives, comments or explanations.
+
+# Answer
+Here is my answer, a verbatim quote from the TEXT:"""
                 )
             )
         )
         registry.register("prompt_shorten", PromptTemplate(
                 input_variables=["reason", "valence", "claim"],
                 template=(
-                    "You are a helpful assisstant and expert for critical thinking and argumentation analysis.\n\n"
-                    "Your task: Shorten the presentation of an argument {valence} a given claim.\n\n"
-                    "CLAIM\n\n{claim}\n\n"
-                    "Shorten the following ARGUMENT (which speaks {valence} the above CLAIM).\n"
-                    "ARGUMENT\n\n{reason}\n\n"
-                    "Rephrase the ARGUMENT in a concise and shorter way, highlighting its gist."
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Shorten the presentation of an argument {valence} a given claim.
+
+# Inputs
+Use the following inputs (an ARGUMENT that speaks {valence} a CLAIM) to solve your assignment.
+
+ARGUMENT:
+:::
+{reason}
+:::
+
+CLAIM:
+:::
+{claim}
+:::
+
+# Detailed Instructions
+Rephrase the ARGUMENT in a concise and shorter way, highlighting its gist.
+Don't provide alternatives, comments or explanations.
+
+# Answer
+My shortened paraphrase:"""
                 )
             )
         )
         registry.register("prompt_headline", PromptTemplate(
                 input_variables=["reason", "valence", "claim"],
                 template=(
-                    "You are a helpful assisstant and expert for critical thinking and argumentation analysis.\n\n"
-                    "Your task: Find a telling name for an argument.\n\n"
-                    "CLAIM\n\n{claim}\n\n"
-                    "Consider the following argument {valence} CLAIM.\n\n{reason}\n\nSummarize the argument in a concise headline (with 1-4 words)."
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Find a telling name for an argument.
+
+# Inputs
+Use the following inputs (an ARGUMENT that speaks {valence} a CLAIM) to solve your assignment.
+
+ARGUMENT:
+:::
+{reason}
+:::
+
+CLAIM:
+:::
+{claim}
+:::
+
+# Detailed Instructions
+Provide a single concise title for the ARGUMENT (1-4 words).
+Make sure that your title matches specifically the ARGUMENT, and not just the CLAIM.
+Don't provide alternatives, comments or explanations.
+
+# Answer
+My title for the ARGUMENT:"""
                 )
             )
         )

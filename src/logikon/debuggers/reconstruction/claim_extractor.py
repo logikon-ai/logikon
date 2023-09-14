@@ -40,90 +40,187 @@ class PromptRegistryFactory:
         registry.register("prompt_central_question", PromptTemplate(
                 input_variables=["prompt","completion"],
                 template=(
-                    "## TASK\n"
-                    "Identify the key question adressed in the following text (CONTEXT).\n\n"
-                    "## CONTEXT\n"
-                    "{prompt}\n"
-                    "{completion}\n\n"
-                    "## INSTRUCTION\n"
-                    "What is the overarching question the above text (CONTEXT) raises and addresses?\n"
-                    "State a single main question in a concise way:\n"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Identify the key question adressed in a text.
+
+# Inputs
+Use the following inputs (a TEXT) to solve your assignment.
+
+TEXT:
+:::
+{prompt}
+{completion}
+:::
+
+# Detailed Instructions
+What is the overarching question the above TERXT raises and addresses?
+State a single main question in a concise way.
+Don't provide alternatives, comments or explanations.
+
+# Answer
+The text's overarching question is:"""
                 )
             )
         )
         registry.register("prompt_binary_question_q", PromptTemplate(
                 input_variables=["central_question"],
                 template=(
-                    "## TASK\n"
-                    "Determine whether a question (A) is a binary question or (B) allows for more than two answers.\n\n"
-                    "## CONTEXT\n"
-                    "The text addresses the following question: {central_question}\n\n"
-                    "## INSTRUCTION\n"
-                    "Is the question a binary question (i.e., a question that can be answered with yes or no)?\n"
-                    "(A) binary question\n"
-                    "(B) allows for more than two answers\n"
-                    "Write 'A' or 'B' in the following line (and nothing else):\n"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Determine whether a question is a binary question, or allows for more than two answers.
+
+# Inputs
+Use the following inputs (a QUESTION) to solve your assignment.
+
+QUESTION:
+:::
+{central_question}
+:::
+
+# Detailed Instructions
+Answer the following multiple choice answer:
+Is the question a binary question (i.e., a question that can be answered with yes or no)? Options:
+(A) binary question
+(B) allows for more than two answers
+
+Don't provide alternatives, comments or explanations. Just answer with "My answer: (A/B)".
+
+# Answer
+My answer:"""
                 )
             )
         )
         registry.register("prompt_central_claim_bin", PromptTemplate(
                 input_variables=["central_question","prompt","completion"],
                 template=(
-                    "## TASK\n"
-                    "Summarize a text's answer to an overarching question.\n\n"
-                    "## CONTEXT\n"
-                    "The following text addresses as overarching question: {central_question}\n\n"
-                    "{prompt}\n"
-                    "{completion}\n\n"
-                    "## INSTRUCTION\n"
-                    "What is the key claim that answer the overarching question and is at issue, argued for, debated, or critically discussed?\n"
-                    "- Hint: The text's overarching question is: {central_question}.\n"
-                    "- State the key claim discussed in the texts above in a clear, short and very concise way, and as a gramatically correct sentence.\n"
-                    "- Concentrate on the main assertion and leave out any reasoning or comments.\n"
-                    "- Provide a SINGLE sentence in one line.\n"
-                    "The key claim of the text is:\n"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Summarize a text's answer to an overarching question.
+
+# Inputs
+Use the following inputs (a QUESTION and a TEXT) to solve your assignment.
+
+QUESTION:
+:::
+{central_question}
+:::
+
+TEXT:
+:::
+{prompt}
+{completion}
+:::
+
+# Detailed Instructions
+What is the key claim that answers the overarching QUESTION, and that is at issue, argued for, debated, or critically discussed in the TEXT?
+
+- State the key claim discussed in the text above in a clear, short and very concise way.
+- Concentrate on the main assertion and don't reproduce the text's reasoning.
+- Make sure that the key claim answers the QUESTION.
+- Provide a SINGLE gramatically correct sentence.
+- Don't add alternatives, comments or explanations.
+
+Reminder: The text's overarching question is: {central_question}.
+
+# Answer
+The key claim of the TEXT is:"""
                 )
             )
         )
         registry.register("prompt_central_claims_nonbin", PromptTemplate(
                 input_variables=["central_question","prompt","completion"],
                 template=(
-                    "## TASK\n"
-                    "Identify the central rivaling claims discussed in a text.\n\n"
-                    "## CONTEXT\n"
-                    "The following text addresses as central question: {central_question}\n\n"
-                    "{prompt}\n"
-                    "{completion}\n\n"
-                    "## INSTRUCTION\n"
-                    "What are the key claims that are argued for, debated, or critically discussed?\n"
-                    "Hint: The key claims are mutually exclusive and direct answers to the central question: {central_question}.\n"
-                    "State each central claim (one gramatically correct sentence) discussed in the "
-                    "texts above in a clear, short and very concise way. Concentrate on the main assertions "
-                    "and leave out any reasoning. "
-                    "Enumerate key claims (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each argument with a new line.\n"
-                    "The key claims, directly answering the central question, are:\n"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Identify the alternative answers to an overarching question discussed in a text.
+
+# Inputs
+Use the following inputs (a QUESTION and a TEXT) to solve your assignment.
+
+QUESTION:
+:::
+{central_question}
+:::
+
+TEXT:
+:::
+{prompt}
+{completion}
+:::
+
+# Detailed Instructions
+What are the rivaling key claim that answer the overarching QUESTION, and that are at issue, argued for, debated, or critically discussed in the TEXT?
+
+- State the key claims discussed in the text above in a clear, short and very concise way.
+- Concentrate on the main assertions and don't reproduce the text's reasoning.
+- Make sure that every single key claim is an answer to the QUESTION.
+- Phrase the key claims such that they are mutually exclusive.
+- Render each key claim as a SINGLE gramatically correct sentence.
+- Don't add comments or explanations.
+- Enumerate key claims (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each claim with a new line.
+
+Reminder: The text's overarching question is: {central_question}.
+
+# Answer
+The key claims of the TEXT are:"""
+
                 )
             )
         )
         registry.register("prompt_central_claims_add", PromptTemplate(
                 input_variables=["central_question","prompt","completion","central_claims"],
                 template=(
-                    "## TASK\n"
-                    "Identify additional alternative answers discussed in a text.\n\n"
-                    "## CONTEXT\n"
-                    "{prompt}\n"
-                    "{completion}\n\n"
-                    "The above text addresses as central (non-binary) question: {central_question}\n"
-                    "The key claims that represent alternative answers to the central question and which are argued for are: {central_claims}\n\n"
-                    "## INSTRUCTION\n"
-                    "Are there any additional direct answers to the central question which are discussed in the text and not listed above?\n"
-                    "Hint: Additional key claims are direct answers to the central question: {central_question}.\n"
-                    "Hint: Additional key claims are mutually exclusive and differ from the key claims listed above.\n"
-                    "State each, if any, additional central claim (one gramatically correct sentence) discussed in the "
-                    "texts above in a clear, short and very concise way. Concentrate on the main assertions "
-                    "and leave out any reasoning. Don't repeat yourself. "
-                    "Enumerate additional key claims (up to 4, fewer are ok) consecutively -- beginning with 1. -- and start each claim with a new line. However, just write 'NONE' if there are no additional key claims and the abpove list is exhaustive.\n"
-                    "Additional key claims, directly answering the central question, are:\n"
+"""
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+Identify additional answers to an overarching question discussed in a text.
+
+# Inputs
+Use the following inputs (a QUESTION, a TEXT, and central CLAIMS) to solve your assignment.
+
+QUESTION:
+:::
+{central_question}
+:::
+
+TEXT:
+:::
+{prompt}
+{completion}
+:::
+
+CLAIMS:
+:::
+{central_claims}
+:::
+
+# Detailed Instructions
+Are there any additional direct answers to the overarching QUESTION which are discussed in the TEXT and not listed under CLAIMS above?
+
+- State any additional key claims discussed in the text above in a clear, short and very concise way.
+- Concentrate on the main assertions and don't reproduce the text's reasoning.
+- Make sure that every single key claim is an answer to the QUESTION.
+- Phrase the key claims such that they are mutually exclusive.
+- Importantly, only provide additional key claims differ from the key CLAIMS listed above.
+- Render each additional key claim as a SINGLE gramatically correct sentence.
+- Don't add comments or explanations.
+- Enumerate any additional key claims (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each claim with a new line.
+- However, just write 'NONE' if there are no additional key claims and the above list of CLAIMS is exhaustive.
+
+Reminder: The text's overarching question is: {central_question}.
+
+# Answer
+The TEXT discusses the following additional key claims that answer the QUESTION:"""
                 )
             )
         )
