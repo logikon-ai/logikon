@@ -396,7 +396,7 @@ class InformalArgMapChain(Chain):
                     new_nodes.extend(new_cons)
 
 
-        return {"argmap": argmap.model_dump()}
+        return {"argmap": argmap.dict()}
 
 
 
