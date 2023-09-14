@@ -181,6 +181,22 @@ class InformalArgMapChain(Chain):
                     list_items.append(line)
         return {"list_items": list_items}
 
+    @staticmethod
+    def parse_yn_answer(answer_text: str, default: bool) -> bool:
+        answer_text = answer_text.strip(" \n(").lower()
+        answer_text = answer_text.split("\n")[0]
+        if (
+            answer_text.startswith("y") or 
+            ("(y)" in answer_text and not "(n)" in answer_text)
+        ):
+            return True
+        if (
+            answer_text.startswith("n") or 
+            ("(n)" in answer_text and not "(y)" in answer_text)
+        ):
+            return True
+
+        return default
 
     def _init_argmap(self, claims) -> InformalArgMap:
         """
@@ -361,11 +377,11 @@ class InformalArgMapChain(Chain):
 
                 answer = chain_q_supported.run(reason=claim, source_text=completion, ctype="CLAIM")
                 print(f"> Answer: {answer}")
-                is_supported = answer.strip(" \n").lower().startswith("y")
+                is_supported = self.parse_yn_answer(answer, False)
 
                 answer = chain_q_attacked.run(reason=claim, source_text=completion, ctype="CLAIM")
                 print(f"> Answer: {answer}")
-                is_attacked = answer.strip(" \n").lower().startswith("y")
+                is_attacked = self.parse_yn_answer(answer, False)
 
                 if is_supported:
                     pros = chain_pros.run(claim=claim, source_text=completion)
