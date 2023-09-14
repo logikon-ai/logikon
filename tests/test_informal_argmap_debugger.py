@@ -16,8 +16,7 @@ def test_informal_argmap01():
         #expert_model="/Users/gregorbetz/git/lmql-tests/llama.cpp/models/7B/Llama-2-7b-orca-v1/ggml-model-q4_0.bin",
         #expert_model="text-ada-001",
         llm_framework="VLLM",
-        expert_model="Open-Orca/OpenOrca-Platypus2-13B",
-        generation_kwargs=dict(stop=["</s>","<EOS>"]),
+        expert_model="OpenAssistant/codellama-13b-oasst-sft-v10",
         expert_model_kwargs=dict(temperature=0.9, max_new_tokens=256, trust_remote_code=True),
     )
     print(config)

@@ -12,8 +12,7 @@ load_dotenv()  # load environment variables from .env file
 def test_score1():
     config = DebugConfig(
         llm_framework="VLLM",
-        expert_model="Open-Orca/OpenOrca-Platypus2-13B",
-        generation_kwargs=dict(stop=["</s>","<EOS>"]),
+        expert_model="OpenAssistant/codellama-13b-oasst-sft-v10",
         expert_model_kwargs=dict(temperature=0.9, max_new_tokens=256, trust_remote_code=True),
     )
 

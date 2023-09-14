@@ -143,7 +143,7 @@ class ClaimExtractionChain(Chain):
     verbose = True
     prompt_registry: Optional[PromptRegistry] = None
     llm: BaseLLM
-    generation_kwargs: Dict
+    generation_kwargs: Optional[Dict]
 
     #depth = 2
 

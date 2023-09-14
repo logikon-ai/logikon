@@ -149,7 +149,7 @@ class InformalArgMapChain(Chain):
     verbose = True
     prompt_registry: PromptRegistry
     llm: BaseLLM
-    generation_kwargs: Dict
+    generation_kwargs: Optional[Dict]
     argmap_depth = 2
 
 
