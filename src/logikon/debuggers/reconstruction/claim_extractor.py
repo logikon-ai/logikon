@@ -12,8 +12,6 @@ from logikon.schemas.results import DebugResults, Artifact
 from logikon.debuggers.utils import init_llm_from_config
 
 
-KWARGS_LLM_FAITHFUL = dict(temperature=0.7, max_tokens=256)
-
 
 class PromptRegistry(Dict):
     """
@@ -74,6 +72,16 @@ You are a helpful, honest and knowledgable AI assisstant with expertise in criti
 # Your Assignment
 Determine whether a question is a binary question, or allows for more than two answers.
 
+# General Explanations
+This assignment asks you to determine whether a given question is binary or not.
+
+A binary question has exactly two possible answers. Yes/No-Questions are therefore a special type of binary questions. Non-binary questions allow for more than two answers. Consider the following illustrative examples.
+
+- Is Mars heavier than Venus? (binary, possible answers: yes, no)
+- Which planet is heavier than Venus? (not binary, possible answers: Earth, Jupiter, Venus, ...)
+- Which is more expensive, Ibiza or Mallorca? (binary, possible answers: Ibiza, Mallorca)
+- Where do most UK expats live? (not binary, possible answers: Portugal, France, Spain, etc.)
+
 # Inputs
 Use the following inputs (a QUESTION) to solve your assignment.
 
@@ -83,8 +91,9 @@ QUESTION:
 :::
 
 # Detailed Instructions
-Answer the following multiple choice answer:
-Is the question a binary question (i.e., a question that can be answered with yes or no)? Options:
+Answer the following multiple choice problem:
+Is the QUESTION above a binary question?
+Options:
 (A) binary question
 (B) allows for more than two answers
 
@@ -130,7 +139,7 @@ What is the key claim that answers the overarching QUESTION, and that is at issu
 Reminder: The text's overarching question is: {central_question}.
 
 # Answer
-The key claim of the TEXT is:"""
+The TEXT discusses the following answer to the overarching QUESTION:"""
                 )
             )
         )
@@ -144,12 +153,7 @@ You are a helpful, honest and knowledgable AI assisstant with expertise in criti
 Identify the alternative answers to an overarching question discussed in a text.
 
 # Inputs
-Use the following inputs (a QUESTION and a TEXT) to solve your assignment.
-
-QUESTION:
-:::
-{central_question}
-:::
+Use the following inputs (a TEXT and a QUESTION) to solve your assignment.
 
 TEXT:
 :::
@@ -157,21 +161,26 @@ TEXT:
 {completion}
 :::
 
-# Detailed Instructions
-What are the rivaling key claim that answer the overarching QUESTION, and that are at issue, argued for, debated, or critically discussed in the TEXT?
+QUESTION:
+:::
+{central_question}
+:::
 
-- State the key claims discussed in the text above in a clear, short and very concise way.
-- Concentrate on the main assertions and don't reproduce the text's reasoning.
-- Make sure that every single key claim is an answer to the QUESTION.
-- Phrase the key claims such that they are mutually exclusive.
-- Render each key claim as a SINGLE gramatically correct sentence.
+# Detailed Instructions
+What are the rivaling answers to the overarching QUESTION that are discussed in the TEXT?
+
+- State the key answers that directly answer the question in a clear, short concise way.
+- Make sure that every single answer directly responds to the QUESTION.
+- Concentrate on the alternative answers to the QUESTION and don't reproduce any claims or reasons advanced in the text.
+- Phrase the alternative answers such that they are mutually exclusive.
+- Render each answer as a SINGLE gramatically correct sentence.
 - Don't add comments or explanations.
-- Enumerate key claims (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each claim with a new line.
+- Enumerate alternative answers (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each answer with a new line.
 
 Reminder: The text's overarching question is: {central_question}.
 
 # Answer
-The key claims of the TEXT are:"""
+The alternative answers of the TEXT are:"""
 
                 )
             )
@@ -186,12 +195,7 @@ You are a helpful, honest and knowledgable AI assisstant with expertise in criti
 Identify additional answers to an overarching question discussed in a text (if any).
 
 # Inputs
-Use the following inputs (a QUESTION, a TEXT, and central CLAIMS) to solve your assignment.
-
-QUESTION:
-:::
-{central_question}
-:::
+Use the following inputs (a QUESTION, a TEXT, and central ANSWERS) to solve your assignment.
 
 TEXT:
 :::
@@ -199,23 +203,26 @@ TEXT:
 {completion}
 :::
 
-CLAIMS:
+QUESTION:
+:::
+{central_question}
+:::
+
+ANSWERS:
 :::
 {central_claims}
 :::
 
 # Detailed Instructions
-Are there any additional direct answers to the overarching QUESTION which are discussed in the TEXT and not listed under CLAIMS above?
+Are there any additional direct answers to the overarching QUESTION which are discussed in the TEXT and not already listed under ANSWERS above?
 
-- State any additional key claims discussed in the text above in a clear, short and very concise way.
-- Concentrate on the main assertions and don't reproduce the text's reasoning.
-- Make sure that every single key claim is an answer to the QUESTION.
-- Phrase the key claims such that they are mutually exclusive.
-- Importantly, only provide additional key claims differ from the key CLAIMS listed above.
-- Render each additional key claim as a SINGLE gramatically correct sentence.
+- State any additional answers to the QUESTION above in a clear, short and very concise way.
+- Make sure that every single new answer directly addresses the QUESTION.
+- Phrase the answers such that they are mutually exclusive.
+- Importantly, only provide additional answers which differ from the ANSWERS listed above.
 - Don't add comments or explanations.
-- Enumerate any additional key claims (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each claim with a new line.
-- However, just write 'NONE' if there are no additional answers to the QUESTION and the above list of CLAIMS is exhaustive.
+- Enumerate any additional answers (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each answer with a new line.
+- However, just write 'NONE' if the above ANSWERS contain all relevant rival answers to the QUESTION.
 
 Reminder: The text's overarching question is: {central_question}.
 

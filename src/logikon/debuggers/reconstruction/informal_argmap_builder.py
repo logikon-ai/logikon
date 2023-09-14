@@ -18,9 +18,6 @@ from logikon.schemas.argument_mapping import InformalArgMap, ArgMapNode, ArgMapE
 
 
 
-KWARGS_LLM_FAITHFUL = dict(temperature=0.7, max_tokens=256)
-
-
 class PromptRegistry(Dict):
     """
     A registry of prompts to be used in the deliberation process.
