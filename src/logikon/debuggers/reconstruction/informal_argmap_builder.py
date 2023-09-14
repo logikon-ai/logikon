@@ -283,7 +283,7 @@ class InformalArgMapChain(Chain):
 
     max_words_reason = 25
     max_words_claim = 25
-    max_words_claim = 6
+    max_words_title = 6
     max_parallel_reasons = 3  # max number of parallel reasons
     verbose = True
     prompt_registry: PromptRegistry = PromptRegistry()
