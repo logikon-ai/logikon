@@ -29,8 +29,10 @@ dependencies = [
   "openai",
   "huggingface_hub",
   "llama-cpp-python",
-  "vllm",
   "pydantic",
+  "pydot",
+  "Unidecode>=1.3.6",
+  "networkx>=3.1",
 ]
 
 [project.urls]
@@ -62,16 +64,30 @@ cov = [
 [[tool.hatch.envs.all.matrix]]
 python = ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
+[tool.hatch.envs.cuda]
+detached = true
+dependencies = [
+  "vllm",
+]
+
 [tool.hatch.envs.lint]
 detached = true
 dependencies = [
+  "langchain",
+  "openai",
+  "huggingface_hub",
+  "llama-cpp-python",
+  "pydantic",
+  "pydot",
+  "Unidecode>=1.3.6",
+  "networkx-stubs",
   "black>=23.1.0",
   "mypy>=1.0.0",
   "ruff>=0.0.243",
   "pydantic>=2.3.0",
 ]
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --ignore-missing-imports --install-types --non-interactive {args:src/logikon tests}"
+typing = "mypy --ignore --install-types --non-interactive {args:src/logikon tests}"
 style = [
   "ruff {args:.}",
   "black --check --diff {args:.}",
