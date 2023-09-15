@@ -23,3 +23,19 @@ def test_score1():
     assert len(result.artifacts) == 2
     print(result.scores)
     assert len(result.scores) == 0
+
+def test_score2():
+    config = DebugConfig(
+        llm_framework="VLLM",
+        expert_model="circulus/Llama-2-7b-orca-v1",
+        expert_model_kwargs=dict(temperature=0.9, max_new_tokens=256, trust_remote_code=True),
+        metrics=["argmap_avg_katz_centrality"]
+    )
+
+    prompt = "Vim or emacs? reason carefully!"
+    completion = "Vim is lighter, emacs is stronger. Vim."
+    result = score(prompt=prompt, completion=completion, config=config)
+    print(result.artifacts)
+    assert len(result.artifacts) == 2
+    print(result.scores)
+    assert len(result.scores) == 0    
