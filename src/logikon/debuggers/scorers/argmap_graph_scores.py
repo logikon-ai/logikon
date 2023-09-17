@@ -73,7 +73,7 @@ class ArgMapGraphSizeScorer(AbstractGraphScorer):
         return cls._KW_PRODUCT
 
     @classmethod
-    def get_description(cls) -> List[str]:
+    def get_description(cls) -> str:
         return cls._KW_DESCRIPTION    
 
     def _calculate_score(self, digraph: nx.DiGraph) -> Tuple[str | float, str, Dict | None]:
@@ -90,7 +90,7 @@ class ArgMapGraphAvgKatzCScorer(AbstractGraphScorer):
         return cls._KW_PRODUCT
 
     @classmethod
-    def get_description(cls) -> List[str]:
+    def get_description(cls) -> str:
         return cls._KW_DESCRIPTION    
 
     def _calculate_score(self, digraph: nx.DiGraph) -> Tuple[str | float, str, Dict | None]:
@@ -110,7 +110,7 @@ class ArgMapGraphAttackRatioScorer(AbstractGraphScorer):
         return cls._KW_PRODUCT
 
     @classmethod
-    def get_description(cls) -> List[str]:
+    def get_description(cls) -> str:
         return cls._KW_DESCRIPTION    
 
     def _calculate_score(self, digraph: nx.DiGraph) -> Tuple[str | float, str, Dict | None]:

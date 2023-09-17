@@ -20,13 +20,16 @@ _VLLM: Optional[VLLM] = None
 
 def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
 
+    llm: BaseLLM = None
+
     if debug_config.llm_framework == "HuggingFaceHub":
-        llm = HuggingFaceHub(repo_id=debug_config.expert_model, model_kwargs=debug_config.expert_model_kwargs)
+        llm = HuggingFaceHub(repo_id=debug_config.expert_model, model_kwargs=debug_config.expert_model_kwargs, client=None)
 
     elif debug_config.llm_framework == "LlamaCpp":
         llm = LlamaCpp(
             model_path=debug_config.expert_model,
             verbose=True,
+            client=None,
             **debug_config.expert_model_kwargs
         )
 
@@ -40,6 +43,7 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
         huggingface_hub.login(os.environ["HUGGINGFACEHUB_API_TOKEN"])
         llm = VLLM(
             model=debug_config.expert_model,
+            client=None,
             **debug_config.expert_model_kwargs
         )
         _VLLM = llm
