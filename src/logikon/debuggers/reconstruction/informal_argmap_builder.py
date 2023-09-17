@@ -42,12 +42,11 @@ class PromptRegistryFactory:
         registry = PromptRegistry()
 
         registry.register(
-            "prompt_q_supported2",
+            "prompt_q_supported",
             PromptTemplate(
                 input_variables=["reason", "source_text", "ctype"],
                 template=(
-                    """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+"""You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 
@@ -66,12 +65,12 @@ You are a helpful, honest and knowledgable AI assisstant with expertise in criti
 
 TEXT:
 :::
-{source_text}
+Here are some pros and cons for common two-factor authentication methods: SMS Text Message: Pros: It's easy to set up and uses something people already have (a phone number). Cons: SMS messages can potentially be intercepted, and it's not ideal for those without consistent cell service. Authentication App: Pros: It's more secure than SMS and apps like Google Authenticator are free and easy to use. Cons: It requires installing an extra app and initial configuration is needed. Security Key: Pros: It's very secure since physical keys are difficult to phish or replicate. Cons: Physical keys can potentially be lost, damaged, or stolen, and they cost extra money to purchase. Overall, it depends on your specific needs and how much convenience vs security you want. SMS is the most convenient but least secure, an authentication app adds more security, and a physical security key is the most secure but least convenient method. Feel free to follow up if you would like me to elaborate on any of the points or discuss other two-factor authentication options. My goal is to provide helpful information so you can determine what will work best in your situation.
 :::
 
 {ctype}:
 :::
-
+One should use an Authentication App for two-factor authentication.
 :::
 
 ANSWER:
@@ -81,18 +80,18 @@ y
 
 TEXT:
 :::
-{source_text}
+Building a computer Pros: * Cheaper in the long run * Easier to fix * Better overall quality Cons: * Can be more expensive upfront * Higher chance of user error * You need to figure out part compatibility --- Off-the-Shelf computer Pros: * Faster to buy than to build * Plug and Play * Normally Cheaper to buy rather than build Cons: * Repairs are harder to do * Build Quality can be lower * Limited configuration available There are plenty of other reasons that can influence your decisions but it comes down to how soon you need a computer, and how confident you are working on a computer.
 :::
 
 {ctype}:
 :::
-{reason}
+If you build your own computer, there's a higher chance of error.
 :::
 
 ANSWER:
-y
+n
 
-# Your task
+# Your Task
 
 TEXT:
 :::
@@ -111,40 +110,6 @@ ANSWER:
             ),
         )
         registry.register(
-            "prompt_q_supported",
-            PromptTemplate(
-                input_variables=["reason", "source_text", "ctype"],
-                template=(
-                    """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
-
-# Your Assignment
-Assess whether it is argued for a certain {ctype}.
-
-# Inputs
-Use the following inputs (a TEXT which contains a certain {ctype}) to solve your assignment.
-
-TEXT:
-:::
-{source_text}
-:::
-
-{ctype}:
-:::
-{reason}
-:::
-
-# Detailed Instructions
-Does the TEXT, beyond stating the {ctype}, present or discuss a justification for the {ctype}?
-That is, are there any arguments in the TEXT which primarily serve to support and back up the {ctype}?
-Provide your answer in the form of a single letter (y/n) without explanations or comments.
-
-# Answer
-My answer is:"""
-                ),
-            ),
-        )
-        registry.register(
             "prompt_q_attacked",
             PromptTemplate(
                 input_variables=["reason", "source_text", "ctype"],
@@ -153,10 +118,49 @@ My answer is:"""
 You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
-Assess whether it is argued against a certain {ctype}.
 
-# Inputs
-Use the following inputs (a TEXT which contains a certain {ctype}) to solve your assignment.
+    Assess whether it is argued against a certain {ctype}.
+
+# Detailed Instructions
+
+    Use the inputs provided (a TEXT which contains a certain {ctype}) to solve your assignment.
+    Does the TEXT, beyond stating the {ctype}, present or discuss an objection against the {ctype}?
+    That is, are there any arguments in the TEXT which primarily serve to refute the {ctype}?
+    Provide your answer in the form of a single letter (y/n) without explanations or comments.
+
+# Examples
+
+## Example 1
+
+TEXT:
+:::
+Here are some pros and cons for common two-factor authentication methods: SMS Text Message: Pros: It's easy to set up and uses something people already have (a phone number). Cons: SMS messages can potentially be intercepted, and it's not ideal for those without consistent cell service. Authentication App: Pros: It's more secure than SMS and apps like Google Authenticator are free and easy to use. Cons: It requires installing an extra app and initial configuration is needed. Security Key: Pros: It's very secure since physical keys are difficult to phish or replicate. Cons: Physical keys can potentially be lost, damaged, or stolen, and they cost extra money to purchase. Overall, it depends on your specific needs and how much convenience vs security you want. SMS is the most convenient but least secure, an authentication app adds more security, and a physical security key is the most secure but least convenient method. Feel free to follow up if you would like me to elaborate on any of the points or discuss other two-factor authentication options. My goal is to provide helpful information so you can determine what will work best in your situation.
+:::
+
+{ctype}:
+:::
+One should use an Authentication App for two-factor authentication.
+:::
+
+ANSWER:
+y
+
+## Example 2
+
+TEXT:
+:::
+Building a computer Pros: * Cheaper in the long run * Easier to fix * Better overall quality Cons: * Can be more expensive upfront * Higher chance of user error * You need to figure out part compatibility --- Off-the-Shelf computer Pros: * Faster to buy than to build * Plug and Play * Normally Cheaper to buy rather than build Cons: * Repairs are harder to do * Build Quality can be lower * Limited configuration available There are plenty of other reasons that can influence your decisions but it comes down to how soon you need a computer, and how confident you are working on a computer.
+:::
+
+{ctype}:
+:::
+If you build your own computer, there's a higher chance of error.
+:::
+
+ANSWER:
+n
+
+# Your Task
 
 TEXT:
 :::
@@ -168,13 +172,9 @@ TEXT:
 {reason}
 :::
 
-# Detailed Instructions
-Does the TEXT, beyond stating the {ctype}, present or discuss an objection against the {ctype}?
-That is, are there any arguments in the TEXT which primarily serve to refute the {ctype}?
-Provide your answer in the form of a single letter (y/n) without explanations or comments.
-
-# Answer
-My answer is:"""
+ANSWER:
+:::
+"""
                 ),
             ),
         )
