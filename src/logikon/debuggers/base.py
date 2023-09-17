@@ -97,8 +97,7 @@ class AbstractArtifactDebugger(AbstractDebugger):
     """
 
     @property
-    @classmethod
-    def product_type(cls) -> str:
+    def product_type(self) -> str:
         return ARTIFACT
     
 
@@ -108,6 +107,5 @@ class AbstractScoreDebugger(AbstractDebugger):
     """
 
     @property
-    @classmethod
-    def product_type(cls) -> str:
+    def product_type(self) -> str:
         return SCORE
