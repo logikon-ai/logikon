@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Any
 
 import copy
 import re
@@ -8,6 +8,7 @@ import uuid
 
 from langchain.chains.base import Chain
 from langchain.chains import LLMChain, TransformChain
+from langchain.callbacks.manager import CallbackManagerForChainRun
 from langchain.llms import BaseLLM
 from langchain.prompts import PromptTemplate
 
@@ -309,8 +310,8 @@ class InformalArgMapChain(Chain):
 
 
     @staticmethod
-    def parse_list(inputs: dict) -> Dict[str, List[str]]:
-        list_items = []
+    def parse_list(inputs: Dict[str,str]) -> Dict[str, List[str]]:
+        list_items: List[str] = []
         list_text = inputs.get("list_text", "")
         text = list_text.strip(" \n")
         for line in text.split("\n"):
@@ -387,7 +388,7 @@ class InformalArgMapChain(Chain):
         subcall: splits reasons list into individual reasons and shortnes each if necessary
         """
 
-        parse_chain = TransformChain(input_variables=["list_text"], output_variables=["list_items"], transform=self.parse_list)
+        parse_chain = TransformChain(input_variables=["list_text"], output_variables=["list_items"], transform=self.parse_list)  # type: ignore
         reasons_l = parse_chain.run({"list_text": reasons})
         reasons_l = [
             self._shorten_reason(reason, valence=valence, claim=claim)
@@ -488,7 +489,7 @@ class InformalArgMapChain(Chain):
         return new_nodes
 
 
-    def _call(self, inputs: Dict[str, str]) -> Dict[str, Dict]:
+    def _call(self, inputs: Dict[str, Any], run_manager: CallbackManagerForChainRun | None = None) -> Dict[str, Dict]:
 
 
         # define subchains

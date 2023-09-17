@@ -20,12 +20,12 @@ _VLLM: Optional[VLLM] = None
 
 def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
 
-    llm: BaseLLM = None
+    llm: Optional[BaseLLM] = None
 
     if debug_config.llm_framework == "HuggingFaceHub":
         llm = HuggingFaceHub(repo_id=debug_config.expert_model, model_kwargs=debug_config.expert_model_kwargs, client=None)
 
-    elif debug_config.llm_framework == "LlamaCpp":
+    if debug_config.llm_framework == "LlamaCpp":
         llm = LlamaCpp(
             model_path=debug_config.expert_model,
             verbose=True,
@@ -33,10 +33,10 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
             **debug_config.expert_model_kwargs
         )
 
-    elif debug_config.llm_framework == "OpenAI":
-        llm = OpenAI(model_name=debug_config.expert_model, **debug_config.expert_model_kwargs)
+    if debug_config.llm_framework == "OpenAI":
+        llm = OpenAI(model=debug_config.expert_model, **debug_config.expert_model_kwargs)
 
-    elif debug_config.llm_framework == "VLLM":
+    if debug_config.llm_framework == "VLLM":
         global _VLLM
         if _VLLM is not None and isinstance(_VLLM, VLLM):
             return _VLLM
@@ -48,7 +48,7 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
         )
         _VLLM = llm
 
-    else:
+    if llm is None:
         raise ValueError(f"Unknown model framework: {debug_config.llm_framework}")
 
     return llm

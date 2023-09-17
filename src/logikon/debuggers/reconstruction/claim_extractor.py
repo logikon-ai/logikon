@@ -4,6 +4,7 @@ from typing import Dict, List, Any, Optional, Tuple
 
 from langchain.chains.base import Chain
 from langchain.chains import LLMChain, TransformChain
+from langchain.callbacks.manager import CallbackManagerForChainRun
 from langchain.llms import BaseLLM
 from langchain.prompts import PromptTemplate
 
@@ -256,7 +257,7 @@ class ClaimExtractionChain(Chain):
         self.llm = kwargs["llm"]
 
     @staticmethod
-    def parse_list(inputs: dict) -> Dict[str, List[str]]:
+    def parse_list(inputs: Dict[str,str]) -> Dict[str, List[str]]:
         list_items = []
         list_text = inputs.get("list_text", "")
         text = list_text.strip(" \n")
@@ -278,7 +279,7 @@ class ClaimExtractionChain(Chain):
     def output_keys(self) -> List[str]:
         return ['claims']
 
-    def _call(self, inputs: Dict[str, str]) -> Dict[str, List[str]]:
+    def _call(self, inputs: Dict[str, str], run_manager: CallbackManagerForChainRun | None = None) -> Dict[str, List[str]]:
 
         # subchains
         chain_central_question = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_question"], verbose=self.verbose)
@@ -286,7 +287,7 @@ class ClaimExtractionChain(Chain):
         chain_central_claim_bin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claim_bin"], verbose=self.verbose)
         chain_central_claims_nonbin = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_nonbin"], verbose=self.verbose)
         chain_central_claims_add = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_add"], verbose=self.verbose)
-        parse_chain = TransformChain(input_variables=["list_text"], output_variables=["list_items"], transform=self.parse_list)
+        parse_chain = TransformChain(input_variables=["list_text"], output_variables=["list_items"], transform=self.parse_list)  # type: ignore
 
 
         prompt = inputs['prompt']
