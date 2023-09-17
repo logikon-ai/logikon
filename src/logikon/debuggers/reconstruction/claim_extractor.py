@@ -366,9 +366,13 @@ class ClaimExtractor(AbstractArtifactDebugger):
     _KW_DESCRIPTION = "Key claims in the deliberation"
     _KW_PRODUCT = "claims"
 
-    @classmethod
-    def get_product(cls) -> str:
-        return cls._KW_PRODUCT
+    @staticmethod
+    def get_product() -> str:
+        return ClaimExtractor._KW_PRODUCT
+
+    @staticmethod
+    def get_description() -> str:
+        return ClaimExtractor._KW_DESCRIPTION
 
     def _debug(self, prompt: str = "", completion: str = "", debug_results: DebugResults | None = None):
         """Extract central claims tha address and answer key question of trace."""

@@ -15,13 +15,13 @@ class DummyDebugger1(AbstractArtifactDebugger):
     _KW_PRODUCT = "dummy_artifact1"
     _KW_REQUIREMENTS: List[str] = []
 
-    @classmethod
-    def get_product(cls) -> str:
-        return cls._KW_PRODUCT
+    @staticmethod
+    def get_product() -> str:
+        return DummyDebugger1._KW_PRODUCT
 
-    @classmethod
-    def get_requirements(cls) -> List[str]:
-        return cls._KW_REQUIREMENTS
+    @staticmethod
+    def get_requirements() -> List[str]:
+        return DummyDebugger1._KW_REQUIREMENTS
 
     def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
         """Concat prompt and completion."""
@@ -42,13 +42,13 @@ class DummyDebugger2(AbstractScoreDebugger):
     _KW_PRODUCT = "dummy_metric2"
     _KW_REQUIREMENTS = ["dummy_artifact1"]
 
-    @classmethod
-    def get_product(cls) -> str:
-        return cls._KW_PRODUCT
+    @staticmethod
+    def get_product() -> str:
+        return DummyDebugger2._KW_PRODUCT
 
-    @classmethod
-    def get_requirements(cls) -> List[str]:
-        return cls._KW_REQUIREMENTS
+    @staticmethod
+    def get_requirements() -> List[str]:
+        return DummyDebugger2._KW_REQUIREMENTS
 
     def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
         """Length of prompt."""

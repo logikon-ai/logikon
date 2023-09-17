@@ -23,13 +23,13 @@ class NetworkXExporter(AbstractArtifactDebugger):
     _KW_PRODUCT = "networkx_graph"
     _KW_REQUIREMENTS = ["informal_argmap"]
 
-    @classmethod
-    def get_product(cls) -> str:
-        return cls._KW_PRODUCT
+    @staticmethod
+    def get_product() -> str:
+        return NetworkXExporter._KW_PRODUCT
 
-    @classmethod
-    def get_requirements(cls) -> list[str]:
-        return cls._KW_REQUIREMENTS
+    @staticmethod
+    def get_requirements() -> list[str]:
+        return NetworkXExporter._KW_REQUIREMENTS
 
     def to_nx(self, argument_map: InformalArgMap) -> nx.DiGraph:
         """builds nx graph from nodes-links argument map"""

@@ -29,15 +29,15 @@ class Debugger(ABC):
     def handle(self, **kwargs) -> DebugResults:
         pass
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def get_product(cls) -> str:
+    def get_product() -> str:
         """Get config keyword of artifact / metric produced by debugger."""
         pass
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def get_requirements(cls) -> List[str]:
+    def get_requirements() -> List[str]:
         """Get config keywords of metrics / artifacts that are required for the debugger."""
         pass
 
@@ -74,8 +74,8 @@ class AbstractDebugger(Debugger):
 
         return kwargs["debug_results"]
 
-    @classmethod
-    def get_requirements(cls) -> List[str]:
+    @staticmethod
+    def get_requirements() -> List[str]:
         """Default implementation: no requirements."""
         return []
 

@@ -29,13 +29,13 @@ class SVGMapExporter(AbstractArtifactDebugger):
     <TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial;Helvetica;" POINT-SIZE="10.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
     >"""
 
-    @classmethod
-    def get_product(cls) -> str:
-        return cls._KW_PRODUCT
+    @staticmethod
+    def get_product() -> str:
+        return SVGMapExporter._KW_PRODUCT
 
-    @classmethod
-    def get_requirements(cls) -> list[str]:
-        return cls._KW_REQUIREMENTS
+    @staticmethod
+    def get_requirements() -> list[str]:
+        return SVGMapExporter._KW_REQUIREMENTS
 
     def _preprocess_graph(self, digraph: nx.DiGraph) -> nx.DiGraph:
         """preprocess graph for graphviz layout"""

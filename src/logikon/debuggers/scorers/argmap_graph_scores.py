@@ -21,13 +21,13 @@ class AbstractGraphScorer(AbstractScoreDebugger):
 
     _KW_REQUIREMENTS = ["networkx_graph"]
 
-    @classmethod
-    def get_requirements(cls) -> list[str]:
-        return cls._KW_REQUIREMENTS
+    @staticmethod
+    def get_requirements() -> list[str]:
+        return AbstractGraphScorer._KW_REQUIREMENTS
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def get_description(cls) -> str:
+    def get_description() -> str:
         pass
 
     @abstractmethod
@@ -64,13 +64,13 @@ class ArgMapGraphSizeScorer(AbstractGraphScorer):
     _KW_DESCRIPTION = "Measure the size of the argument map (number of nodes)"
     _KW_PRODUCT = "argmap_size"
 
-    @classmethod
-    def get_product(cls) -> str:
-        return cls._KW_PRODUCT
+    @staticmethod
+    def get_product() -> str:
+        return ArgMapGraphSizeScorer._KW_PRODUCT
 
-    @classmethod
-    def get_description(cls) -> str:
-        return cls._KW_DESCRIPTION
+    @staticmethod
+    def get_description() -> str:
+        return ArgMapGraphSizeScorer._KW_DESCRIPTION
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
         return len(digraph.nodes), "", None
@@ -80,13 +80,13 @@ class ArgMapGraphAvgKatzCScorer(AbstractGraphScorer):
     _KW_DESCRIPTION = "Average Katz centrality of all nodes in the graph"
     _KW_PRODUCT = "argmap_avg_katz_centrality"
 
-    @classmethod
-    def get_product(cls) -> str:
-        return cls._KW_PRODUCT
+    @staticmethod
+    def get_product() -> str:
+        return ArgMapGraphAvgKatzCScorer._KW_PRODUCT
 
-    @classmethod
-    def get_description(cls) -> str:
-        return cls._KW_DESCRIPTION
+    @staticmethod
+    def get_description() -> str:
+        return ArgMapGraphAvgKatzCScorer._KW_DESCRIPTION
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
         centrality = nx.katz_centrality(digraph)
@@ -99,13 +99,13 @@ class ArgMapGraphAttackRatioScorer(AbstractGraphScorer):
     _KW_DESCRIPTION = "Ratio of attacking reasons (cons) in the informal argmap"
     _KW_PRODUCT = "argmap_attack_ratio"
 
-    @classmethod
-    def get_product(cls) -> str:
-        return cls._KW_PRODUCT
+    @staticmethod
+    def get_product() -> str:
+        return ArgMapGraphAttackRatioScorer._KW_PRODUCT
 
-    @classmethod
-    def get_description(cls) -> str:
-        return cls._KW_DESCRIPTION
+    @staticmethod
+    def get_description() -> str:
+        return ArgMapGraphAttackRatioScorer._KW_DESCRIPTION
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
         edge_data = digraph.edges.data("valence")

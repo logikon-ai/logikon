@@ -572,13 +572,17 @@ class InformalArgMapBuilder(AbstractArtifactDebugger):
     _KW_PRODUCT = "informal_argmap"
     _KW_REQUIREMENTS = ["claims"]
 
-    @classmethod
-    def get_product(cls) -> str:
-        return cls._KW_PRODUCT
+    @staticmethod
+    def get_product() -> str:
+        return InformalArgMapBuilder._KW_PRODUCT
 
-    @classmethod
-    def get_requirements(cls) -> list[str]:
-        return cls._KW_REQUIREMENTS
+    @staticmethod
+    def get_requirements() -> list[str]:
+        return InformalArgMapBuilder._KW_REQUIREMENTS
+
+    @staticmethod
+    def get_description() -> str:
+        return InformalArgMapBuilder._KW_DESCRIPTION
 
     def _debug(self, prompt: str = "", completion: str = "", debug_results: DebugResults | None = None):
         """Reconstruct reasoning as argmap."""
