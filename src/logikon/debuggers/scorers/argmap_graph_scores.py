@@ -50,17 +50,17 @@ class AbstractGraphScorer(AbstractScoreDebugger):
         except StopIteration:
             raise ValueError("Missing required artifact: networkx_graph")
 
-        score, comment, metadata = self._calculate_score(networkx_graph)
+        value, comment, metadata = self._calculate_score(networkx_graph)
 
-        artifact = Score(
+        score = Score(
             id=self.get_product(),
             description=self.get_description(),
-            score=score,
+            score=value,
             comment=comment,
             metadata=metadata,
         )
 
-        debug_results.artifacts.append(artifact)
+        debug_results.scores.append(score)
 
 
 class ArgMapGraphSizeScorer(AbstractGraphScorer):
