@@ -46,7 +46,7 @@ class PromptRegistryFactory:
             PromptTemplate(
                 input_variables=["reason", "source_text", "ctype"],
                 template=(
-"""You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+                    """You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 
