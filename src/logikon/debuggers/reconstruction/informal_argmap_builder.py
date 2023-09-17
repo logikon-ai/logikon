@@ -19,7 +19,7 @@ from logikon.schemas.results import Artifact, DebugResults
 
 class PromptRegistry(Dict):
     """
-    A registry of prompts to be used in the deliberation process.
+    A registry of prompts to be used in building an informal argmap.
     """
 
     def __init__(self):
@@ -41,6 +41,75 @@ class PromptRegistryFactory:
     def create() -> PromptRegistry:
         registry = PromptRegistry()
 
+        registry.register(
+            "prompt_q_supported2",
+            PromptTemplate(
+                input_variables=["reason", "source_text", "ctype"],
+                template=(
+                    """
+You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+# Your Assignment
+
+    Assess whether it is argued for a certain {ctype}.
+
+# Detailed Instructions
+
+    Use the inputs provided (a TEXT which contains a certain {ctype}) to solve your assignment.
+    Does the TEXT, beyond stating the {ctype}, present or discuss a justification for the {ctype}?
+    That is, are there any arguments in the TEXT which primarily serve to support and back up the {ctype}?
+    Provide your answer in the form of a single letter (y/n) without explanations or comments.
+   
+# Examples
+
+## Example 1
+
+TEXT:
+:::
+{source_text}
+:::
+
+{ctype}:
+:::
+
+:::
+
+ANSWER:
+y
+
+## Example 2
+
+TEXT:
+:::
+{source_text}
+:::
+
+{ctype}:
+:::
+{reason}
+:::
+
+ANSWER:
+y
+
+# Your task
+
+TEXT:
+:::
+{source_text}
+:::
+
+{ctype}:
+:::
+{reason}
+:::
+
+ANSWER:
+:::
+"""
+                ),
+            ),
+        )
         registry.register(
             "prompt_q_supported",
             PromptTemplate(
@@ -68,7 +137,7 @@ TEXT:
 # Detailed Instructions
 Does the TEXT, beyond stating the {ctype}, present or discuss a justification for the {ctype}?
 That is, are there any arguments in the TEXT which primarily serve to support and back up the {ctype}?
-Provide your answer in the form of a single letter (y/n) with out explanations or comments.
+Provide your answer in the form of a single letter (y/n) without explanations or comments.
 
 # Answer
 My answer is:"""

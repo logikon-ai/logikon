@@ -1,9 +1,6 @@
 # test score function
-from typing import List, Optional
 
-import pytest
-
-from logikon.debuggers.base import ARTIFACT, SCORE, AbstractArtifactDebugger, AbstractDebugger, AbstractScoreDebugger
+from logikon.debuggers.base import AbstractArtifactDebugger, AbstractDebugger, AbstractScoreDebugger
 from logikon.debuggers.factory import DebuggerFactory, get_debugger_registry
 from logikon.schemas.configs import DebugConfig
 
