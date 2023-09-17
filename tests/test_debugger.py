@@ -13,7 +13,7 @@ class DummyDebugger1(AbstractArtifactDebugger):
     
     _KW_DESCRIPTION = "dummy_debugger1"
     _KW_PRODUCT = "dummy_artifact1"
-    _KW_REQUIREMENTS = []
+    _KW_REQUIREMENTS: List[str] = []
 
     @classmethod
     def get_product(cls) -> str:
