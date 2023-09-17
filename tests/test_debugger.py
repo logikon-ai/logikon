@@ -4,13 +4,13 @@ from typing import List, Optional
 import pytest
 
 from logikon.debuggers.base import AbstractArtifactDebugger, AbstractScoreDebugger
-from logikon.schemas.results import DebugResults, Artifact, Score
 from logikon.schemas.configs import DebugConfig
+from logikon.schemas.results import Artifact, DebugResults, Score
 
 
 class DummyDebugger1(AbstractArtifactDebugger):
     """Dummy Debugger"""
-    
+
     _KW_DESCRIPTION = "dummy_debugger1"
     _KW_PRODUCT = "dummy_artifact1"
     _KW_REQUIREMENTS: List[str] = []
@@ -21,12 +21,12 @@ class DummyDebugger1(AbstractArtifactDebugger):
 
     @classmethod
     def get_requirements(cls) -> List[str]:
-        return cls._KW_REQUIREMENTS    
+        return cls._KW_REQUIREMENTS
 
     def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
         """Concat prompt and completion."""
         assert debug_results is not None
-        data = prompt+completion
+        data = prompt + completion
         artifact = Artifact(
             id=self._KW_PRODUCT,
             description=self._KW_DESCRIPTION,
@@ -37,7 +37,7 @@ class DummyDebugger1(AbstractArtifactDebugger):
 
 class DummyDebugger2(AbstractScoreDebugger):
     """Dummy Debugger"""
-    
+
     _KW_DESCRIPTION = "dummy_debugger2"
     _KW_PRODUCT = "dummy_metric2"
     _KW_REQUIREMENTS = ["dummy_artifact1"]
@@ -48,7 +48,7 @@ class DummyDebugger2(AbstractScoreDebugger):
 
     @classmethod
     def get_requirements(cls) -> List[str]:
-        return cls._KW_REQUIREMENTS    
+        return cls._KW_REQUIREMENTS
 
     def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
         """Length of prompt."""
@@ -75,5 +75,5 @@ def test_debugger_chaining():
     assert len(results.artifacts) == 1
     assert len(results.scores) == 1
 
-    assert results.artifacts[0].data == prompt+completion
+    assert results.artifacts[0].data == prompt + completion
     assert results.scores[0].score == len(prompt)

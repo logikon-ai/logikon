@@ -1,12 +1,9 @@
-
-from abc import ABC, abstractmethod
-
-from typing import List, Optional
 import logging
+from abc import ABC, abstractmethod
+from typing import List, Optional
 
-from logikon.schemas.results import DebugResults
 from logikon.schemas.configs import DebugConfig
-
+from logikon.schemas.results import DebugResults
 
 ARTIFACT = "ARTIFACT"
 SCORE = "SCORE"
@@ -64,13 +61,12 @@ class AbstractDebugger(Debugger):
         self._next_debugger = debugger
         return debugger
 
-
     def handle(self, **kwargs) -> DebugResults:
         """Handles the debug request."""
 
         if "debug_results" not in kwargs:
             kwargs["debug_results"] = DebugResults()
-        
+
         self._debug(**kwargs)
 
         if self._next_debugger:
@@ -89,7 +85,7 @@ class AbstractDebugger(Debugger):
         A :class:`logging.Logger` that can be used within the :meth:`run()` method.
         """
         return logging.getLogger(self.__class__.__name__)
-    
+
 
 class AbstractArtifactDebugger(AbstractDebugger):
     """
@@ -99,7 +95,7 @@ class AbstractArtifactDebugger(AbstractDebugger):
     @property
     def product_type(self) -> str:
         return ARTIFACT
-    
+
 
 class AbstractScoreDebugger(AbstractDebugger):
     """

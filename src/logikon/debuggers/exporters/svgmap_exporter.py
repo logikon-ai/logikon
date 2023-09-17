@@ -1,28 +1,26 @@
-
 from __future__ import annotations
-from typing import List, Optional, Dict, Tuple
 
 import copy
 import textwrap
+from typing import Dict, List, Optional, Tuple
 
 import networkx as nx
 import pydot
 from unidecode import unidecode
 
 from logikon.debuggers.base import AbstractArtifactDebugger
-from logikon.schemas.results import DebugResults, Artifact
-
+from logikon.schemas.results import Artifact, DebugResults
 
 
 class SVGMapExporter(AbstractArtifactDebugger):
     """SVGMapExporter Debugger
-    
+
     This debugger exports an a networkx graph as svg via graphviz.
-    
+
     It requires the following artifacts:
     - networkx_graph
     """
-    
+
     _KW_DESCRIPTION = "Exports an informal argmap as a networkx graph"
     _KW_PRODUCT = "svg_argmap"
     _KW_REQUIREMENTS = ["networkx_graph"]
@@ -36,9 +34,8 @@ class SVGMapExporter(AbstractArtifactDebugger):
         return cls._KW_PRODUCT
 
     @classmethod
-    def get_requirements(cls) -> List[str]:
-        return cls._KW_REQUIREMENTS    
-
+    def get_requirements(cls) -> list[str]:
+        return cls._KW_REQUIREMENTS
 
     def _preprocess_graph(self, digraph: nx.DiGraph) -> nx.DiGraph:
         """preprocess graph for graphviz layout"""
@@ -51,14 +48,14 @@ class SVGMapExporter(AbstractArtifactDebugger):
             label = unidecode(label)
 
             if ":" in text:
-                text = text.replace(":"," --")
+                text = text.replace(":", " --")
             if ":" in label:
-                label = label.replace(":"," --")
+                label = label.replace(":", " --")
             if "&" in text:
-                text = text.replace("&","+")
+                text = text.replace("&", "+")
             if "&" in label:
-                label = label.replace("&","+")
-                
+                label = label.replace("&", "+")
+
             textlines = textwrap.wrap(text, width=30)
             text = "<BR/>".join(textlines)
             textlines = textwrap.wrap(label, width=25)
@@ -74,12 +71,10 @@ class SVGMapExporter(AbstractArtifactDebugger):
             nodedata["tooltip"] = text
 
         for _, linkdata in digraph.edges.items():
-            linkdata["color"] = "red" if linkdata["valence"]=="con" else "darkgreen"
+            linkdata["color"] = "red" if linkdata["valence"] == "con" else "darkgreen"
             linkdata["penwidth"] = "1.5"
 
         return digraph
-
-
 
     def _to_svg(self, digraph: nx.DiGraph) -> bytes:
         """builds svg from nx graph"""
@@ -96,20 +91,18 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
         return svg
 
-
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
+    def _debug(self, prompt: str = "", completion: str = "", debug_results: DebugResults | None = None):
         """Reconstruct reasoning as argmap."""
 
         assert debug_results is not None
 
         try:
             networkx_graph: nx.DiGraph = next(
-                artifact.data
-                for artifact in debug_results.artifacts
-                if artifact.id == "networkx_graph"
+                artifact.data for artifact in debug_results.artifacts if artifact.id == "networkx_graph"
             )
         except StopIteration:
-            raise ValueError("Missing required artifact: networkx_graph")
+            msg = "Missing required artifact: networkx_graph"
+            raise ValueError(msg)
 
         svg_argmap = self._to_svg(networkx_graph)
 

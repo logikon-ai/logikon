@@ -3,14 +3,12 @@ from typing import List, Optional
 
 import pytest
 
-from logikon.debuggers.base import ARTIFACT, SCORE, AbstractDebugger, AbstractArtifactDebugger, AbstractScoreDebugger
+from logikon.debuggers.base import ARTIFACT, SCORE, AbstractArtifactDebugger, AbstractDebugger, AbstractScoreDebugger
 from logikon.debuggers.factory import DebuggerFactory, get_debugger_registry
 from logikon.schemas.configs import DebugConfig
 
 
-
 def test_debugger_factory():
-
     registry = get_debugger_registry()
 
     for product_kw, debugger_class in registry.items():
@@ -23,12 +21,9 @@ def test_debugger_factory():
             metrics.append(product_kw)
         else:
             print("Unknown debugger class type")
-            assert False
+            raise AssertionError()
 
-        config = DebugConfig(
-            metrics=metrics,
-            artifacts=artifacts
-        )
+        config = DebugConfig(metrics=metrics, artifacts=artifacts)
 
         debug_chain = DebuggerFactory().create(config)
         assert isinstance(debug_chain, AbstractDebugger)

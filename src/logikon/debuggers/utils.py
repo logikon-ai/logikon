@@ -1,35 +1,33 @@
 from __future__ import annotations
-from typing import Optional
 
 import os
+from typing import Optional
 
 import huggingface_hub
-from langchain.llms import BaseLLM
 from langchain.llms import (
+    VLLM,
+    BaseLLM,
     HuggingFaceHub,
     LlamaCpp,
     OpenAI,
-    VLLM,
 )
 
 from logikon.schemas.configs import DebugConfig
 
-_VLLM: Optional[VLLM] = None
+_VLLM: VLLM | None = None
 
 
 def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
-
-    llm: Optional[BaseLLM] = None
+    llm: BaseLLM | None = None
 
     if debug_config.llm_framework == "HuggingFaceHub":
-        llm = HuggingFaceHub(repo_id=debug_config.expert_model, model_kwargs=debug_config.expert_model_kwargs, client=None)
+        llm = HuggingFaceHub(
+            repo_id=debug_config.expert_model, model_kwargs=debug_config.expert_model_kwargs, client=None
+        )
 
     if debug_config.llm_framework == "LlamaCpp":
         llm = LlamaCpp(
-            model_path=debug_config.expert_model,
-            verbose=True,
-            client=None,
-            **debug_config.expert_model_kwargs
+            model_path=debug_config.expert_model, verbose=True, client=None, **debug_config.expert_model_kwargs
         )
 
     if debug_config.llm_framework == "OpenAI":
@@ -40,14 +38,11 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
         if _VLLM is not None and isinstance(_VLLM, VLLM):
             return _VLLM
         huggingface_hub.login(os.environ["HUGGINGFACEHUB_API_TOKEN"])
-        llm = VLLM(
-            model=debug_config.expert_model,
-            client=None,
-            **debug_config.expert_model_kwargs
-        )
+        llm = VLLM(model=debug_config.expert_model, client=None, **debug_config.expert_model_kwargs)
         _VLLM = llm
 
     if llm is None:
-        raise ValueError(f"Unknown model framework: {debug_config.llm_framework}")
+        msg = f"Unknown model framework: {debug_config.llm_framework}"
+        raise ValueError(msg)
 
     return llm

@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from typing import Type, Mapping
+from typing import Mapping, Type
 
 from logikon.debuggers.base import Debugger
-from logikon.debuggers.reconstruction.informal_argmap_builder import InformalArgMapBuilder
-from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
 from logikon.debuggers.exporters.networkx_exporter import NetworkXExporter
 from logikon.debuggers.exporters.svgmap_exporter import SVGMapExporter
+from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
+from logikon.debuggers.reconstruction.informal_argmap_builder import InformalArgMapBuilder
 from logikon.debuggers.scorers.argmap_graph_scores import (
-    ArgMapGraphSizeScorer,
-    ArgMapGraphAvgKatzCScorer,
     ArgMapGraphAttackRatioScorer,
+    ArgMapGraphAvgKatzCScorer,
+    ArgMapGraphSizeScorer,
 )
 
 _DEBUGGER_REGISTRY = {
@@ -23,7 +23,8 @@ _DEBUGGER_REGISTRY = {
     "argmap_attack_ratio": ArgMapGraphAttackRatioScorer,
 }
 
-def get_debugger_registry() -> Mapping[str, Type[Debugger]]:
+
+def get_debugger_registry() -> Mapping[str, type[Debugger]]:
     """Get the debugger registry."""
     # sanity checks
     for keyword, debugger in _DEBUGGER_REGISTRY.items():

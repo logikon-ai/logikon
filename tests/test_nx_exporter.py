@@ -1,9 +1,8 @@
+import networkx as nx
 import pytest
 
-import networkx as nx
-
 from logikon.debuggers.exporters.networkx_exporter import NetworkXExporter
-from logikon.schemas.argument_mapping import InformalArgMap, ArgMapNode, ArgMapEdge, AnnotationSpan
+from logikon.schemas.argument_mapping import AnnotationSpan, ArgMapEdge, ArgMapNode, InformalArgMap
 from logikon.schemas.configs import DebugConfig
 
 
@@ -20,6 +19,7 @@ def argmap1() -> InformalArgMap:
     ]
     return InformalArgMap(nodelist=nodelist, edgelist=edgelist)
 
+
 def test_nx_exporter(argmap1: InformalArgMap):
     nx_exporter = NetworkXExporter(DebugConfig())
     nx_map = nx_exporter.to_nx(argmap1)
@@ -35,4 +35,3 @@ def test_nx_exporter(argmap1: InformalArgMap):
         original_node = next(n for n in argmap1.nodelist if n.id == node)
         assert nodedata["label"] == original_node.label
         assert nodedata["text"] == original_node.text
-
