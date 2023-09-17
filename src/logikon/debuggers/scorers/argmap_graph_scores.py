@@ -7,12 +7,12 @@ from abc import abstractmethod
 import networkx as nx
 import numpy as np
 
-from logikon.debuggers.base import AbstractDebugger
+from logikon.debuggers.base import AbstractScoreDebugger
 from logikon.schemas.results import DebugResults, Score
 
 
 
-class AbstractGraphScorer(AbstractDebugger):
+class AbstractGraphScorer(AbstractScoreDebugger):
     """AbstractGraphScorer Debugger
     
     Base class for graph scorers.
@@ -68,9 +68,11 @@ class ArgMapGraphSizeScorer(AbstractGraphScorer):
     _KW_DESCRIPTION = "Measure the size of the argument map (number of nodes)"
     _KW_PRODUCT = "argmap_size"
 
+    @classmethod
     def get_product(cls) -> str:
         return cls._KW_PRODUCT
 
+    @classmethod
     def get_description(cls) -> List[str]:
         return cls._KW_DESCRIPTION    
 
@@ -83,9 +85,11 @@ class ArgMapGraphAvgKatzCScorer(AbstractGraphScorer):
     _KW_DESCRIPTION = "Average Katz centrality of all nodes in the graph"
     _KW_PRODUCT = "argmap_avg_katz_centrality"
 
+    @classmethod
     def get_product(cls) -> str:
         return cls._KW_PRODUCT
 
+    @classmethod
     def get_description(cls) -> List[str]:
         return cls._KW_DESCRIPTION    
 
@@ -101,9 +105,11 @@ class ArgMapGraphAttackRatioScorer(AbstractGraphScorer):
     _KW_DESCRIPTION = "Ratio of attacking reasons (cons) in the informal argmap"
     _KW_PRODUCT = "argmap_attack_ratio"
 
+    @classmethod
     def get_product(cls) -> str:
         return cls._KW_PRODUCT
 
+    @classmethod
     def get_description(cls) -> List[str]:
         return cls._KW_DESCRIPTION    
 

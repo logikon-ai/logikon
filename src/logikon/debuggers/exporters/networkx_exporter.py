@@ -5,13 +5,13 @@ from typing import List, Optional, Dict, Tuple
 import networkx as nx
 from unidecode import unidecode
 
-from logikon.debuggers.base import AbstractDebugger
+from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.results import DebugResults, Artifact
 from logikon.schemas.argument_mapping import InformalArgMap, ArgMapNode, ArgMapEdge, AnnotationSpan
 
 
 
-class NetworkXExporter(AbstractDebugger):
+class NetworkXExporter(AbstractArtifactDebugger):
     """NetworkXExporter Debugger
     
     This debugger exports an informal argmap as a networkx graph.

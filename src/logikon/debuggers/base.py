@@ -7,6 +7,11 @@ import logging
 from logikon.schemas.results import DebugResults
 from logikon.schemas.configs import DebugConfig
 
+
+ARTIFACT = "ARTIFACT"
+SCORE = "SCORE"
+
+
 class Debugger(ABC):
     """Abstract base class for all debuggers."""
 
@@ -37,6 +42,11 @@ class Debugger(ABC):
     @abstractmethod
     def get_requirements(cls) -> List[str]:
         """Get config keywords of metrics / artifacts that are required for the debugger."""
+        pass
+
+    @property
+    @abstractmethod
+    def product_type(self) -> str:
         pass
 
 
@@ -79,3 +89,25 @@ class AbstractDebugger(Debugger):
         A :class:`logging.Logger` that can be used within the :meth:`run()` method.
         """
         return logging.getLogger(self.__class__.__name__)
+    
+
+class AbstractArtifactDebugger(AbstractDebugger):
+    """
+    Base debugger class for cerating artifacts.
+    """
+
+    @property
+    @classmethod
+    def product_type(cls) -> str:
+        return ARTIFACT
+    
+
+class AbstractScoreDebugger(AbstractDebugger):
+    """
+    Base debugger class for cerating scroes.
+    """
+
+    @property
+    @classmethod
+    def product_type(cls) -> str:
+        return SCORE

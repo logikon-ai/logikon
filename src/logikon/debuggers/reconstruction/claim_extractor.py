@@ -7,7 +7,7 @@ from langchain.chains import LLMChain, TransformChain
 from langchain.llms import BaseLLM
 from langchain.prompts import PromptTemplate
 
-from logikon.debuggers.base import AbstractDebugger
+from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.results import DebugResults, Artifact
 from logikon.debuggers.utils import init_llm_from_config
 
@@ -342,7 +342,7 @@ class ClaimExtractionChain(Chain):
 
 
 
-class ClaimExtractor(AbstractDebugger):
+class ClaimExtractor(AbstractArtifactDebugger):
     """ClaimExtractor Debugger
     
     This debugger is responsible for extracting claims from the

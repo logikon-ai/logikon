@@ -9,12 +9,12 @@ import networkx as nx
 import pydot
 from unidecode import unidecode
 
-from logikon.debuggers.base import AbstractDebugger
+from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.results import DebugResults, Artifact
 
 
 
-class SVGMapExporter(AbstractDebugger):
+class SVGMapExporter(AbstractArtifactDebugger):
     """SVGMapExporter Debugger
     
     This debugger exports an a networkx graph as svg via graphviz.

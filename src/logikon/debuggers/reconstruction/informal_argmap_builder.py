@@ -11,7 +11,7 @@ from langchain.chains import LLMChain, TransformChain
 from langchain.llms import BaseLLM
 from langchain.prompts import PromptTemplate
 
-from logikon.debuggers.base import AbstractDebugger
+from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.debuggers.utils import init_llm_from_config
 from logikon.schemas.results import DebugResults, Artifact
 from logikon.schemas.argument_mapping import InformalArgMap, ArgMapNode, ArgMapEdge, AnnotationSpan
@@ -543,7 +543,7 @@ class InformalArgMapChain(Chain):
 
 
 
-class InformalArgMapBuilder(AbstractDebugger):
+class InformalArgMapBuilder(AbstractArtifactDebugger):
     """InformalArgMap Debugger
     
     This debugger is responsible for extracting informal argument maps from the

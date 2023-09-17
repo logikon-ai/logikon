@@ -1,0 +1,40 @@
+# test score function
+from typing import List, Optional
+
+import pytest
+
+from logikon.debuggers.base import ARTIFACT, SCORE, AbstractDebugger, AbstractArtifactDebugger, AbstractScoreDebugger
+from logikon.debuggers.factory import DebuggerFactory, get_debugger_registry
+from logikon.schemas.configs import DebugConfig
+
+
+
+def test_debugger_factory():
+
+    registry = get_debugger_registry()
+
+    for product_kw, debugger_class in registry.items():
+        print(f"Testing: {product_kw}: {debugger_class}")
+        artifacts = []
+        metrics = []
+        if issubclass(debugger_class, AbstractArtifactDebugger):
+            artifacts.append(product_kw)
+        elif issubclass(debugger_class, AbstractScoreDebugger):
+            metrics.append(product_kw)
+        else:
+            print("Unknown debugger class type")
+            assert False
+
+        config = DebugConfig(
+            metrics=metrics,
+            artifacts=artifacts
+        )
+
+        debug_chain = DebuggerFactory().create(config)
+        assert isinstance(debug_chain, AbstractDebugger)
+
+        # loop over chain to debugger that produces product
+        current_debugger = debug_chain
+        while current_debugger.get_product() != product_kw:
+            current_debugger = current_debugger._next_debugger
+            assert current_debugger
