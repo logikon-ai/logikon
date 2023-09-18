@@ -32,6 +32,7 @@ def test_debugger_factory():
                 current_debugger = current_debugger._next_debugger
                 assert current_debugger
 
+
 def test_debugger_factory2():
     config = DebugConfig(
         expert_model="text-ada-002",
