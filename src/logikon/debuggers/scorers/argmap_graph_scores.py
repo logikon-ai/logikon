@@ -31,10 +31,10 @@ class AbstractGraphScorer(AbstractScoreDebugger):
         pass
 
     @abstractmethod
-    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
+    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         pass
 
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: DebugResults | None = None):
+    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
         """Score the argmap."""
 
         assert debug_results is not None
@@ -72,7 +72,7 @@ class ArgMapGraphSizeScorer(AbstractGraphScorer):
     def get_description() -> str:
         return ArgMapGraphSizeScorer._KW_DESCRIPTION
 
-    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
+    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         return len(digraph.nodes), "", None
 
 
@@ -88,7 +88,7 @@ class ArgMapGraphAvgKatzCScorer(AbstractGraphScorer):
     def get_description() -> str:
         return ArgMapGraphAvgKatzCScorer._KW_DESCRIPTION
 
-    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
+    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         centrality = nx.katz_centrality(digraph)
         avg_centrality = np.mean(list(centrality.values()))
 
@@ -107,7 +107,7 @@ class ArgMapGraphAttackRatioScorer(AbstractGraphScorer):
     def get_description() -> str:
         return ArgMapGraphAttackRatioScorer._KW_DESCRIPTION
 
-    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
+    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         edge_data = digraph.edges.data("valence")
         attack_ratio = [val for _, _, val in edge_data].count("con") / len(edge_data)
 

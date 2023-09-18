@@ -10,7 +10,7 @@ from logikon.schemas.results import DebugResults
 def score(
     prompt: str,
     completion: str,
-    config: DebugConfig | None = None,
+    config: Optional[DebugConfig] = None,
 ) -> DebugResults:
     """Score the completion."""
 

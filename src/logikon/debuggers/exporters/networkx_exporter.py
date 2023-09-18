@@ -45,7 +45,7 @@ class NetworkXExporter(AbstractArtifactDebugger):
 
         return digraph
 
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: DebugResults | None = None):
+    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
         """Reconstruct reasoning as argmap."""
 
         assert debug_results is not None

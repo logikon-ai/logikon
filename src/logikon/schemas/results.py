@@ -11,8 +11,8 @@ class Artifact(BaseModel):
     id: str
     description: str
     data: Any
-    dtype: str | None = None
-    metadata: dict | None = None
+    dtype: Optional[str] = None
+    metadata: Optional[dict] = None
 
 
 class Score(BaseModel):
@@ -20,9 +20,9 @@ class Score(BaseModel):
 
     id: str
     description: str
-    score: float | str
-    comment: str | None = None
-    metadata: dict | None = None
+    score: Union[float, str]
+    comment: Optional[str] = None
+    metadata: Optional[dict] = None
 
 
 class DebugResults(BaseModel):

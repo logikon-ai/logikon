@@ -472,9 +472,9 @@ class InformalArgMapChain(Chain):
         argmap: InformalArgMap,
         reason: str,
         label: str = "",
-        target_id: str | None = None,
+        target_id: Optional[str] = None,
         valence: str = "for",
-        annotations: list[AnnotationSpan] | None = None,
+        annotations: Optional[list[AnnotationSpan]] = None,
     ) -> ArgMapNode:
         """
         subcall: adds and returns node
@@ -568,7 +568,7 @@ class InformalArgMapChain(Chain):
 
         return new_nodes
 
-    def _call(self, inputs: dict[str, Any], run_manager: CallbackManagerForChainRun | None = None) -> dict[str, dict]:
+    def _call(self, inputs: dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> dict[str, dict]:
         # define subchains
         chain_pros = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_pros"], verbose=self.verbose)
         chain_cons = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_cons"], verbose=self.verbose)
@@ -653,7 +653,7 @@ class InformalArgMapBuilder(AbstractArtifactDebugger):
     def get_description() -> str:
         return InformalArgMapBuilder._KW_DESCRIPTION
 
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: DebugResults | None = None):
+    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
         """Reconstruct reasoning as argmap."""
 
         assert debug_results is not None

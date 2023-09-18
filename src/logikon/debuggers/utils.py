@@ -14,11 +14,11 @@ from langchain.llms import (
 
 from logikon.schemas.configs import DebugConfig
 
-_VLLM: VLLM | None = None
+_VLLM: Optional[VLLM] = None
 
 
 def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
-    llm: BaseLLM | None = None
+    llm: Optional[BaseLLM] = None
 
     if debug_config.llm_framework == "HuggingFaceHub":
         llm = HuggingFaceHub(

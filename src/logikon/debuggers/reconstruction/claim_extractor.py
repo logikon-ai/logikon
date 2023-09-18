@@ -285,7 +285,7 @@ class ClaimExtractionChain(Chain):
         return ["claims"]
 
     def _call(
-        self, inputs: dict[str, str], run_manager: CallbackManagerForChainRun | None = None
+        self, inputs: dict[str, str], run_manager: Optional[CallbackManagerForChainRun] = None
     ) -> dict[str, list[str]]:
         # subchains
         chain_central_question = LLMChain(
@@ -374,7 +374,7 @@ class ClaimExtractor(AbstractArtifactDebugger):
     def get_description() -> str:
         return ClaimExtractor._KW_DESCRIPTION
 
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: DebugResults | None = None):
+    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
         """Extract central claims tha address and answer key question of trace."""
 
         assert debug_results is not None
