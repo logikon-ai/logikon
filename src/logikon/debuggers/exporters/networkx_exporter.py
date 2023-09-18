@@ -52,7 +52,9 @@ class NetworkXExporter(AbstractArtifactDebugger):
 
         try:
             informal_argmap: InformalArgMap = next(
-                artifact.data for artifact in debug_results.artifacts if artifact.id == "informal_argmap"
+                InformalArgMap(**artifact.data)
+                for artifact in debug_results.artifacts
+                if artifact.id == "informal_argmap"
             )
         except StopIteration:
             msg = "Missing required artifact: informal_argmap"
