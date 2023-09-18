@@ -4,7 +4,6 @@ from logikon.schemas.configs import DebugConfig
 
 
 def test_configs():
-
     config = DebugConfig()
     assert config.expert_model == "text-ada-001"
 
