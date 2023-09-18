@@ -568,7 +568,9 @@ class InformalArgMapChain(Chain):
 
         return new_nodes
 
-    def _call(self, inputs: dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> dict[str, dict]:
+    def _call(
+        self, inputs: dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None
+    ) -> dict[str, dict]:
         # define subchains
         chain_pros = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_pros"], verbose=self.verbose)
         chain_cons = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_cons"], verbose=self.verbose)
