@@ -11,7 +11,7 @@ from logikon.schemas.configs import DebugConfig
 class DebuggerFactory:
     """Factory for creating a debugger chain based on a config."""
 
-    def create(self, config: DebugConfig) -> Debugger | None:
+    def create(self, config: DebugConfig) -> Optional[Debugger]:
         """Create a debugger chain based on a config."""
 
         registry = get_debugger_registry()

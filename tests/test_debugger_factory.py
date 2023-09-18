@@ -31,3 +31,11 @@ def test_debugger_factory():
             while current_debugger.get_product() != product_kw:
                 current_debugger = current_debugger._next_debugger
                 assert current_debugger
+
+def test_debugger_factory2():
+    config = DebugConfig(
+        expert_model="text-ada-002",
+        llm_framework="VLLM",
+    )
+    debug_chain = DebuggerFactory().create(config)
+    assert isinstance(debug_chain, AbstractDebugger)
