@@ -37,28 +37,27 @@ class SVGMapExporter(AbstractArtifactDebugger):
     def get_requirements() -> list[str]:
         return SVGMapExporter._KW_REQUIREMENTS
 
+    def _preprocess_string(value:str) -> str:
+        new_value = unidecode(value)
+        if ":" in new_value:
+            new_value = new_value.replace(":", " --")
+        if "&" in new_value:
+            new_value = new_value.replace("&", "+")
+        return new_value
+    
     def _preprocess_graph(self, digraph: nx.DiGraph) -> nx.DiGraph:
         """preprocess graph for graphviz layout"""
         digraph = copy.deepcopy(digraph)
 
         for _, nodedata in digraph.nodes.items():
-            text = nodedata["text"]
-            text = unidecode(text)
-            label = nodedata["label"]
-            label = unidecode(label)
 
-            if ":" in text:
-                text = text.replace(":", " --")
-            if ":" in label:
-                label = label.replace(":", " --")
-            if "&" in text:
-                text = text.replace("&", "+")
-            if "&" in label:
-                label = label.replace("&", "+")
+            for key, value in nodedata.items():
+                if isinstance(value, str):
+                    nodedata[key] = self._preprocess_string(value)
 
-            textlines = textwrap.wrap(text, width=30)
+            textlines = textwrap.wrap(nodedata["text"], width=30)
             text = "<BR/>".join(textlines)
-            textlines = textwrap.wrap(label, width=25)
+            textlines = textwrap.wrap(nodedata["label"], width=25)
             label = "<BR/>".join(textlines)
 
             nodedata["label"] = self._NODE_TEMPLATE.format(
@@ -67,6 +66,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
                 bgcolor="lightblue",
             )
             nodedata.pop("text")
+            nodedata.pop("annotations")
             nodedata["shape"] = "plaintext"
             nodedata["tooltip"] = text
 
