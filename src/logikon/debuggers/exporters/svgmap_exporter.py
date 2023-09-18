@@ -37,20 +37,19 @@ class SVGMapExporter(AbstractArtifactDebugger):
     def get_requirements() -> list[str]:
         return SVGMapExporter._KW_REQUIREMENTS
 
-    def _preprocess_string(value:str) -> str:
+    def _preprocess_string(self, value: str) -> str:
         new_value = unidecode(value)
         if ":" in new_value:
             new_value = new_value.replace(":", " --")
         if "&" in new_value:
             new_value = new_value.replace("&", "+")
         return new_value
-    
+
     def _preprocess_graph(self, digraph: nx.DiGraph) -> nx.DiGraph:
         """preprocess graph for graphviz layout"""
         digraph = copy.deepcopy(digraph)
 
         for _, nodedata in digraph.nodes.items():
-
             for key, value in nodedata.items():
                 if isinstance(value, str):
                     nodedata[key] = self._preprocess_string(value)
