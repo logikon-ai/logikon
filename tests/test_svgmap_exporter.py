@@ -26,6 +26,7 @@ def nx_map1() -> nx.DiGraph:
     nx_graph = nx.node_link_graph(data)
     return nx_graph
 
+
 @pytest.fixture(name="nx_map2")
 def nx_map2() -> nx.DiGraph:
     data = {
@@ -33,16 +34,20 @@ def nx_map2() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": 10*(f"argument-{i} and "), "label": f"arg{i}", "annotations": [], "nodeType": "proposition", "id": f"n{i}"}
+            {
+                "text": 10 * (f"argument-{i} and "),
+                "label": f"arg{i}",
+                "annotations": [],
+                "nodeType": "proposition",
+                "id": f"n{i}",
+            }
             for i in range(16)
         ],
-        "links": [
-            {"valence": "pro", "source": f"n{i+1}", "target": f"n{i // 2}"}
-            for i in range(15)
-        ],
+        "links": [{"valence": "pro", "source": f"n{i+1}", "target": f"n{i // 2}"} for i in range(15)],
     }
     nx_graph = nx.node_link_graph(data)
     return nx_graph
+
 
 def test_preprocessor01(nx_map1):
     config = DebugConfig()
@@ -63,7 +68,7 @@ def test_svg_exporter(nx_map1):
     svgmap = svgmap_exporter._to_svg(nx_map1)
     assert isinstance(svgmap, str)
 
-    #svgmap = svgmap.decode("utf-8")
+    # svgmap = svgmap.decode("utf-8")
     assert svgmap.startswith('<?xml version="1.0" encoding="UTF-8" standalone="no"?>')
 
     for _, nodedata in nx_map1.nodes.items():

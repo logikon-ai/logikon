@@ -10,6 +10,7 @@ import pydot
 from unidecode import unidecode
 
 from logikon.debuggers.base import AbstractArtifactDebugger
+from logikon.schemas.configs import DebugConfig
 from logikon.schemas.results import Artifact, DebugResults
 
 
@@ -29,6 +30,19 @@ class SVGMapExporter(AbstractArtifactDebugger):
     _NODE_TEMPLATE = """<
     <TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
     >"""
+
+    def __init__(self, debug_config: DebugConfig):
+        super().__init__(debug_config)
+        # check if graphviz is available
+        try:
+            import subprocess
+
+            subprocess.run(["dot", "-V"])
+        except:
+            self.logger.error("Graphviz command dot not found.")
+            raise ValueError(
+                "Graphviz dot command not found. To create SVG argument map, install graphviz on this system."
+            )
 
     @staticmethod
     def get_product() -> str:
@@ -84,14 +98,14 @@ class SVGMapExporter(AbstractArtifactDebugger):
         dot: pydot.Graph = nx.nx_pydot.to_pydot(digraph)
         dot.set("rankdir", "RL")
         dot.set("ratio", "compress")
-        #dot.set("size", "24")
+        # dot.set("size", "24")
         dot.set("orientation", "portrait")
         dot.set("overlap", "compress")
 
         gv = graphviz.Source(str(dot))
         gv.format = "svg"
         svg = gv.pipe(encoding="utf-8")
-        #svg = dot.create_svg(prog=["dot"])
+        # svg = dot.create_svg(prog=["dot"])
 
         return svg
 
