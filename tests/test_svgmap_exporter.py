@@ -1,6 +1,8 @@
 import networkx as nx
 import pytest
 
+import os
+
 from logikon.debuggers.exporters.svgmap_exporter import SVGMapExporter
 from logikon.schemas.configs import DebugConfig
 
@@ -24,6 +26,23 @@ def nx_map1() -> nx.DiGraph:
     nx_graph = nx.node_link_graph(data)
     return nx_graph
 
+@pytest.fixture(name="nx_map2")
+def nx_map2() -> nx.DiGraph:
+    data = {
+        "directed": True,
+        "multigraph": False,
+        "graph": {},
+        "nodes": [
+            {"text": 10*(f"argument-{i} "), "label": f"arg{i}", "annotations": [], "nodeType": "proposition", "id": f"n{i}"}
+            for i in range(16)
+        ],
+        "links": [
+            {"valence": "pro", "source": f"n{i+1}", "target": f"n{i // 2}"}
+            for i in range(15)
+        ],
+    }
+    nx_graph = nx.node_link_graph(data)
+    return nx_graph
 
 def test_preprocessor01(nx_map1):
     config = DebugConfig()
@@ -49,3 +68,15 @@ def test_svg_exporter(nx_map1):
 
     for _, nodedata in nx_map1.nodes.items():
         assert nodedata["label"] in svgmap
+
+
+def test_svg_exporter_save(nx_map2):
+    config = DebugConfig()
+    svgmap_exporter = SVGMapExporter(config)
+    svgmap = svgmap_exporter._to_svg(nx_map2)
+    assert isinstance(svgmap, bytes)
+
+    with open("test_graph.svg", 'wb') as f:
+        f.write(svgmap)
+
+    assert os.path.isfile("test_graph.svg")

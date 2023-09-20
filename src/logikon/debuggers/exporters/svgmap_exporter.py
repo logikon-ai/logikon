@@ -83,9 +83,9 @@ class SVGMapExporter(AbstractArtifactDebugger):
         dot: pydot.Graph = nx.nx_pydot.to_pydot(digraph)
         dot.set("rankdir", "RL")
         dot.set("ratio", "compress")
-        dot.set("size", "24")
+        #dot.set("size", "24")
         dot.set("orientation", "portrait")
-        dot.set("overlay", "compress")
+        dot.set("overlap", "compress")
         svg = dot.create_svg(prog=["dot"])
 
         return svg
