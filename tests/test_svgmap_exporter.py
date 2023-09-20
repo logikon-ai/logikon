@@ -33,7 +33,7 @@ def nx_map2() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": 10*(f"argument-{i} "), "label": f"arg{i}", "annotations": [], "nodeType": "proposition", "id": f"n{i}"}
+            {"text": 10*(f"argument-{i} and "), "label": f"arg{i}", "annotations": [], "nodeType": "proposition", "id": f"n{i}"}
             for i in range(16)
         ],
         "links": [
@@ -61,9 +61,9 @@ def test_svg_exporter(nx_map1):
     config = DebugConfig()
     svgmap_exporter = SVGMapExporter(config)
     svgmap = svgmap_exporter._to_svg(nx_map1)
-    assert isinstance(svgmap, bytes)
+    assert isinstance(svgmap, str)
 
-    svgmap = svgmap.decode("utf-8")
+    #svgmap = svgmap.decode("utf-8")
     assert svgmap.startswith('<?xml version="1.0" encoding="UTF-8" standalone="no"?>')
 
     for _, nodedata in nx_map1.nodes.items():
@@ -74,9 +74,9 @@ def test_svg_exporter_save(nx_map2):
     config = DebugConfig()
     svgmap_exporter = SVGMapExporter(config)
     svgmap = svgmap_exporter._to_svg(nx_map2)
-    assert isinstance(svgmap, bytes)
+    assert isinstance(svgmap, str)
 
-    with open("test_graph.svg", 'wb') as f:
+    with open("test_graph.svg", 'w') as f:
         f.write(svgmap)
 
     assert os.path.isfile("test_graph.svg")

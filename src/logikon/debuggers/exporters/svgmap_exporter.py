@@ -4,6 +4,7 @@ import copy
 import textwrap
 from typing import Dict, List, Optional, Tuple
 
+import graphviz
 import networkx as nx
 import pydot
 from unidecode import unidecode
@@ -26,7 +27,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
     _KW_REQUIREMENTS = ["networkx_graph"]
 
     _NODE_TEMPLATE = """<
-    <TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial;Helvetica;" POINT-SIZE="10.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
+    <TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
     >"""
 
     @staticmethod
@@ -75,7 +76,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
         return digraph
 
-    def _to_svg(self, digraph: nx.DiGraph) -> bytes:
+    def _to_svg(self, digraph: nx.DiGraph) -> str:
         """builds svg from nx graph"""
 
         digraph = self._preprocess_graph(digraph)
@@ -86,7 +87,11 @@ class SVGMapExporter(AbstractArtifactDebugger):
         #dot.set("size", "24")
         dot.set("orientation", "portrait")
         dot.set("overlap", "compress")
-        svg = dot.create_svg(prog=["dot"])
+
+        gv = graphviz.Source(str(dot))
+        gv.format = "svg"
+        svg = gv.pipe(encoding="utf-8")
+        #svg = dot.create_svg(prog=["dot"])
 
         return svg
 
