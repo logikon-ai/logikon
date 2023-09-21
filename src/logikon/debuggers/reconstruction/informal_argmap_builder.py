@@ -104,7 +104,6 @@ TEXT:
 :::
 
 ANSWER:
-:::
 """
                 ),
             ),
@@ -173,7 +172,6 @@ TEXT:
 :::
 
 ANSWER:
-:::
 """
                 ),
             ),
@@ -209,7 +207,7 @@ What are the main arguments presented in the TEXT that directly support the CLAI
 - Try to identify distinct reasons (at most four, but fewer is also ok), and avoid repeating one and the same argument in different words.
 - Avoid merely restating the CLAIM in different words.
 - IMPORTANT: Stay faithful to the text! Don't invent your own reasons. Don't provide reasons which are neither presented nor discussed in the text.
-- Enumerate the text's arguments consecutively -- beginning with 1. -- and start each argument with a new line.
+- Enumerate the text's arguments for the CLAIM consecutively -- beginning with 1. -- and start each argument with a new line.
 - (Write 'None' if the TEXT doesn't contain any such arguments.)
 
 # Answer
