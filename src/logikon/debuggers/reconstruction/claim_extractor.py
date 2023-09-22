@@ -120,67 +120,22 @@ OVERARCHING QUESTION:
                 template=(
                     """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
-# Your Assignment
+# Inputs
 
-Determine whether a question is a binary question, or allows for more than two answers.
-
-# General Explanations
-
-This assignment asks you to determine whether a given question is binary or not.
-A binary question has exactly two possible answers. Yes/No-Questions are therefore a special type of binary questions. Non-binary questions allow for more than two answers. Consider also illustrative examples below.
-
-# Detailed Instructions
-
-Answer the multiple choice problem: Is the QUESTION a binary question?
-Options:
-
-(A) binary question
-(B) allows for more than two answers
-
-Don't provide alternatives, comments or explanations. Just answer with A/B, as in the following examples.
-
-# Examples
-
-QUESTION to-be-characterized as binary (A) or not (B):
-:::
-Is Mars heavier than Venus?
-:::
-
-ANSWER:
-A
-
-QUESTION to-be-characterized as binary (A) or not (B):
-:::
-Which planet is heavier than Venus?
-:::
-
-ANSWER:
-B
-
-QUESTION to-be-characterized as binary (A) or not (B):
-:::
-Where do most UK expats live?
-:::
-
-ANSWER:
-B
-
-QUESTION to-be-characterized as binary (A) or not (B):
-:::
-Which is more expensive, Ibiza or Mallorca?
-:::
-
-ANSWER:
-A
-
-# Your Task
-
-QUESTION to-be-characterized as binary (A) or not (B):
+QUESTION:
 :::
 {central_question}
 :::
 
-ANSWER:
+# Instructions
+
+Bob wants to answer the QUESTION as quickly as (grammatically) possible. What applies?
+
+(A) Bob could answer the QUESTION by simply saying "yes" (or "no").
+(B) The QUESTION presents exactly two alternative options. Bob could simply choose one of these two answers.
+(C) Neither A nor B.
+
+Don't provide alternatives, comments or explanations. Just answer with A/B/C.
 """
                 ),
             ),
@@ -322,7 +277,7 @@ class ClaimExtractionChain(Chain):
         binary = chain_binary_question_q.run(central_question=central_question)
         print(f"> Answer: {binary}")
         binary = binary.strip(" \n").upper()
-        if binary.startswith("(B") or binary.startswith("B") or ("(B)" in binary and "(A)" not in binary):
+        if binary.startswith("(C") or binary.startswith("C") or ("(C)" in binary and "(A)" not in binary and "(B)" not in binary):
             binary = False
         else:
             binary = True
