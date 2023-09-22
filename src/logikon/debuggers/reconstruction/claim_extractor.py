@@ -226,84 +226,26 @@ State and enumerate (1., 2.) the two opposite answers to the binary question in 
 You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
-Identify the alternative answers to an overarching question discussed in a text.
+
+State the alternative answers to a TEXT's overarching question.
 
 # Inputs
-Use the following inputs (a TEXT and a QUESTION) to solve your assignment.
 
-TEXT:
-:::
-{prompt}
-{completion}
-:::
+Use the following inputs (a QUESTION and a TEXT) to solve your assignment.
 
 QUESTION:
 :::
 {central_question}
 :::
 
-# Detailed Instructions
-What are the rivaling answers to the overarching QUESTION that are discussed in the TEXT?
-
-- State the key answers that directly answer the question in a clear, short concise way.
-- Make sure that every single answer directly responds to the QUESTION.
-- Concentrate on the alternative answers to the QUESTION and don't reproduce any claims or reasons advanced in the text.
-- Phrase the alternative answers such that they are mutually exclusive.
-- Render each answer as a SINGLE grammatically correct sentence.
-- Don't add comments or explanations.
-- Enumerate alternative answers (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each answer with a new line.
-
-Reminder: The text's overarching question is: {central_question}.
-
-# Answer
-The alternative answers of the TEXT are:"""
-                ),
-            ),
-        )
-        registry.register(
-            "prompt_central_claims_add",
-            PromptTemplate(
-                input_variables=["central_question", "prompt", "completion", "central_claims"],
-                template=(
-                    """
-You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
-
-# Your Assignment
-Identify additional answers to an overarching question discussed in a text (if any).
-
-# Inputs
-Use the following inputs (a QUESTION, a TEXT, and central ANSWERS) to solve your assignment.
-
 TEXT:
 :::
-{prompt}
-{completion}
-:::
-
-QUESTION:
-:::
-{central_question}
-:::
-
-ANSWERS:
-:::
-{central_claims}
+{prompt} {completion}
 :::
 
 # Detailed Instructions
-Are there any additional direct answers to the overarching QUESTION which are discussed in the TEXT and not already listed under ANSWERS above?
 
-- State any additional answers to the QUESTION above in a clear, short and very concise way.
-- Make sure that every single new answer directly addresses the QUESTION.
-- Phrase the answers such that they are mutually exclusive.
-- Importantly, only provide additional answers which differ from the ANSWERS listed above.
-- Don't add comments or explanations.
-- Enumerate any additional answers (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each answer with a new line.
-- However, just write 'NONE' if the above ANSWERS contain all relevant rival answers to the QUESTION.
-
-Reminder: The text's overarching question is: {central_question}.
-
-# Answer
+State and enumerate (1., 2., ...) the alternative answers to the overarching question in clear and plain language. Render each answer as a single, unequivocal, grammatically correct sentence. Leave out any justifications or reasoning. Be succinct (no comments or explanations).
 """
                 ),
             ),
@@ -365,9 +307,6 @@ class ClaimExtractionChain(Chain):
         chain_central_claims_nonbin = LLMChain(
             llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_nonbin"], verbose=self.verbose
         )
-        chain_central_claims_add = LLMChain(
-            llm=self.llm, prompt=self.prompt_registry["prompt_central_claims_add"], verbose=self.verbose
-        )
         parse_chain = TransformChain(input_variables=["list_text"], output_variables=["list_items"], transform=self.parse_list)  # type: ignore
 
         prompt = inputs["prompt"]
@@ -404,18 +343,7 @@ class ClaimExtractionChain(Chain):
             print(f"> Answer: {central_claims}")
             claims = parse_chain.run(list_text=central_claims)
             if claims:
-                while len(claims) < self.max_claims:
-                    n = len(claims)
-                    central_claims = chain_central_claims_add.run(
-                        prompt=prompt,
-                        completion=completion,
-                        central_question=central_question,
-                        central_claims="* " + ("\n* ".join(claims)),
-                    )
-                    print(f"> Answer: {central_claims}")
-                    claims.extend(parse_chain.run(list_text=central_claims))
-                    if len(claims) == n:
-                        break
+                claims = claims[:self.max_claims]  # cut to max length
 
         return {"claims": claims}
 
