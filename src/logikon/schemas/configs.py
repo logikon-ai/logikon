@@ -9,7 +9,7 @@ class DebugConfig(BaseModel):
     """Configuration for scoring."""
 
     expert_model: str = "text-ada-001"
-    expert_model_kwargs: dict[str, Any] = {"temperature": 0.9}
+    expert_model_kwargs: dict[str, Any] = {"temperature": 0.7}
     llm_framework: str = "OpenAI"
     generation_kwargs: Optional[dict] = None
     metrics: list[Union[str, Any]] = []
