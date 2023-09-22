@@ -92,8 +92,8 @@ Who is or was Mozart?
 TEXT:
 :::
 A: But private actors are more likely to focus their investment into the most profitable ATCs.
-B: I disagee. Private companies will charge more to use ATCs with more expensive equipment which will motivate airlines to move to less safe ATCs.
-A: Still most air lines are in favor of privatization.
+B: I disagree. Private companies will charge more to use ATCs with more expensive equipment which will motivate airlines to move to less safe ATCs.
+A: Still most airlines are in favor of privatization.
 B: I think safety should remain the top priority. Plus, the US leads the global ATC (Air Traffic Control) community in technology and procedure development.
 :::
 
@@ -194,7 +194,7 @@ ANSWER:
 
 # Your Assignment
 
-State a text's central claim that answers its overarching question.
+State the two opposite answers to a TEXT's overarching binary question.
 
 # Inputs
 
@@ -211,19 +211,9 @@ TEXT:
 :::
 
 # Detailed Instructions
-What is the key claim that answers the overarching QUESTION, and that is at issue, argued for, debated, or critically discussed in the TEXT?
 
-- State the key claim discussed in the text above in a clear, short and very concise way.
-- Concentrate on the main assertion and don't reproduce the text's reasoning.
-- Make sure that the key claim answers the QUESTION.
-- Note that the key claim may be implicit in the text.
-- Provide a SINGLE grammatically correct sentence.
-- Don't add alternatives, comments or explanations.
-
-Reminder: The text's overarching question is: {central_question}
-
-# Answer
-The TEXT discusses the following answer to the overarching QUESTION:"""
+State and enumerate (1., 2.) the two opposite answers to the binary question in clear and simple language.
+"""
                 ),
             ),
         )
@@ -331,7 +321,6 @@ class ClaimExtractionChain(Chain):
     prompt_registry: PromptRegistry = PromptRegistry()
     llm: BaseLLM
 
-    # depth = 2
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -403,11 +392,10 @@ class ClaimExtractionChain(Chain):
             central_claim = chain_central_claim_bin.run(
                 prompt=prompt, completion=completion, central_question=central_question
             )
-            if "." in central_claim:
-                central_claim = central_claim.split(".")[0] + "."
-            central_claim = central_claim.strip(" \n")
             print(f"> Answer: {central_claim}")
-            claims = [central_claim]
+            claims = parse_chain.run(list_text=central_claim)
+            if claims:
+                claims = claims[:1]
 
         if not binary:
             central_claims = chain_central_claims_nonbin.run(
