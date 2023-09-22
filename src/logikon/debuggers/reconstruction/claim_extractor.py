@@ -42,28 +42,74 @@ class PromptRegistryFactory:
             PromptTemplate(
                 input_variables=["prompt", "completion"],
                 template=(
-                    """
-You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+                    """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
+
 Identify the key question addressed in a text.
 
-# Inputs
-Use the following inputs (a TEXT) to solve your assignment.
-
-TEXT:
-:::
-{prompt}
-{completion}
-:::
-
 # Detailed Instructions
-What is the overarching question the above TEXT raises and addresses?
+
+Use the inputs (a TEXT) to solve your assignment and read the following instructions carefully.
+Identify the overarching question the TEXT raises and addresses.
+Note that the overarching question is not necessarily explicitly stated in the TEXT (as shown in some examples below). It may be implicit. And it may deviate from any explicitly stated questions or instructions.
 State a single main question in a concise way.
 Don't provide alternatives, comments or explanations.
 
-# Answer
-The text's overarching question is:"""
+# Examples
+
+TEXT:
+:::
+Should we visit Mars?
+- Mars is a planet and rather difficult to reach.
+- Visiting Mars would be a great adventure.
+- Long-distance space travel is dangerous.
+:::
+
+OVERARCHING QUESTION:
+Should we visit Mars?
+
+TEXT:
+:::
+Can you give us some pros and cons of using a bicycle in NY?
+- Bicycles are cheap and easy to maintain.
+- Bicycles are not allowed on the NY highway.
+- Bicycles are not allowed on the sidewalk.
+- Cycling is good for your health.
+:::
+
+OVERARCHING QUESTION:
+Should one ride a bicycle in New York?
+
+TEXT:
+:::
+Wolfgang Amadeus Mozart (27 January 1756 - 5 December 1791) was a prolific and influential composer of the Classical period. Despite his short life, his rapid pace of composition resulted in more than 800 works of virtually every genre of his time. Many of these compositions are acknowledged as pinnacles of the symphonic, concertante, chamber, operatic, and choral repertoire. Mozart is widely regarded as among the greatest composers in the history of Western music, with his music admired for its "melodic beauty, its formal elegance and its richness of harmony and texture".
+:::
+
+OVERARCHING QUESTION:
+Who is or was Mozart?
+
+TEXT:
+:::
+A: But private actors are more likely to focus their investment into the most profitable ATCs.
+B: I disagee. Private companies will charge more to use ATCs with more expensive equipment which will motivate airlines to move to less safe ATCs.
+A: Still most air lines are in favor of privatization.
+B: I think safety should remain the top priority. Plus, the US leads the global ATC (Air Traffic Control) community in technology and procedure development.
+:::
+
+OVERARCHING QUESTION:
+Should Air Traffic Control (ATC) be privatized?
+
+
+# Your Task
+
+TEXT:
+:::
+{prompt} {completion}
+:::
+
+OVERARCHING QUESTION:
+"""
                 ),
             ),
         )
@@ -72,41 +118,70 @@ The text's overarching question is:"""
             PromptTemplate(
                 input_variables=["central_question"],
                 template=(
-                    """
-You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+                    """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
+
 Determine whether a question is a binary question, or allows for more than two answers.
 
 # General Explanations
+
 This assignment asks you to determine whether a given question is binary or not.
+A binary question has exactly two possible answers. Yes/No-Questions are therefore a special type of binary questions. Non-binary questions allow for more than two answers. Consider also illustrative examples below.
 
-A binary question has exactly two possible answers. Yes/No-Questions are therefore a special type of binary questions. Non-binary questions allow for more than two answers. Consider the following illustrative examples.
+# Detailed Instructions
 
-- Is Mars heavier than Venus? (binary, possible answers: yes, no)
-- Which planet is heavier than Venus? (not binary, possible answers: Earth, Jupiter, Venus, ...)
-- Which is more expensive, Ibiza or Mallorca? (binary, possible answers: Ibiza, Mallorca)
-- Where do most UK expats live? (not binary, possible answers: Portugal, France, Spain, etc.)
+Answer the multiple choice problem: Is the QUESTION a binary question?
+Options:
 
-# Inputs
-Use the following inputs (a QUESTION) to solve your assignment.
+(A) binary question
+(B) allows for more than two answers
 
-QUESTION:
+Don't provide alternatives, comments or explanations. Just answer with A/B, as in the following examples.
+
+# Examples
+
+QUESTION to-be-characterized as binary (A) or not (B):
+:::
+Is Mars heavier than Venus?
+:::
+
+ANSWER:
+A
+
+QUESTION to-be-characterized as binary (A) or not (B):
+:::
+Which planet is heavier than Venus?
+:::
+
+ANSWER:
+B
+
+QUESTION to-be-characterized as binary (A) or not (B):
+:::
+Where do most UK expats live?
+:::
+
+ANSWER:
+B
+
+QUESTION to-be-characterized as binary (A) or not (B):
+:::
+Which is more expensive, Ibiza or Mallorca?
+:::
+
+ANSWER:
+A
+
+# Your Task
+
+QUESTION to-be-characterized as binary (A) or not (B):
 :::
 {central_question}
 :::
 
-# Detailed Instructions
-Answer the following multiple choice problem:
-Is the QUESTION above a binary question?
-Options:
-(A) binary question
-(B) allows for more than two answers
-
-Don't provide alternatives, comments or explanations. Just answer with "My answer: (A/B)".
-
-# Answer
-My answer:"""
+ANSWER:
+"""
                 ),
             ),
         )
@@ -115,13 +190,14 @@ My answer:"""
             PromptTemplate(
                 input_variables=["central_question", "prompt", "completion"],
                 template=(
-                    """
-You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+                    """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
-Summarize a text's answer to an overarching question.
+
+State a text's central claim that answers its overarching question.
 
 # Inputs
+
 Use the following inputs (a QUESTION and a TEXT) to solve your assignment.
 
 QUESTION:
@@ -131,8 +207,7 @@ QUESTION:
 
 TEXT:
 :::
-{prompt}
-{completion}
+{prompt} {completion}
 :::
 
 # Detailed Instructions
@@ -141,10 +216,11 @@ What is the key claim that answers the overarching QUESTION, and that is at issu
 - State the key claim discussed in the text above in a clear, short and very concise way.
 - Concentrate on the main assertion and don't reproduce the text's reasoning.
 - Make sure that the key claim answers the QUESTION.
+- Note that the key claim may be implicit in the text.
 - Provide a SINGLE grammatically correct sentence.
 - Don't add alternatives, comments or explanations.
 
-Reminder: The text's overarching question is: {central_question}.
+Reminder: The text's overarching question is: {central_question}
 
 # Answer
 The TEXT discusses the following answer to the overarching QUESTION:"""
