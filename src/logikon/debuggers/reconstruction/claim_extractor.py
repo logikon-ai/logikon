@@ -46,14 +46,14 @@ class PromptRegistryFactory:
 
 # Your Assignment
 
-Identify the key question addressed in a text.
+Identify the basic question addressed in a text.
 
 # Detailed Instructions
 
 Use the inputs (a TEXT) to solve your assignment and read the following instructions carefully.
 Identify the overarching question the TEXT raises and addresses.
 Note that the overarching question is not necessarily explicitly stated in the TEXT (as shown in some examples below). It may be implicit. And it may deviate from any explicitly stated questions or instructions.
-State a single main question in a concise way.
+State a single bold question in a concise and most-simple way. Use plain language.
 Don't provide alternatives, comments or explanations.
 
 # Examples
