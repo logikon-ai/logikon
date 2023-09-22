@@ -279,7 +279,7 @@ class ClaimExtractionChain(Chain):
         binary = chain_binary_question_q.run(central_question=central_question)
         print(f"> Answer: {binary}")
         binary = binary.strip(" \n").upper()
-        if binary.startswith("(C") or binary.startswith("C") or ("(C)" in binary and "(A)" not in binary and "(B)" not in binary):
+        if binary.startswith("(B") or binary.startswith("B") or ("(B)" in binary and "(A)" not in binary):
             binary = False
         else:
             binary = True
