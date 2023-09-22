@@ -120,20 +120,22 @@ OVERARCHING QUESTION:
                 template=(
                     """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
-# Inputs
+# Your Assignment
 
-QUESTION:
-:::
-{central_question}
-:::
+Determine whether the replies are answers to a question.
 
-# Instructions
+Read the following question and the replies carefully to determine if the replies match the question.
 
-Bob wants to answer the QUESTION as quickly as (grammatically) possible. What applies?
+Q: "What do you think: {central_question}"
 
-(A) Bob could answer the QUESTION by simply saying "yes" (or "no").
-(B) The QUESTION presents exactly two alternative options. Bob could simply choose one of these two answers.
-(C) Neither A nor B.
+Replies
+Ann: "Yes, absolutely."
+Bob: "No, not at all."
+
+What applies? 
+
+(A) Ann's and Bob's replies answer the question. 
+(B) Neither Ann's nor Bob's reply answers the question.
 
 Don't provide alternatives, comments or explanations. Just answer with A/B/C.
 """
@@ -200,7 +202,7 @@ TEXT:
 
 # Detailed Instructions
 
-State and enumerate (1., 2., ...) the alternative answers to the overarching question in clear and plain language. Render each answer as a single, unequivocal, grammatically correct sentence. Leave out any justifications or reasoning. Be succinct (no comments or explanations).
+State and enumerate (1., 2., ...) the alternative answers to the overarching question in clear and plain language. Render each answer as a single, very short, unequivocal, grammatically correct sentence. Leave out any justifications or reasoning. Be succinct (no comments or explanations).
 """
                 ),
             ),
