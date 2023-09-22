@@ -568,6 +568,12 @@ class InformalArgMapChain(Chain):
         new_nodes = []
         claim = target_node.text
         reasons_l = self._process_reasons(reasons, claim=claim, valence=valence)
+
+        doublecheck = self._is_pro_reason if valence == "for" else self._is_con_reason
+        reasons_l = [
+            reason for reason in reasons_l
+            if doublecheck(claim=claim, reason=reason)
+        ]
         reasons_l = reasons_l[: self.max_parallel_reasons]  # cut off reasons
 
         chain_headline = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_headline"], verbose=self.verbose)
