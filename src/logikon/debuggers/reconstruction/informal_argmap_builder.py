@@ -449,6 +449,9 @@ class InformalArgMapChain(Chain):
         quote = quote.split("\n")[0]
         quote = quote.strip("\"")
 
+        if not quote or not quote in source_text:
+            return False
+
         # check if quote is actually pro reason
         is_supported = self._is_pro_reason(claim=claim, reason=quote)
         return is_supported
@@ -461,6 +464,9 @@ class InformalArgMapChain(Chain):
         quote = quote.strip(" \n")
         quote = quote.split("\n")[0]
         quote = quote.strip("\"")
+
+        if not quote or not quote in source_text:
+            return False
 
         # check if quote is actually con reason
         is_attacked = self._is_con_reason(claim=claim, reason=quote)
