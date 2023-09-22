@@ -43,10 +43,10 @@ class PromptRegistryFactory:
                 input_variables=["prompt", "completion"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
-Identify the key question adressed in a text.
+Identify the key question addressed in a text.
 
 # Inputs
 Use the following inputs (a TEXT) to solve your assignment.
@@ -58,7 +58,7 @@ TEXT:
 :::
 
 # Detailed Instructions
-What is the overarching question the above TERXT raises and addresses?
+What is the overarching question the above TEXT raises and addresses?
 State a single main question in a concise way.
 Don't provide alternatives, comments or explanations.
 
@@ -73,7 +73,7 @@ The text's overarching question is:"""
                 input_variables=["central_question"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 Determine whether a question is a binary question, or allows for more than two answers.
@@ -116,7 +116,7 @@ My answer:"""
                 input_variables=["central_question", "prompt", "completion"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 Summarize a text's answer to an overarching question.
@@ -141,7 +141,7 @@ What is the key claim that answers the overarching QUESTION, and that is at issu
 - State the key claim discussed in the text above in a clear, short and very concise way.
 - Concentrate on the main assertion and don't reproduce the text's reasoning.
 - Make sure that the key claim answers the QUESTION.
-- Provide a SINGLE gramatically correct sentence.
+- Provide a SINGLE grammatically correct sentence.
 - Don't add alternatives, comments or explanations.
 
 Reminder: The text's overarching question is: {central_question}.
@@ -157,7 +157,7 @@ The TEXT discusses the following answer to the overarching QUESTION:"""
                 input_variables=["central_question", "prompt", "completion"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 Identify the alternative answers to an overarching question discussed in a text.
@@ -183,7 +183,7 @@ What are the rivaling answers to the overarching QUESTION that are discussed in 
 - Make sure that every single answer directly responds to the QUESTION.
 - Concentrate on the alternative answers to the QUESTION and don't reproduce any claims or reasons advanced in the text.
 - Phrase the alternative answers such that they are mutually exclusive.
-- Render each answer as a SINGLE gramatically correct sentence.
+- Render each answer as a SINGLE grammatically correct sentence.
 - Don't add comments or explanations.
 - Enumerate alternative answers (up to four, fewer are ok) consecutively -- beginning with 1. -- and start each answer with a new line.
 
@@ -200,7 +200,7 @@ The alternative answers of the TEXT are:"""
                 input_variables=["central_question", "prompt", "completion", "central_claims"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 Identify additional answers to an overarching question discussed in a text (if any).
