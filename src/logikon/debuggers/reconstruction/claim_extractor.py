@@ -56,7 +56,7 @@ Note that the overarching question is not necessarily explicitly stated in the T
 State a single bold question in a concise and most-simple way. Use plain language.
 Don't provide alternatives, comments or explanations.
 
-# Examples
+# Example
 
 TEXT:
 :::
@@ -68,6 +68,8 @@ Should we visit Mars?
 
 OVERARCHING QUESTION:
 Should we visit Mars?
+
+# Example
 
 TEXT:
 :::
@@ -81,6 +83,8 @@ Can you give us some pros and cons of using a bicycle in NY?
 OVERARCHING QUESTION:
 Should one ride a bicycle in New York?
 
+# Example
+
 TEXT:
 :::
 Wolfgang Amadeus Mozart (27 January 1756 - 5 December 1791) was a prolific and influential composer of the Classical period. Despite his short life, his rapid pace of composition resulted in more than 800 works of virtually every genre of his time. Many of these compositions are acknowledged as pinnacles of the symphonic, concertante, chamber, operatic, and choral repertoire. Mozart is widely regarded as among the greatest composers in the history of Western music, with his music admired for its "melodic beauty, its formal elegance and its richness of harmony and texture".
@@ -88,6 +92,19 @@ Wolfgang Amadeus Mozart (27 January 1756 - 5 December 1791) was a prolific and i
 
 OVERARCHING QUESTION:
 Who is or was Mozart?
+
+# Example
+
+TEXT:
+:::
+P: What are the pros and cons to consider when deciding whether to buy a house?
+A: Pros: You can build equity and credit. Cons: You have to pay property taxes and maintenance costs. 
+:::
+
+OVERARCHING QUESTION:
+Should one buy a house?
+
+# Example
 
 TEXT:
 :::
@@ -99,7 +116,6 @@ B: I think safety should remain the top priority. Plus, the US leads the global 
 
 OVERARCHING QUESTION:
 Should Air Traffic Control (ATC) be privatized?
-
 
 # Your Task
 
