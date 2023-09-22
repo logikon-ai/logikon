@@ -42,136 +42,117 @@ class PromptRegistryFactory:
         registry = PromptRegistry()
 
         registry.register(
-            "prompt_q_supported",
+            "prompt_q_supports",
             PromptTemplate(
-                input_variables=["reason", "source_text", "ctype"],
+                input_variables=["premise", "hypothesis"],
                 template=(
-                    """You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+                    """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
-# Your Assignment
+Decide whether a given PREMISE represents a reason for (entails or backs) a given HYPOTHESIS. 
 
-    Assess whether it is argued for a certain {ctype}.
+Read the PREMISE and HYPOTHESIS carefully.
 
-# Detailed Instructions
-
-    Use the inputs provided (a TEXT which contains a certain {ctype}) to solve your assignment.
-    Does the TEXT, beyond stating the {ctype}, present or discuss a justification for the {ctype}?
-    That is, are there any arguments in the TEXT which primarily serve to support and back up the {ctype}?
-    Provide your answer in the form of a single letter (y/n) without explanations or comments.
-   
-# Examples
-
-## Example 1
-
-TEXT:
+PREMISE
 :::
-Here are some pros and cons for common two-factor authentication methods: SMS Text Message: Pros: It's easy to set up and uses something people already have (a phone number). Cons: SMS messages can potentially be intercepted, and it's not ideal for those without consistent cell service. Authentication App: Pros: It's more secure than SMS and apps like Google Authenticator are free and easy to use. Cons: It requires installing an extra app and initial configuration is needed. Security Key: Pros: It's very secure since physical keys are difficult to phish or replicate. Cons: Physical keys can potentially be lost, damaged, or stolen, and they cost extra money to purchase. Overall, it depends on your specific needs and how much convenience vs security you want. SMS is the most convenient but least secure, an authentication app adds more security, and a physical security key is the most secure but least convenient method. Feel free to follow up if you would like me to elaborate on any of the points or discuss other two-factor authentication options. My goal is to provide helpful information so you can determine what will work best in your situation.
+{premise}
 :::
 
-{ctype}:
+HYPOTHESIS
 :::
-One should use an Authentication App for two-factor authentication.
-:::
-
-ANSWER:
-y
-
-## Example 2
-
-TEXT:
-:::
-Building a computer Pros: * Cheaper in the long run * Easier to fix * Better overall quality Cons: * Can be more expensive upfront * Higher chance of user error * You need to figure out part compatibility --- Off-the-Shelf computer Pros: * Faster to buy than to build * Plug and Play * Normally Cheaper to buy rather than build Cons: * Repairs are harder to do * Build Quality can be lower * Limited configuration available There are plenty of other reasons that can influence your decisions but it comes down to how soon you need a computer, and how confident you are working on a computer.
+{hypothesis}
 :::
 
-{ctype}:
-:::
-If you build your own computer, there's a higher chance of error.
-:::
+Which of the following is the most appropriate description of the relation between PREMISE and HYPOTHESIS?
 
-ANSWER:
-n
+A) The PREMISE paraphrases and is roughly equivalent with the HYPOTHESIS
+B) The PREMISE is different from but supports the HYPOTHESIS
+C) Neither A nor B
 
-# Your Task
-
-TEXT:
-:::
-{source_text}
-:::
-
-{ctype}:
-:::
-{reason}
-:::
-
-ANSWER:
+Just answer in the line below with A, B or C. No comments, no explanation.
 """
                 ),
             ),
         )
         registry.register(
-            "prompt_q_attacked",
+            "prompt_q_attacks",
             PromptTemplate(
-                input_variables=["reason", "source_text", "ctype"],
+                input_variables=["premise", "hypothesis"],
                 template=(
-                    """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+                    """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
-# Your Assignment
+Decide whether a given PREMISE represents a reason against (attacks or disconfirms) a given HYPOTHESIS. 
 
-    Assess whether it is argued against a certain {ctype}.
+Read the PREMISE and HYPOTHESIS carefully.
 
-# Detailed Instructions
-
-    Use the inputs provided (a TEXT which contains a certain {ctype}) to solve your assignment.
-    Does the TEXT, beyond stating the {ctype}, present or discuss an objection against the {ctype}?
-    That is, are there any arguments in the TEXT which primarily serve to refute the {ctype}?
-    Provide your answer in the form of a single letter (y/n) without explanations or comments.
-
-# Examples
-
-## Example 1
-
-TEXT:
+PREMISE
 :::
-Here are some pros and cons for common two-factor authentication methods: SMS Text Message: Pros: It's easy to set up and uses something people already have (a phone number). Cons: SMS messages can potentially be intercepted, and it's not ideal for those without consistent cell service. Authentication App: Pros: It's more secure than SMS and apps like Google Authenticator are free and easy to use. Cons: It requires installing an extra app and initial configuration is needed. Security Key: Pros: It's very secure since physical keys are difficult to phish or replicate. Cons: Physical keys can potentially be lost, damaged, or stolen, and they cost extra money to purchase. Overall, it depends on your specific needs and how much convenience vs security you want. SMS is the most convenient but least secure, an authentication app adds more security, and a physical security key is the most secure but least convenient method. Feel free to follow up if you would like me to elaborate on any of the points or discuss other two-factor authentication options. My goal is to provide helpful information so you can determine what will work best in your situation.
+{premise}
 :::
 
-{ctype}:
+HYPOTHESIS
 :::
-One should use an Authentication App for two-factor authentication.
-:::
-
-ANSWER:
-y
-
-## Example 2
-
-TEXT:
-:::
-Building a computer Pros: * Cheaper in the long run * Easier to fix * Better overall quality Cons: * Can be more expensive upfront * Higher chance of user error * You need to figure out part compatibility --- Off-the-Shelf computer Pros: * Faster to buy than to build * Plug and Play * Normally Cheaper to buy rather than build Cons: * Repairs are harder to do * Build Quality can be lower * Limited configuration available There are plenty of other reasons that can influence your decisions but it comes down to how soon you need a computer, and how confident you are working on a computer.
+{hypothesis}
 :::
 
-{ctype}:
-:::
-If you build your own computer, there's a higher chance of error.
-:::
+Which of the following is the most appropriate description of the relation between PREMISE and HYPOTHESIS?
 
-ANSWER:
-n
+A) The PREMISE merely states that the HYPOTHESIS is (partly) false or wrong.
+B) The PREMISE provides an independent reason for why the HYPOTHESIS is false or wrong.
+C) Neither A nor B
 
-# Your Task
+Just answer with A, B or C in the line below. No comments, no explanation.
+"""
+                ),
+            ),
+        )
+        registry.register(
+            "prompt_pro_quote",
+            PromptTemplate(
+                input_variables=["claim", "source_text"],
+                template=(
+                    """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
-TEXT:
+Identify a text span that represents a reason for a given claim. 
+
+Read the TEXT and CLAIM carefully.
+
+TEXT
 :::
 {source_text}
 :::
 
-{ctype}:
+CLAIM
 :::
-{reason}
+{claim}
 :::
 
-ANSWER:
+What is the TEXT's strongest reason for the CLAIM? Produce a verbatim quote from the TEXT containing at most three sentences. Use quotation marks, don't comment, no explanations.
+"""
+                ),
+            ),
+        )
+        registry.register(
+            "prompt_con_quote",
+            PromptTemplate(
+                input_variables=["claim", "source_text"],
+                template=(
+                    """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+Identify a text span that represents a reason against (an objection to) a given claim.
+
+Read the TEXT and CLAIM carefully.
+
+TEXT
+:::
+{source_text}
+:::
+
+CLAIM
+:::
+{claim}
+:::
+
+What is the TEXT's strongest reason against the CLAIM? Produce a verbatim quote from the TEXT containing at most three sentences. Use quotation marks, don't comment, no explanations.
 """
                 ),
             ),
@@ -182,7 +163,7 @@ ANSWER:
                 input_variables=["claim", "source_text"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 Summarize particular pro arguments presented in a text.
@@ -222,7 +203,7 @@ I see the following arguments for the CLAIM in the TEXT above:
                 input_variables=["claim", "source_text"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 Summarize particular con arguments (objections) presented in a text.
@@ -262,7 +243,7 @@ I see the following arguments against the CLAIM in the TEXT above:
                 input_variables=["claim", "source_text"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 Identify the text-span in a text that expresses a given claim most clearly.
@@ -295,7 +276,7 @@ Here is my answer, a verbatim quote from the TEXT:"""
                 input_variables=["reason", "valence", "claim"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 Shorten the presentation of an argument {valence} a given claim.
@@ -328,7 +309,7 @@ My shortened paraphrase:"""
                 input_variables=["reason", "valence", "claim"],
                 template=(
                     """
-You are a helpful, honest and knowledgable AI assisstant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
 
 # Your Assignment
 Find a telling title for an argument.
@@ -436,6 +417,54 @@ class InformalArgMapChain(Chain):
                         )
                     )
         return argmap
+
+    def _is_pro_reason(self, claim: str, reason: str) -> bool:
+        chain_q_supports = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_supports"], verbose=self.verbose)
+        answer = chain_q_supports.run(premise=reason, hypothesis=claim)
+        print(f"> Answer: {answer}")
+        answer = answer.strip(" \n")
+        is_pro = (
+            answer.lower().startswith("b") or
+            "b)" in answer.lower() and "a)" not in answer.lower() and "c)" not in answer.lower()
+        )
+        return is_pro
+
+    def _is_con_reason(self, claim: str, reason: str) -> bool:
+        chain_q_attacks = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_attacks"], verbose=self.verbose)
+        answer = chain_q_attacks.run(premise=reason, hypothesis=claim)
+        print(f"> Answer: {answer}")
+        answer = answer.strip(" \n")
+        is_con = (
+            answer.lower().startswith("b") or
+            "b)" in answer.lower() and "a)" not in answer.lower() and "c)" not in answer.lower()
+        )
+        return is_con
+
+    def _is_supported(self, claim: str, source_text: str) -> bool:
+        # get quote that represents strongest pro reason
+        chain_pro_quote = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_pro_quote"], verbose=self.verbose)
+        quote = chain_pro_quote.run(claim=claim, source_text=source_text)
+        print(f"> Answer: {quote}")
+        quote = quote.strip(" \n")
+        quote = quote.split("\n")[0]
+        quote = quote.strip("\"")
+
+        # check if quote is actually pro reason
+        is_supported = self._is_pro_reason(claim=claim, reason=quote)
+        return is_supported
+
+    def _is_attacked(self, claim: str, source_text: str) -> bool:
+        # get quote that represents strongest con reason
+        chain_con_quote = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_con_quote"], verbose=self.verbose)
+        quote = chain_con_quote.run(claim=claim, source_text=source_text)
+        print(f"> Answer: {quote}")
+        quote = quote.strip(" \n")
+        quote = quote.split("\n")[0]
+        quote = quote.strip("\"")
+
+        # check if quote is actually con reason
+        is_attacked = self._is_con_reason(claim=claim, reason=quote)
+        return is_attacked
 
     def _shorten_reason(self, reason: str, claim: str = "", valence: str = "for") -> str:
         """
@@ -572,12 +601,6 @@ class InformalArgMapChain(Chain):
         # define subchains
         chain_pros = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_pros"], verbose=self.verbose)
         chain_cons = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_cons"], verbose=self.verbose)
-        chain_q_supported = LLMChain(
-            llm=self.llm, prompt=self.prompt_registry["prompt_q_supported"], verbose=self.verbose
-        )
-        chain_q_attacked = LLMChain(
-            llm=self.llm, prompt=self.prompt_registry["prompt_q_attacked"], verbose=self.verbose
-        )
 
         completion = inputs["completion"]
         claims = inputs["claims"]
@@ -599,13 +622,8 @@ class InformalArgMapChain(Chain):
                 print(f"### Processing target node {enum} of {len(target_nodes)} at depth {depth+1}. ###")
                 claim = target_node.text
 
-                answer = chain_q_supported.run(reason=claim, source_text=completion, ctype="CLAIM")
-                print(f"> Answer: {answer}")
-                is_supported = self.parse_yn_answer(answer, False)
-
-                answer = chain_q_attacked.run(reason=claim, source_text=completion, ctype="CLAIM")
-                print(f"> Answer: {answer}")
-                is_attacked = self.parse_yn_answer(answer, False)
+                is_supported = self._is_supported(claim=claim, source_text=completion)
+                is_attacked = self._is_attacked(claim=claim, source_text=completion)
 
                 if is_supported:
                     pros = chain_pros.run(claim=claim, source_text=completion)
