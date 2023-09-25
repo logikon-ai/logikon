@@ -666,16 +666,18 @@ class InformalArgMapChain(Chain):
             quote = chain_annotation.run(source_text=completion, claim=reason)
             print(f"> Answer: {quote}")
             annotations = self._match_quote(quote, completion)
-            if not self._is_redundant(argmap=argmap, reason=reason, annotations=annotations):
-                new_node = self._add_argument(
-                    argmap=argmap,
-                    reason=reason,
-                    label=headline,
-                    target_id=target_node.id,
-                    valence=valence,
-                    annotations=annotations,
-                )
-                new_nodes.append(new_node)
+            # only add argument if a match has been found
+            if annotations:  
+                if not self._is_redundant(argmap=argmap, reason=reason, annotations=annotations):
+                    new_node = self._add_argument(
+                        argmap=argmap,
+                        reason=reason,
+                        label=headline,
+                        target_id=target_node.id,
+                        valence=valence,
+                        annotations=annotations,
+                    )
+                    new_nodes.append(new_node)
 
         return new_nodes
 
