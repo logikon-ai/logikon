@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import List, Optional
 
-from logikon.debuggers.base import Debugger
+from logikon.debuggers.interface import Debugger
 from logikon.debuggers.registry import get_debugger_registry
 from logikon.schemas.configs import DebugConfig
 
@@ -15,6 +15,7 @@ class DebuggerFactory:
         """Create a debugger chain based on a config."""
 
         registry = get_debugger_registry()
+        input_ids = [inpt.id for inpt in config.inputs]
 
         # Check if all metrics and artifacts keys in config are registered
         for key in config.metrics + config.artifacts:
@@ -29,6 +30,19 @@ class DebuggerFactory:
                 if key.get_product() not in registry:
                     msg = f"Debugger '{key}' not properly registered: Product {key.get_product()} not in registry."
                     raise ValueError(msg)
+
+        # Check if any of the metrics / artifacts keys in config are already provided as inputs
+        for key in config.metrics + config.artifacts:
+            if isinstance(key, str):
+                if key in input_ids:
+                    raise ValueError(
+                        f"Inconsistent configuration. {key} provided as input but also as metric / artifact."
+                    )
+            elif issubclass(key, Debugger):
+                if key.get_product() in input_ids:
+                    raise ValueError(
+                        f"Inconsistent configuration. {key.get_product()} provided as input but also as metric / artifact."
+                    )
 
         # Create list of debuggers from config and registry
         debuggers: List[Debugger] = []
@@ -48,7 +62,7 @@ class DebuggerFactory:
             for debugger in debuggers:
                 requirements.update(debugger.get_requirements())
 
-            if requirements.issubset(products):
+            if requirements.issubset(products | set(input_ids)):
                 requirements_satisfied = True
 
             for requirement_kw in requirements:
@@ -63,7 +77,7 @@ class DebuggerFactory:
         chain: list[Debugger] = []
         while debuggers:
             added_any = False
-            products_available = {debugger.get_product() for debugger in chain}
+            products_available = {debugger.get_product() for debugger in chain} | set(input_ids)
             for debugger in debuggers:
                 requirements = set(debugger.get_requirements())
                 if requirements.issubset(products_available):
@@ -72,7 +86,7 @@ class DebuggerFactory:
                     added_any = True
             if not added_any:
                 debuggers_left = [debugger.get_product() for debugger in debuggers]
-                msg = f"Could not create debugger chain. Failed to satisfy any of the following debuggers requirements: {debuggers_left}"
+                msg = f"Could not create debugger chain. Failed to satisfy any of the following debuggers' requirements: {debuggers_left}"
                 raise ValueError(msg)
 
         if not chain:

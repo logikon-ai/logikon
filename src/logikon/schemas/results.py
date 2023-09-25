@@ -5,24 +5,26 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel
 
 
-class Artifact(BaseModel):
-    """An artifact generated through logical debugging."""
+class BaseCTModel(BaseModel):
+    """Base model for all entities processed or created through logical analysis."""
 
     id: str
     description: str
+    metadata: Optional[dict] = None
+
+
+class Artifact(BaseCTModel):
+    """An artifact serving as input and/or generated through logical debugging."""
+
     data: Any
     dtype: Optional[str] = None
-    metadata: Optional[dict] = None
 
 
-class Score(BaseModel):
-    """A score for a completion."""
+class Score(BaseCTModel):
+    """A score for a completion / reasoning trace."""
 
-    id: str
-    description: str
     score: Union[float, str]
     comment: Optional[str] = None
-    metadata: Optional[dict] = None
 
 
 class DebugResults(BaseModel):

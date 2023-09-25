@@ -419,13 +419,17 @@ class InformalArgMapChain(Chain):
         return argmap
 
     def _is_pro_reason(self, claim: str, reason: str) -> bool:
-        chain_q_supports = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_supports"], verbose=self.verbose)
+        chain_q_supports = LLMChain(
+            llm=self.llm, prompt=self.prompt_registry["prompt_q_supports"], verbose=self.verbose
+        )
         answer = chain_q_supports.run(premise=reason, hypothesis=claim)
         print(f"> Answer: {answer}")
         answer = answer.strip(" \n")
         is_pro = (
-            answer.lower().startswith("b") or
-            "b)" in answer.lower() and "a)" not in answer.lower() and "c)" not in answer.lower()
+            answer.lower().startswith("b")
+            or "b)" in answer.lower()
+            and "a)" not in answer.lower()
+            and "c)" not in answer.lower()
         )
         return is_pro
 
@@ -435,8 +439,10 @@ class InformalArgMapChain(Chain):
         print(f"> Answer: {answer}")
         answer = answer.strip(" \n")
         is_con = (
-            answer.lower().startswith("b") or
-            "b)" in answer.lower() and "a)" not in answer.lower() and "c)" not in answer.lower()
+            answer.lower().startswith("b")
+            or "b)" in answer.lower()
+            and "a)" not in answer.lower()
+            and "c)" not in answer.lower()
         )
         return is_con
 
@@ -576,10 +582,7 @@ class InformalArgMapChain(Chain):
         reasons_l = self._process_reasons(reasons, claim=claim, valence=valence)
 
         doublecheck = self._is_pro_reason if valence == "for" else self._is_con_reason
-        reasons_l = [
-            reason for reason in reasons_l
-            if doublecheck(claim=claim, reason=reason)
-        ]
+        reasons_l = [reason for reason in reasons_l if doublecheck(claim=claim, reason=reason)]
         reasons_l = reasons_l[: self.max_parallel_reasons]  # cut off reasons
 
         chain_headline = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_headline"], verbose=self.verbose)
@@ -683,10 +686,8 @@ class InformalArgMapBuilder(AbstractArtifactDebugger):
     def get_description() -> str:
         return InformalArgMapBuilder._KW_DESCRIPTION
 
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
+    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
         """Reconstruct reasoning as argmap."""
-
-        assert debug_results is not None
 
         claims = next(artifact.data for artifact in debug_results.artifacts if artifact.id == "claims")
 

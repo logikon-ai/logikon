@@ -1,50 +1,13 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from logikon.schemas.configs import DebugConfig
-from logikon.schemas.results import DebugResults
+from logikon.schemas.results import DebugResults, Score, Artifact
+from logikon.debuggers.interface import Debugger
 
 ARTIFACT = "ARTIFACT"
 SCORE = "SCORE"
-
-
-class Debugger(ABC):
-    """Abstract base class for all debuggers."""
-
-    @abstractmethod
-    def __init__(self, debug_config: DebugConfig):
-        pass
-
-    @abstractmethod
-    def set_next(self, handler):
-        pass
-
-    @abstractmethod
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
-        """Debug completion."""
-        pass
-
-    @abstractmethod
-    def handle(self, **kwargs) -> DebugResults:
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def get_product() -> str:
-        """Get config keyword of artifact / metric produced by debugger."""
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def get_requirements() -> List[str]:
-        """Get config keywords of metrics / artifacts that are required for the debugger."""
-        pass
-
-    @property
-    @abstractmethod
-    def product_type(self) -> str:
-        pass
 
 
 class AbstractDebugger(Debugger):
@@ -61,18 +24,32 @@ class AbstractDebugger(Debugger):
         self._next_debugger = debugger
         return debugger
 
-    def handle(self, **kwargs) -> DebugResults:
+    @abstractmethod
+    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
+        """Debug completion."""
+        pass
+
+    def handle(
+        self, inputs: List[Union[Artifact, Score]], debug_results: Optional[DebugResults] = None
+    ) -> DebugResults:
         """Handles the debug request."""
 
-        if "debug_results" not in kwargs:
-            kwargs["debug_results"] = DebugResults()
+        # add artifacts and scores provided as inputs
+        if debug_results is None:
+            debug_results = DebugResults(
+                artifacts=[a for a in inputs if isinstance(a, Artifact) and not a.id in ["prompt", "completion"]],
+                scores=[s for s in inputs if isinstance(s, Score)],
+            )
 
-        self._debug(**kwargs)
+        prompt = next(a.data for a in inputs if isinstance(a, Artifact) and a.id == "prompt")
+        completion = next(a.data for a in inputs if isinstance(a, Artifact) and a.id == "completion")
+
+        self._debug(prompt=prompt, completion=completion, debug_results=debug_results)
 
         if self._next_debugger:
-            self._next_debugger.handle(**kwargs)
+            self._next_debugger.handle(inputs, debug_results)
 
-        return kwargs["debug_results"]
+        return debug_results
 
     @staticmethod
     def get_requirements() -> List[str]:
@@ -89,7 +66,7 @@ class AbstractDebugger(Debugger):
 
 class AbstractArtifactDebugger(AbstractDebugger):
     """
-    Base debugger class for cerating artifacts.
+    Base debugger class for creating artifacts.
     """
 
     @property

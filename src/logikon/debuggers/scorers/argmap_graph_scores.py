@@ -34,10 +34,8 @@ class AbstractGraphScorer(AbstractScoreDebugger):
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         pass
 
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
+    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
         """Score the argmap."""
-
-        assert debug_results is not None
 
         try:
             networkx_graph: nx.DiGraph = next(

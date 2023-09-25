@@ -4,12 +4,12 @@ from typing import Any, Dict, List, Optional, Union
 
 from logikon.debuggers.factory import DebuggerFactory
 from logikon.schemas.configs import DebugConfig
-from logikon.schemas.results import DebugResults
+from logikon.schemas.results import DebugResults, Artifact
 
 
 def score(
-    prompt: str,
-    completion: str,
+    prompt: Optional[str] = None,
+    completion: Optional[str] = None,
     config: Optional[DebugConfig] = None,
 ) -> DebugResults:
     """Score the completion."""
@@ -19,12 +19,26 @@ def score(
 
     # TODO: optionally load configuration from yaml config file
 
+    # add prompt and completion to config
+    if prompt is not None:
+        if any(inpt.id == "prompt" for inpt in config.inputs):
+            raise ValueError(
+                "Inconsistent configuration. Prompt provided as kwargs for score() but already present in config.inputs."
+            )
+        config.inputs.append(Artifact(id="prompt", description="Prompt", data=prompt, dtype="str"))
+    if completion is not None:
+        if any(inpt.id == "completion" for inpt in config.inputs):
+            raise ValueError(
+                "Inconsistent configuration. Completion provided as kwargs for score() but already present in config.inputs."
+            )
+        config.inputs.append(Artifact(id="completion", description="Completion", data=completion, dtype="str"))
+
     # Dynamically construct debugger chain based on config
     debugger = DebuggerFactory().create(config)
     if not debugger:
         return DebugResults()
 
     # Debug the completion
-    debug_results = debugger.handle(prompt=prompt, completion=completion)
+    debug_results = debugger.handle(inputs=config.inputs)
 
     return debug_results

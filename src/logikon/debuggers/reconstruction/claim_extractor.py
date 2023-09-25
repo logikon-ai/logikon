@@ -236,7 +236,6 @@ class ClaimExtractionChain(Chain):
     prompt_registry: PromptRegistry = PromptRegistry()
     llm: BaseLLM
 
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.prompt_registry = PromptRegistryFactory().create()
@@ -316,7 +315,7 @@ class ClaimExtractionChain(Chain):
             print(f"> Answer: {central_claims}")
             claims = parse_chain.run(list_text=central_claims)
             if claims:
-                claims = claims[:self.max_claims]  # cut to max length
+                claims = claims[: self.max_claims]  # cut to max length
 
         return {"claims": claims}
 
@@ -339,10 +338,8 @@ class ClaimExtractor(AbstractArtifactDebugger):
     def get_description() -> str:
         return ClaimExtractor._KW_DESCRIPTION
 
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
+    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
         """Extract central claims tha address and answer key question of trace."""
-
-        assert debug_results is not None
 
         llm = init_llm_from_config(self._debug_config)
         generation_kwargs = self._debug_config.generation_kwargs

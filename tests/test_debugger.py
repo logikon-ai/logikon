@@ -23,9 +23,8 @@ class DummyDebugger1(AbstractArtifactDebugger):
     def get_requirements() -> List[str]:
         return DummyDebugger1._KW_REQUIREMENTS
 
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
+    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
         """Concat prompt and completion."""
-        assert debug_results is not None
         data = prompt + completion
         artifact = Artifact(
             id=self._KW_PRODUCT,
@@ -50,9 +49,8 @@ class DummyDebugger2(AbstractScoreDebugger):
     def get_requirements() -> List[str]:
         return DummyDebugger2._KW_REQUIREMENTS
 
-    def _debug(self, prompt: str = "", completion: str = "", debug_results: Optional[DebugResults] = None):
+    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
         """Length of prompt."""
-        assert debug_results is not None
         value = len(prompt)
         score = Score(
             id=self._KW_PRODUCT,
@@ -70,7 +68,10 @@ def test_debugger_chaining():
     prompt = "01234"
     completion = "56789"
 
-    results = debugger1.handle(prompt=prompt, completion=completion)
+    config.inputs.append(Artifact(id="prompt", description="Prompt", data=prompt, dtype="str"))
+    config.inputs.append(Artifact(id="completion", description="Completion", data=completion, dtype="str"))
+
+    results = debugger1.handle(inputs=config.inputs)
 
     assert len(results.artifacts) == 1
     assert len(results.scores) == 1
