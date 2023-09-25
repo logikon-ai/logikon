@@ -436,7 +436,7 @@ class InformalArgMapChain(Chain):
 
     def _is_pro_reason(self, claim: str, reason: str) -> bool:
         if isinstance(self.llm, OpenAI):
-            llm_kwargs = {"max_tokens": 4}
+            llm_kwargs = {"max_tokens": 4, "temperature": 0.4}
         else:
             llm_kwargs = {}
         chain_q_supports = LLMChain(
@@ -455,7 +455,7 @@ class InformalArgMapChain(Chain):
 
     def _is_con_reason(self, claim: str, reason: str) -> bool:
         if isinstance(self.llm, OpenAI):
-            llm_kwargs = {"max_tokens": 4}
+            llm_kwargs = {"max_tokens": 4, "temperature": 0.4}
         else:
             llm_kwargs = {}
         chain_q_attacks = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_attacks"], verbose=self.verbose, llm_kwargs=llm_kwargs)
@@ -505,7 +505,7 @@ class InformalArgMapChain(Chain):
     def _are_equivalent(self, reason1: str, reason2: str) -> bool:
         """checks if two reasons are equivalent"""
         if isinstance(self.llm, OpenAI):
-            llm_kwargs = {"max_tokens": 4}
+            llm_kwargs = {"max_tokens": 4, "temperature": 0.4}
         else:
             llm_kwargs = {}
         chain_q_equivalent = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_equivalent"], verbose=self.verbose, llm_kwargs=llm_kwargs)
