@@ -61,7 +61,7 @@ class PromptRegistryFactory:
 {reason2}
 </Argument-2>
 
-Are these two arguments roughly equivalent and essentially making the same point? Recall that two reasons can be equivalent even if they use different wording and have different grammatical structure.
+Are these two arguments making roughly the same point?
 
 Answer with Yes/No, first. Then, give a concise explanation of your answer (one sentence). 
 """
