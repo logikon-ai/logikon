@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
 
+import copy
+
 from logikon.debuggers.factory import DebuggerFactory
 from logikon.schemas.configs import DebugConfig
 from logikon.schemas.results import DebugResults, Artifact
@@ -16,6 +18,8 @@ def score(
 
     if config is None:
         config = DebugConfig()
+    else:
+        config = copy.deepcopy(config)
 
     # TODO: optionally load configuration from yaml config file
 
