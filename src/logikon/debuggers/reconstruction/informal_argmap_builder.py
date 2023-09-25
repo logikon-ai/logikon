@@ -41,6 +41,30 @@ class PromptRegistryFactory:
     def create() -> PromptRegistry:
         registry = PromptRegistry()
 
+
+        registry.register(
+            "prompt_q_equivalent",
+            PromptTemplate(
+                input_variables=["reason1", "reason2"],
+                template=(
+                    """You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+                    Consider the following arguments:
+
+<Argument-1>
+{reason1}
+</Argument-1>
+<Argument-2>
+{reason2}
+</Argument-2>
+
+Are these two arguments roughly equivalent and essentially making the same point?
+
+Answer with Yes/No, first. Then, give a concise explanation of your answer (one sentence). 
+"""
+                ),
+            ),
+        )
         registry.register(
             "prompt_q_supports",
             PromptTemplate(
@@ -478,6 +502,46 @@ class InformalArgMapChain(Chain):
         is_attacked = self._is_con_reason(claim=claim, reason=quote)
         return is_attacked
 
+    def _are_equivalent(self, reason1: str, reason2: str) -> bool:
+        """checks if two reasons are equivalent"""
+        chain_q_equivalent = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_equivalent"], verbose=self.verbose, llm_kwargs={"max_length": 6})
+        answer = chain_q_equivalent.run(reason1=reason1, reason2=reason2)
+        answer = str(answer)
+        print(f"> Answer: {answer}")
+        answer = answer.strip(" \n")
+        answer = answer.split("\n")[0]
+        answer = answer.strip("\" ")
+
+        if answer.lower().startswith("yes"):
+            return True
+
+        return False
+
+    def _is_redundant(self, argmap: InformalArgMap, reason:str, annotations: List[AnnotationSpan]) -> bool:
+        """
+        checks if reason is redundant, i.e. equivalent to a reason already in the argmap 
+        """
+        if not reason:
+            return True
+        
+        # check redundancy only for nodes with overlapping annotation span
+        overlapping_nodes = []
+        for node in argmap.nodelist:
+            overlaps = False
+            for span1 in annotations:
+                for span2 in node.annotations:
+                    if span1.start < span2.end and span2.start < span1.end:
+                        overlaps = True
+                        break
+            if overlaps:
+                overlapping_nodes.append(node)
+
+        for node in overlapping_nodes:
+            if self._are_equivalent(reason, node.text):
+                return True
+
+        return False
+    
     def _shorten_reason(self, reason: str, claim: str = "", valence: str = "for") -> str:
         """
         subcall: shorten reason if necessary
@@ -598,15 +662,16 @@ class InformalArgMapChain(Chain):
             quote = chain_annotation.run(source_text=completion, claim=reason)
             print(f"> Answer: {quote}")
             annotations = self._match_quote(quote, completion)
-            new_node = self._add_argument(
-                argmap=argmap,
-                reason=reason,
-                label=headline,
-                target_id=target_node.id,
-                valence=valence,
-                annotations=annotations,
-            )
-            new_nodes.append(new_node)
+            if not self._is_redundant(argmap=argmap, reason=reason, annotations=annotations):
+                new_node = self._add_argument(
+                    argmap=argmap,
+                    reason=reason,
+                    label=headline,
+                    target_id=target_node.id,
+                    valence=valence,
+                    annotations=annotations,
+                )
+                new_nodes.append(new_node)
 
         return new_nodes
 
