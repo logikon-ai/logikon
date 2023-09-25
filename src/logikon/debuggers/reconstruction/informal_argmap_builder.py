@@ -8,8 +8,11 @@ from typing import Any, Dict, List, Optional, Tuple
 from langchain.callbacks.manager import CallbackManagerForChainRun
 from langchain.chains import LLMChain, TransformChain
 from langchain.chains.base import Chain
-from langchain.llms import BaseLLM
 from langchain.prompts import PromptTemplate
+from langchain.llms import BaseLLM
+from langchain.llms import (
+    OpenAI,
+)
 
 from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.debuggers.utils import init_llm_from_config
@@ -404,17 +407,6 @@ class InformalArgMapChain(Chain):
                     list_items.append(line)
         return {"list_items": list_items}
 
-    @staticmethod
-    def parse_yn_answer(answer_text: str, default: bool) -> bool:
-        answer_text = answer_text.strip(" \n(").lower()
-        answer_text = answer_text.split("\n")[0]
-        if answer_text.startswith("y") or ("(y)" in answer_text and "(n)" not in answer_text):
-            return True
-        if answer_text.startswith("n") or ("(n)" in answer_text and "(y)" not in answer_text):
-            return True
-
-        return default
-
     def _init_argmap(self, claims) -> InformalArgMap:
         """
         initializes argmap with central claims (mutually exclusive)
@@ -443,8 +435,12 @@ class InformalArgMapChain(Chain):
         return argmap
 
     def _is_pro_reason(self, claim: str, reason: str) -> bool:
+        if isinstance(self.llm, OpenAI):
+            llm_kwargs = {"max_tokens": 4}
+        else:
+            llm_kwargs = {}
         chain_q_supports = LLMChain(
-            llm=self.llm, prompt=self.prompt_registry["prompt_q_supports"], verbose=self.verbose
+            llm=self.llm, prompt=self.prompt_registry["prompt_q_supports"], verbose=self.verbose, llm_kwargs=llm_kwargs
         )
         answer = chain_q_supports.run(premise=reason, hypothesis=claim)
         print(f"> Answer: {answer}")
@@ -458,7 +454,11 @@ class InformalArgMapChain(Chain):
         return is_pro
 
     def _is_con_reason(self, claim: str, reason: str) -> bool:
-        chain_q_attacks = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_attacks"], verbose=self.verbose)
+        if isinstance(self.llm, OpenAI):
+            llm_kwargs = {"max_tokens": 4}
+        else:
+            llm_kwargs = {}
+        chain_q_attacks = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_attacks"], verbose=self.verbose, llm_kwargs=llm_kwargs)
         answer = chain_q_attacks.run(premise=reason, hypothesis=claim)
         print(f"> Answer: {answer}")
         answer = answer.strip(" \n")
@@ -504,7 +504,11 @@ class InformalArgMapChain(Chain):
 
     def _are_equivalent(self, reason1: str, reason2: str) -> bool:
         """checks if two reasons are equivalent"""
-        chain_q_equivalent = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_equivalent"], verbose=self.verbose, llm_kwargs={"max_length": 6})
+        if isinstance(self.llm, OpenAI):
+            llm_kwargs = {"max_tokens": 4}
+        else:
+            llm_kwargs = {}
+        chain_q_equivalent = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_equivalent"], verbose=self.verbose, llm_kwargs=llm_kwargs)
         answer = chain_q_equivalent.run(reason1=reason1, reason2=reason2)
         answer = str(answer)
         print(f"> Answer: {answer}")
