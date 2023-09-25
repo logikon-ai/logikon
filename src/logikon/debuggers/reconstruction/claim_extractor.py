@@ -153,7 +153,7 @@ What applies?
 (A) Ann's and Bob's replies answer the question. 
 (B) Neither Ann's nor Bob's reply answers the question.
 
-Don't provide alternatives, comments or explanations. Just answer with A/B/C.
+Don't provide alternatives, comments or explanations. Just answer with A/B.
 """
                 ),
             ),
