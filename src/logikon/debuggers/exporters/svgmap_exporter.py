@@ -6,9 +6,9 @@ from typing import Dict, List, Optional, Tuple
 
 import graphviz
 import networkx as nx
-import pydot
 from unidecode import unidecode
 
+import logikon
 from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.configs import DebugConfig
 from logikon.schemas.results import Artifact, DebugResults
@@ -95,16 +95,29 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
         digraph = self._preprocess_graph(digraph)
 
-        dot: pydot.Graph = nx.nx_pydot.to_pydot(digraph)
-        dot.set("rankdir", "RL")
-        dot.set("ratio", "compress")
-        # dot.set("size", "24")
-        dot.set("orientation", "portrait")
-        dot.set("overlap", "compress")
+        dot = graphviz.Digraph(
+            'logikon informal argument map',
+            comment=f'Created with `logikon` python module version {logikon.__version__}',
+            format="svg",
+        )
 
-        gv = graphviz.Source(str(dot))
-        gv.format = "svg"
-        svg = gv.pipe(encoding="utf-8")
+        for node, nodedata in digraph.nodes.items():
+            dot.node(str(node), **nodedata)
+
+        for edge, edgedata in digraph.edges.items():
+            dot.edge(str(edge[0]), str(edge[-1]), **edgedata)
+
+        # dot: pydot.Graph = nx.nx_pydot.to_pydot(digraph)
+        # dot.set("rankdir", "RL")
+        # dot.set("ratio", "compress")
+        # # dot.set("size", "24")
+        # dot.set("orientation", "portrait")
+        # dot.set("overlap", "compress")
+
+        # gv = graphviz.Source(str(dot))
+        # gv.format = "svg"
+
+        svg = dot.pipe(encoding="utf-8")
         # svg = dot.create_svg(prog=["dot"])
 
         return svg
