@@ -33,12 +33,19 @@ class NetworkXExporter(AbstractArtifactDebugger):
 
     def to_nx(self, argument_map: InformalArgMap) -> nx.DiGraph:
         """builds nx graph from nodes-links argument map"""
+        try:
+            nodes = argument_map.model_dump()["nodelist"]
+            links = argument_map.model_dump()["edgelist"]
+        except AttributeError:
+            nodes = argument_map.dict()["nodelist"]
+            links = argument_map.dict()["edgelist"]
+
         data = {
             "directed": True,
             "multigraph": False,
             "graph": {},
-            "nodes": argument_map.model_dump()["nodelist"],
-            "links": argument_map.model_dump()["edgelist"],
+            "nodes": nodes,
+            "links": links,
         }
 
         digraph = nx.node_link_graph(data)

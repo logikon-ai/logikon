@@ -733,7 +733,12 @@ class InformalArgMapChain(Chain):
                     )
                     new_nodes.extend(new_cons)
 
-        return {"argmap": argmap.model_dump()}
+        try:
+            argmap_dict = argmap.model_dump()
+        except AttributeError:
+            argmap_dict = argmap.dict()
+
+        return {"argmap": argmap_dict}
 
 
 class InformalArgMapBuilder(AbstractArtifactDebugger):
