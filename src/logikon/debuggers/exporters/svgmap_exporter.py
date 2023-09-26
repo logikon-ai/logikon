@@ -121,8 +121,8 @@ class SVGMapExporter(AbstractArtifactDebugger):
         # dot.set("overlap", "compress")
 
         # gv = graphviz.Source(str(dot))
-        # gv.format = "svg"
 
+        dot.format = "svg"
         svg = dot.pipe(encoding="utf-8")
         # svg = dot.create_svg(prog=["dot"])
 
