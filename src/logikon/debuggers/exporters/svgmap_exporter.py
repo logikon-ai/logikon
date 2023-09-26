@@ -98,7 +98,13 @@ class SVGMapExporter(AbstractArtifactDebugger):
         dot = graphviz.Digraph(
             'logikon informal argument map',
             comment=f'Created with `logikon` python module version {logikon.__version__}',
-            format="svg",
+            graph_attr=dict(
+                format="svg",
+                rankdir="RL",
+                ratio="compress",
+                orientation="portrait",
+                overlap="compress",
+            ),
         )
 
         for node, nodedata in digraph.nodes.items():
