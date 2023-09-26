@@ -37,8 +37,8 @@ class NetworkXExporter(AbstractArtifactDebugger):
             "directed": True,
             "multigraph": False,
             "graph": {},
-            "nodes": argument_map.dict()["nodelist"],
-            "links": argument_map.dict()["edgelist"],
+            "nodes": argument_map.model_dump()["nodelist"],
+            "links": argument_map.model_dump()["edgelist"],
         }
 
         digraph = nx.node_link_graph(data)

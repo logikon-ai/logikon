@@ -44,7 +44,6 @@ class PromptRegistryFactory:
     def create() -> PromptRegistry:
         registry = PromptRegistry()
 
-
         registry.register(
             "prompt_q_equivalent",
             PromptTemplate(
@@ -458,7 +457,9 @@ class InformalArgMapChain(Chain):
             llm_kwargs = {"max_tokens": 4, "temperature": 0.4}
         else:
             llm_kwargs = {}
-        chain_q_attacks = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_attacks"], verbose=self.verbose, llm_kwargs=llm_kwargs)
+        chain_q_attacks = LLMChain(
+            llm=self.llm, prompt=self.prompt_registry["prompt_q_attacks"], verbose=self.verbose, llm_kwargs=llm_kwargs
+        )
         answer = chain_q_attacks.run(premise=reason, hypothesis=claim)
         print(f"> Answer: {answer}")
         answer = answer.strip(" \n")
@@ -508,7 +509,12 @@ class InformalArgMapChain(Chain):
             llm_kwargs = {"max_tokens": 4, "temperature": 0.4}
         else:
             llm_kwargs = {}
-        chain_q_equivalent = LLMChain(llm=self.llm, prompt=self.prompt_registry["prompt_q_equivalent"], verbose=self.verbose, llm_kwargs=llm_kwargs)
+        chain_q_equivalent = LLMChain(
+            llm=self.llm,
+            prompt=self.prompt_registry["prompt_q_equivalent"],
+            verbose=self.verbose,
+            llm_kwargs=llm_kwargs,
+        )
         answer = chain_q_equivalent.run(reason1=reason1, reason2=reason2)
         answer = str(answer)
         print(f"> Answer: {answer}")
@@ -521,13 +527,13 @@ class InformalArgMapChain(Chain):
 
         return False
 
-    def _is_redundant(self, argmap: InformalArgMap, reason:str, annotations: List[AnnotationSpan]) -> bool:
+    def _is_redundant(self, argmap: InformalArgMap, reason: str, annotations: List[AnnotationSpan]) -> bool:
         """
-        checks if reason is redundant, i.e. equivalent to a reason already in the argmap 
+        checks if reason is redundant, i.e. equivalent to a reason already in the argmap
         """
         if not reason:
             return True
-        
+
         # check redundancy only for nodes with overlapping annotation span
         overlapping_nodes = []
         for node in argmap.nodelist:
@@ -545,7 +551,7 @@ class InformalArgMapChain(Chain):
                 return True
 
         return False
-    
+
     def _shorten_reason(self, reason: str, claim: str = "", valence: str = "for") -> str:
         """
         subcall: shorten reason if necessary
@@ -667,7 +673,7 @@ class InformalArgMapChain(Chain):
             print(f"> Answer: {quote}")
             annotations = self._match_quote(quote, completion)
             # only add argument if a match has been found
-            if annotations:  
+            if annotations:
                 if not self._is_redundant(argmap=argmap, reason=reason, annotations=annotations):
                     new_node = self._add_argument(
                         argmap=argmap,
@@ -727,7 +733,7 @@ class InformalArgMapChain(Chain):
                     )
                     new_nodes.extend(new_cons)
 
-        return {"argmap": argmap.dict()}
+        return {"argmap": argmap.model_dump()}
 
 
 class InformalArgMapBuilder(AbstractArtifactDebugger):
