@@ -107,6 +107,9 @@ class ArgMapGraphAttackRatioScorer(AbstractGraphScorer):
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         edge_data = digraph.edges.data("valence")
-        attack_ratio = [val for _, _, val in edge_data].count("con") / len(edge_data)
+        if edge_data:
+            attack_ratio = [val for _, _, val in edge_data].count("con") / len(edge_data)
+        else:
+            attack_ratio = 0
 
         return attack_ratio, "", None
