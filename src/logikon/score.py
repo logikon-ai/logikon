@@ -13,10 +13,12 @@ def score(
     prompt: Optional[str] = None,
     completion: Optional[str] = None,
     config: Optional[DebugConfig] = None,
-) -> DebugResults:
+) -> Optional[DebugResults]:
     """Score the completion."""
 
     if config is None:
+        if prompt is None and completion is None:
+            return None
         config = DebugConfig()
     else:
         config = copy.deepcopy(config)
