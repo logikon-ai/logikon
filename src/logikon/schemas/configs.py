@@ -11,7 +11,7 @@ from logikon.debuggers.interface import Debugger
 class DebugConfig(BaseModel):
     """Configuration for scoring."""
 
-    expert_model: str = "text-ada-001"
+    expert_model: str = "gpt-3.5-turbo-instruct"
     expert_model_kwargs: dict[str, Any] = {"temperature": 0.7}
     llm_framework: str = "OpenAI"
     generation_kwargs: Optional[dict] = None
