@@ -38,7 +38,9 @@ def init_llm_from_config(debug_config: DebugConfig, **kwargs) -> BaseLLM:
         if _VLLM is not None and isinstance(_VLLM, VLLM):
             return _VLLM
         huggingface_hub.login(os.environ.get("HUGGINGFACEHUB_API_TOKEN"))
-        llm = VLLM(model=debug_config.expert_model, client=None, trust_remote_code=True, **debug_config.expert_model_kwargs)
+        llm = VLLM(
+            model=debug_config.expert_model, client=None, trust_remote_code=True, **debug_config.expert_model_kwargs
+        )
         _VLLM = llm
 
     if llm is None:

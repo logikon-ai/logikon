@@ -11,7 +11,7 @@ from logikon.debuggers.interface import Debugger
 class DebugConfig(BaseModel):
     """
     Configuration for scoring reasoning traces.
-    
+
     Args:
         expert_model: The name of the expert model to use.
         expert_model_kwargs: Keyword arguments to pass to the expert model.
@@ -19,7 +19,7 @@ class DebugConfig(BaseModel):
         inputs: The inputs to the expert model (Artifacts or Scores).
         metrics: The metrics to use for scoring (keyword or debugger class).
         artifacts: The artifacts to generate (keyword or debugger class).
-        report_to: Integrations.    
+        report_to: Integrations.
     """
 
     expert_model: str = "gpt-3.5-turbo-instruct"
