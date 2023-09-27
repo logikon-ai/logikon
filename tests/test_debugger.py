@@ -55,7 +55,7 @@ class DummyDebugger2(AbstractScoreDebugger):
         score = Score(
             id=self._KW_PRODUCT,
             description=self._KW_DESCRIPTION,
-            score=value,
+            value=value,
         )
         debug_results.scores.append(score)
 
@@ -77,4 +77,4 @@ def test_debugger_chaining():
     assert len(results.scores) == 1
 
     assert results.artifacts[0].data == prompt + completion
-    assert results.scores[0].score == len(prompt)
+    assert results.scores[0].value == len(prompt)

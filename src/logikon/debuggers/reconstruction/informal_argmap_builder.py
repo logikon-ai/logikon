@@ -734,7 +734,7 @@ class InformalArgMapChain(Chain):
                     new_nodes.extend(new_cons)
 
         try:
-            argmap_dict = argmap.model_dump()
+            argmap_dict = argmap.model_dump()  # type: ignore
         except AttributeError:
             argmap_dict = argmap.dict()
 

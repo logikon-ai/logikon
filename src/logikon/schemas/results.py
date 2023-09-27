@@ -23,7 +23,7 @@ class Artifact(BaseCTModel):
 class Score(BaseCTModel):
     """A score for a completion / reasoning trace."""
 
-    score: Union[float, str]
+    value: Union[float, str]
     comment: Optional[str] = None
 
 

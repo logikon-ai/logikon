@@ -50,7 +50,7 @@ class AbstractGraphScorer(AbstractScoreDebugger):
         score = Score(
             id=self.get_product(),
             description=self.get_description(),
-            score=value,
+            value=value,
             comment=comment,
             metadata=metadata,
         )
