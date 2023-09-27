@@ -152,7 +152,7 @@ CLAIM
 {claim}
 :::
 
-What is the TEXT's strongest reason for the CLAIM? Produce a verbatim quote from the TEXT containing at most three sentences. Use quotation marks, don't comment, no explanations.
+What is the TEXT's strongest reason for the CLAIM? Produce a verbatim quote from the TEXT containing at most three sentences which set forth that reason. Use quotation marks, don't comment, no explanations.
 """
                 ),
             ),
@@ -178,7 +178,7 @@ CLAIM
 {claim}
 :::
 
-What is the TEXT's strongest reason against the CLAIM? Produce a verbatim quote from the TEXT containing at most three sentences. Use quotation marks, don't comment, no explanations.
+What is the TEXT's strongest reason against the CLAIM? Produce a verbatim quote from the TEXT containing at most three sentences which set forth that reason. Use quotation marks, don't comment, no explanations.
 """
                 ),
             ),
