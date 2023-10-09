@@ -15,6 +15,11 @@ completion = openai.Completion.create(model="text-davinci-003", prompt=prompt).c
 
 # Debug and score reasoning
 score = logikon.score(prompt=prompt, completion=completion)
+
+#  >>> print(score)
+#  n_arguments=5
+#  redundancy=.13
+#  pros_cons_balance=.6
 ```
 
 
@@ -91,5 +96,21 @@ print(chain.run("Vim or Emacs?", callbacks=[lgk_handler]))
 ```
 
 
+
+### Evaluate Human -- AI interaction
+
+```python
+"""Evaluate a chat history"""
+
+´import logikon
+
+# Chat between human user and AI assistant
+...
+
+chat_history = retrieve_chat_history()
+
+# Debug and score reasoning
+score = logikon.score(messages=chat_history)
+```
 
 

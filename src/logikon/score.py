@@ -6,14 +6,14 @@ import copy
 
 from logikon.debuggers.factory import DebuggerFactory
 from logikon.schemas.configs import DebugConfig
-from logikon.schemas.results import DebugResults, Artifact
+from logikon.schemas.results import DebugState, Artifact, INPUT_KWS
 
 
 def score(
     prompt: Optional[str] = None,
     completion: Optional[str] = None,
     config: Optional[DebugConfig] = None,
-) -> Optional[DebugResults]:
+) -> Optional[DebugState]:
     """Score the completion."""
 
     if config is None:
@@ -27,24 +27,24 @@ def score(
 
     # add prompt and completion to config
     if prompt is not None:
-        if any(inpt.id == "prompt" for inpt in config.inputs):
+        if any(inpt.id == INPUT_KWS.prompt for inpt in config.inputs):
             raise ValueError(
                 "Inconsistent configuration. Prompt provided as kwargs for score() but already present in config.inputs."
             )
-        config.inputs.append(Artifact(id="prompt", description="Prompt", data=prompt, dtype="str"))
+        config.inputs.append(Artifact(id=INPUT_KWS.prompt, description="Prompt", data=prompt, dtype="str"))
     if completion is not None:
-        if any(inpt.id == "completion" for inpt in config.inputs):
+        if any(inpt.id == INPUT_KWS.completion for inpt in config.inputs):
             raise ValueError(
                 "Inconsistent configuration. Completion provided as kwargs for score() but already present in config.inputs."
             )
-        config.inputs.append(Artifact(id="completion", description="Completion", data=completion, dtype="str"))
+        config.inputs.append(Artifact(id=INPUT_KWS.completion, description="Completion", data=completion, dtype="str"))
 
-    # Dynamically construct debugger chain based on config
-    debugger = DebuggerFactory().create(config)
-    if not debugger:
-        return DebugResults()
+    # Dynamically construct debugger pipeline based on config
+    debugger_pipeline = DebuggerFactory().create(config)
+    if not debugger_pipeline:
+        return DebugState()
 
     # Debug the completion
-    debug_results = debugger.handle(inputs=config.inputs)
+    debug_results = debugger_pipeline(inputs=config.inputs)
 
     return debug_results

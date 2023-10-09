@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Union
 
 from logikon.schemas.configs import DebugConfig
-from logikon.schemas.results import DebugResults, Score, Artifact
+from logikon.schemas.results import DebugState, Score, Artifact, INPUT_KWS
 from logikon.debuggers.interface import Debugger
 
 ARTIFACT = "ARTIFACT"
@@ -12,44 +12,23 @@ SCORE = "SCORE"
 
 class AbstractDebugger(Debugger):
     """
-    Base debugger class with default chaining behavior.
+    Base debugger class with default __call__ implementation.
     """
-
-    _next_debugger: Optional[Debugger] = None
 
     def __init__(self, debug_config: DebugConfig):
         self._debug_config = debug_config
 
-    def set_next(self, debugger: Debugger) -> Debugger:
-        self._next_debugger = debugger
-        return debugger
-
     @abstractmethod
-    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
-        """Debug completion."""
+    def _debug(self, debug_state: DebugState):
+        """Debug debug_state."""
         pass
 
-    def handle(
-        self, inputs: List[Union[Artifact, Score]], debug_results: Optional[DebugResults] = None
-    ) -> DebugResults:
-        """Handles the debug request."""
+    def __call__(self, debug_state: DebugState) -> DebugState:
+        """Carries out debugging process associated with this debugger for given debug_state."""
 
-        # add artifacts and scores provided as inputs
-        if debug_results is None:
-            debug_results = DebugResults(
-                artifacts=[a for a in inputs if isinstance(a, Artifact) and not a.id in ["prompt", "completion"]],
-                scores=[s for s in inputs if isinstance(s, Score)],
-            )
+        self._debug(debug_state=debug_state)
 
-        prompt = next(a.data for a in inputs if isinstance(a, Artifact) and a.id == "prompt")
-        completion = next(a.data for a in inputs if isinstance(a, Artifact) and a.id == "completion")
-
-        self._debug(prompt=prompt, completion=completion, debug_results=debug_results)
-
-        if self._next_debugger:
-            self._next_debugger.handle(inputs, debug_results)
-
-        return debug_results
+        return debug_state
 
     @staticmethod
     def get_requirements() -> List[str]:
@@ -76,7 +55,7 @@ class AbstractArtifactDebugger(AbstractDebugger):
 
 class AbstractScoreDebugger(AbstractDebugger):
     """
-    Base debugger class for cerating scroes.
+    Base debugger class for creating scroes.
     """
 
     @property

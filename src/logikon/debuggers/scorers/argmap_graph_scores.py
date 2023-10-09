@@ -7,7 +7,7 @@ import networkx as nx
 import numpy as np
 
 from logikon.debuggers.base import AbstractScoreDebugger
-from logikon.schemas.results import DebugResults, Score
+from logikon.schemas.results import DebugState, Score
 
 
 class AbstractGraphScorer(AbstractScoreDebugger):
@@ -34,12 +34,12 @@ class AbstractGraphScorer(AbstractScoreDebugger):
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         pass
 
-    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
+    def _debug(self, debug_state: DebugState):
         """Score the argmap."""
 
         try:
             networkx_graph: nx.DiGraph = next(
-                artifact.data for artifact in debug_results.artifacts if artifact.id == "networkx_graph"
+                artifact.data for artifact in debug_state.artifacts if artifact.id == "networkx_graph"
             )
         except StopIteration:
             msg = "Missing required artifact: networkx_graph"
@@ -55,7 +55,7 @@ class AbstractGraphScorer(AbstractScoreDebugger):
             metadata=metadata,
         )
 
-        debug_results.scores.append(score)
+        debug_state.scores.append(score)
 
 
 class ArgMapGraphSizeScorer(AbstractGraphScorer):

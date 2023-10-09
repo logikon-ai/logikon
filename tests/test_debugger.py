@@ -5,7 +5,7 @@ import pytest
 
 from logikon.debuggers.base import AbstractArtifactDebugger, AbstractScoreDebugger
 from logikon.schemas.configs import DebugConfig
-from logikon.schemas.results import Artifact, DebugResults, Score
+from logikon.schemas.results import Artifact, DebugState, Score, INPUT_KWS
 
 
 class DummyDebugger1(AbstractArtifactDebugger):
@@ -23,15 +23,16 @@ class DummyDebugger1(AbstractArtifactDebugger):
     def get_requirements() -> List[str]:
         return DummyDebugger1._KW_REQUIREMENTS
 
-    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
+    def _debug(self, debug_state: DebugState):
+        prompt, completion = debug_state.get_prompt_completion()
         """Concat prompt and completion."""
-        data = prompt + completion
+        data = prompt + completion if prompt and completion else "None"
         artifact = Artifact(
             id=self._KW_PRODUCT,
             description=self._KW_DESCRIPTION,
             data=data,
         )
-        debug_results.artifacts.append(artifact)
+        debug_state.artifacts.append(artifact)
 
 
 class DummyDebugger2(AbstractScoreDebugger):
@@ -49,29 +50,34 @@ class DummyDebugger2(AbstractScoreDebugger):
     def get_requirements() -> List[str]:
         return DummyDebugger2._KW_REQUIREMENTS
 
-    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
+    def _debug(self, debug_state: DebugState):
         """Length of prompt."""
-        value = len(prompt)
+        prompt, _ = debug_state.get_prompt_completion()
+        value = len(prompt) if prompt else 0
         score = Score(
             id=self._KW_PRODUCT,
             description=self._KW_DESCRIPTION,
             value=value,
         )
-        debug_results.scores.append(score)
+        debug_state.scores.append(score)
 
 
-def test_debugger_chaining():
+def test_debugger_pipeline():
     config = DebugConfig()
+
     debugger1 = DummyDebugger1(config)
-    debugger1.set_next(DummyDebugger2(config))
+    debugger2 = DummyDebugger2(config)
 
     prompt = "01234"
     completion = "56789"
 
-    config.inputs.append(Artifact(id="prompt", description="Prompt", data=prompt, dtype="str"))
-    config.inputs.append(Artifact(id="completion", description="Completion", data=completion, dtype="str"))
+    config.inputs.append(Artifact(id=INPUT_KWS.prompt, description="Prompt", data=prompt, dtype="str"))
+    config.inputs.append(Artifact(id=INPUT_KWS.completion, description="Completion", data=completion, dtype="str"))
 
-    results = debugger1.handle(inputs=config.inputs)
+    # manual pipeline
+    results = DebugState(inputs=config.inputs)
+    results = debugger1(debug_state=results)
+    results = debugger2(debug_state=results)
 
     assert len(results.artifacts) == 1
     assert len(results.scores) == 1

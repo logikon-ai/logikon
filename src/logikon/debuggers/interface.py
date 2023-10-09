@@ -12,16 +12,12 @@ class Debugger(ABC):
         pass
 
     @abstractmethod
-    def set_next(self, handler):
+    def _debug(self, debug_state):
+        """Debug inputs in debug_state."""
         pass
 
     @abstractmethod
-    def _debug(self, prompt: str, completion: str, debug_results):
-        """Debug completion."""
-        pass
-
-    @abstractmethod
-    def handle(self, inputs, debug_results=None):
+    def __call__(self, debug_state):
         pass
 
     @staticmethod

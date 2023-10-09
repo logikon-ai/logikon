@@ -7,7 +7,7 @@ from unidecode import unidecode
 
 from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.argument_mapping import AnnotationSpan, ArgMapEdge, ArgMapNode, InformalArgMap
-from logikon.schemas.results import Artifact, DebugResults
+from logikon.schemas.results import Artifact, DebugState
 
 
 class NetworkXExporter(AbstractArtifactDebugger):
@@ -52,13 +52,13 @@ class NetworkXExporter(AbstractArtifactDebugger):
 
         return digraph
 
-    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
+    def _debug(self, debug_state: DebugState):
         """Reconstruct reasoning as argmap."""
 
         try:
             informal_argmap: InformalArgMap = next(
                 InformalArgMap(**artifact.data)
-                for artifact in debug_results.artifacts
+                for artifact in debug_state.artifacts
                 if artifact.id == "informal_argmap"
             )
         except StopIteration:
@@ -73,4 +73,4 @@ class NetworkXExporter(AbstractArtifactDebugger):
             data=networkx_graph,
         )
 
-        debug_results.artifacts.append(artifact)
+        debug_state.artifacts.append(artifact)

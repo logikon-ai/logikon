@@ -17,7 +17,7 @@ from langchain.llms import (
 from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.debuggers.utils import init_llm_from_config
 from logikon.schemas.argument_mapping import AnnotationSpan, ArgMapEdge, ArgMapNode, InformalArgMap
-from logikon.schemas.results import Artifact, DebugResults
+from logikon.schemas.results import Artifact, DebugState
 
 
 class PromptRegistry(Dict):
@@ -768,10 +768,11 @@ class InformalArgMapBuilder(AbstractArtifactDebugger):
     def get_description() -> str:
         return InformalArgMapBuilder._KW_DESCRIPTION
 
-    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
+    def _debug(self, debug_state: DebugState):
         """Reconstruct reasoning as argmap."""
 
-        claims = next(artifact.data for artifact in debug_results.artifacts if artifact.id == "claims")
+        prompt, completion = debug_state.get_prompt_completion()
+        claims = next(artifact.data for artifact in debug_state.artifacts if artifact.id == "claims")
 
         llm = init_llm_from_config(self._debug_config)
         generation_kwargs = self._debug_config.generation_kwargs
@@ -784,4 +785,4 @@ class InformalArgMapBuilder(AbstractArtifactDebugger):
             data=argmap,
         )
 
-        debug_results.artifacts.append(artifact)
+        debug_state.artifacts.append(artifact)

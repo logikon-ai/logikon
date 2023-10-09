@@ -1,18 +1,53 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional
+from typing import List, Optional, Callable
+
+import copy
+import functools as ft
 
 from logikon.debuggers.interface import Debugger
 from logikon.debuggers.registry import get_debugger_registry
 from logikon.schemas.configs import DebugConfig
+from logikon.schemas.results import DebugState, Artifact
 
 
 class DebuggerFactory:
-    """Factory for creating a debugger chain based on a config."""
+    """Factory for creating a debugger pipeline based on a config."""
 
-    def create(self, config: DebugConfig) -> Optional[Debugger]:
-        """Create a debugger chain based on a config."""
+    @staticmethod
+    def run_pipeline(pipeline: List[Debugger], inputs: List[Artifact] = [], debug_state: Optional[DebugState] = None):
+        """runs debugger pipeline"""
+
+        if debug_state is None:
+            # if not provided, initialize empty debug_state
+            state = DebugState()
+        else:
+            state = copy.deepcopy(debug_state)
+
+        # check whether input ids are unique
+        for input_artifact in inputs:
+            if [a.id for a in inputs].count(input_artifact.id) > 1:
+                raise ValueError(
+                    f"Found several input artifacts with id {input_artifact.id}. Input ids are required to be unique."
+                )
+
+        # add inputs to debug_state
+        for input_artifact in inputs:
+            if input_artifact.id in state.inputs:
+                raise ValueError(
+                    f"Duplicate input artifact id {input_artifact.id} found in debug_state.inputs and inputs. Ids must be unique."
+                )
+            state.inputs.append(input_artifact)
+
+        # iterate over debuggers
+        for debugger in pipeline:
+            state = debugger(debug_state=state)
+
+        return state
+
+    def create(self, config: DebugConfig) -> Optional[Callable]:
+        """Create a debugger pipeline based on a config."""
 
         registry = get_debugger_registry()
         input_ids = [inpt.id for inpt in config.inputs]
@@ -73,15 +108,15 @@ class DebuggerFactory:
                     new_debugger = registry[requirement_kw][0](config)
                     debuggers.append(new_debugger)
 
-        # Create debugger chain respecting the dependencies (iteratively add and remove debuggers)
-        chain: list[Debugger] = []
+        # Create debugger pipeline respecting the dependencies (iteratively add and remove debuggers)
+        pipeline: list[Debugger] = []
         while debuggers:
             added_any = False
-            products_available = {debugger.get_product() for debugger in chain} | set(input_ids)
+            products_available = {debugger.get_product() for debugger in pipeline} | set(input_ids)
             for debugger in debuggers:
                 requirements = set(debugger.get_requirements())
                 if requirements.issubset(products_available):
-                    chain.append(debugger)
+                    pipeline.append(debugger)
                     debuggers.remove(debugger)
                     added_any = True
             if not added_any:
@@ -89,14 +124,16 @@ class DebuggerFactory:
                 msg = f"Could not create debugger chain. Failed to satisfy any of the following debuggers' requirements: {debuggers_left}"
                 raise ValueError(msg)
 
-        if not chain:
+        if not pipeline:
             return None
 
         # chain the debuggers via set_next()
-        for i in range(len(chain) - 1):
-            chain[i].set_next(chain[i + 1])
+        # for i in range(len(pipeline) - 1):
+        #    pipeline[i].set_next(pipeline[i + 1])
 
-        return chain[0]
+        pipeline_callable = ft.partial(self.run_pipeline, pipeline=pipeline)
+
+        return pipeline_callable
 
     @property
     def logger(self) -> logging.Logger:

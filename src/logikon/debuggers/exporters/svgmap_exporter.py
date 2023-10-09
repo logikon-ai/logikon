@@ -11,7 +11,7 @@ from unidecode import unidecode
 import logikon
 from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.configs import DebugConfig
-from logikon.schemas.results import Artifact, DebugResults
+from logikon.schemas.results import Artifact, DebugState
 
 
 class SVGMapExporter(AbstractArtifactDebugger):
@@ -128,12 +128,12 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
         return svg
 
-    def _debug(self, prompt: str, completion: str, debug_results: DebugResults):
+    def _debug(self, debug_state: DebugState):
         """Reconstruct reasoning as argmap."""
 
         try:
             networkx_graph: nx.DiGraph = next(
-                artifact.data for artifact in debug_results.artifacts if artifact.id == "networkx_graph"
+                artifact.data for artifact in debug_state.artifacts if artifact.id == "networkx_graph"
             )
         except StopIteration:
             msg = "Missing required artifact: networkx_graph"
@@ -147,4 +147,4 @@ class SVGMapExporter(AbstractArtifactDebugger):
             data=svg_argmap,
         )
 
-        debug_results.artifacts.append(artifact)
+        debug_state.artifacts.append(artifact)

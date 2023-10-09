@@ -24,13 +24,7 @@ def test_debugger_factory():
             config = DebugConfig(metrics=metrics, artifacts=artifacts)
 
             debug_chain = DebuggerFactory().create(config)
-            assert isinstance(debug_chain, AbstractDebugger)
-
-            # loop over chain to debugger that produces product
-            current_debugger = debug_chain
-            while current_debugger.get_product() != product_kw:
-                current_debugger = current_debugger._next_debugger
-                assert current_debugger
+            assert callable(debug_chain)
 
 
 def test_debugger_factory2():
@@ -39,4 +33,4 @@ def test_debugger_factory2():
         llm_framework="VLLM",
     )
     debug_chain = DebuggerFactory().create(config)
-    assert isinstance(debug_chain, AbstractDebugger)
+    assert callable(debug_chain)
