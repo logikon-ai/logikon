@@ -28,7 +28,7 @@ dependencies = [
   "langchain",
   "openai",
   "outlines",
-  "lmql",
+  "lmql @ git+https://github.com/eth-sri/lmql@v0.7b3",
   "huggingface_hub",
   "pydantic>=1.10.0",
   "graphviz>=0.20.1",
@@ -103,6 +103,8 @@ all = [
   "style",
   "typing",
 ]
+[tool.hatch.metadata]
+allow-direct-references=true
 
 [tool.pytest]
 log_cli=true

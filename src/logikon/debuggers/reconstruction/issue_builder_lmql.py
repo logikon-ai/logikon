@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
-import functools as ft
-
 import lmql
 
 from logikon.debuggers.reconstruction.lmql_debugger import LMQLDebugger
@@ -27,7 +24,7 @@ QUESTIONS_EVAL = [
 @lmql.query
 def key_issue(prompt, completion):
     """
-    beam_sample(n=2, temperature=.4)
+    beam_sample(n=3, temperature=.4)
         "### System\n\n"
         "You are a helpful argumentation analysis assistant.\n\n"
         "### User\n\n"
@@ -102,6 +99,8 @@ class IssueBuilderLMQL(LMQLDebugger):
         """Extract central issue of text (prompt/completion)."""
 
         prompt, completion = debug_state.get_prompt_completion()
+        if prompt is None or completion is None:
+            raise ValueError(f"Prompt or completion is None. {self.__class__} requires both prompt and completion to debug.")
 
         # draft summarizations
         results = key_issue(
@@ -129,6 +128,9 @@ class IssueBuilderLMQL(LMQLDebugger):
         )
         label = result.variables.get("FINAL_ANSWER")
         issue = next((draft["text"] for draft in issue_drafts if draft["label"] == label), None)
+
+        if issue is None:
+            self.logger.warning("Failed to elicit issue (issue is None).")
 
         artifact = Artifact(
             id=self._KW_PRODUCT,
