@@ -4,8 +4,6 @@
 ### Score completions with one extra line of code
 
 ```python
-"""Score completions with one extra line of code"""
-
 import openai
 import logikon
 
@@ -13,7 +11,7 @@ import logikon
 prompt = "Vim or Emacs? Reason carefully before submitting your choice."
 completion = openai.Completion.create(model="text-davinci-003", prompt=prompt).choices[0].text
 
-# Debug and score reasoning
+# Debug and score reasoning 🚀
 score = logikon.score(prompt=prompt, completion=completion)
 
 #  >>> print(score)
@@ -26,8 +24,6 @@ score = logikon.score(prompt=prompt, completion=completion)
 ### Configure metrics, artifacts and debugging methods
 
 ```python
-"""Configure metrics, artifacts and debugging methods"""
-
 import logikon
 
 # Configure scoring methods
@@ -48,8 +44,6 @@ score = logikon.score(config=config, prompt=prompt, completion=completion)
 ### Simple reporting
 
 ```python
-"""Simple reporting"""
-
 import logikon
 
 your_mlops_platforms = ["wandb", "langfuse", ...]
@@ -71,8 +65,6 @@ score = logikon.score(config=config, prompt=prompt, completion=completion)
 ### LangChain integration
 
 ```python
-"""LangChain integration"""
-
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
@@ -97,20 +89,21 @@ print(chain.run("Vim or Emacs?", callbacks=[lgk_handler]))
 
 
 
-### Evaluate Human -- AI interaction
+### Evaluate Human–AI interaction
 
 ```python
-"""Evaluate a chat history"""
 
-´import logikon
+import logikon
+import your_mlops_platform
 
-# Chat between human user and AI assistant
-...
-
-chat_history = retrieve_chat_history()
+# Retrieve chat between human user and AI assistant
+chat_history = your_mlops_platform.get_logs()
 
 # Debug and score reasoning
 score = logikon.score(messages=chat_history)
+
+# Log scores
+your_mlops_platform.log(score)
 ```
 
 
