@@ -28,7 +28,7 @@ dependencies = [
   "langchain",
   "openai",
   "outlines",
-  "lmql @ git+https://github.com/eth-sri/lmql@v0.7b3",
+  "lmql==0.7.0",
   "huggingface_hub",
   "pydantic>=1.10.0",
   "graphviz>=0.20.1",
