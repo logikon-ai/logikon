@@ -1,28 +1,351 @@
-# issue_builder_ol.py
+"""Building a Pros & Cons List with LMQL"""
 
 from __future__ import annotations
 from typing import List, Dict
 
+import copy
 import functools as ft
+import uuid
 
 import lmql
 
 from logikon.debuggers.reconstruction.lmql_debugger import LMQLDebugger
 from logikon.schemas.results import Artifact, DebugState
+from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
 
+MAX_N_REASONS = 50
+MAX_N_ROOTS = 50
+MAX_LEN_TITLE = 32
+MAX_LEN_GIST = 180
 N_DRAFTS = 3
 LABELS = "ABCDEFG"
-QUESTIONS_EVAL = [
-    "Which alternative captures best the text's overarching issue addressed?",
-    "Which alternative is most clear and concise?",
-    "Which alternative is most faithful to the text?",
-]
 
 # examples
 
 
-# prompt templates
+# lmql queries
 
+
+@lmql.query
+def mine_reasons(prompt, completion, issue) -> List[Claim]:
+    '''lmql
+    sample(temperature=.4)
+        """
+        ### System
+        
+        You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+        ### User
+
+        Your Assignment: Summarize all the arguments (pros and cons) presented in a text.
+
+        Use the following inputs (a TEXT that addresses an ISSUE) to solve your assignment.
+
+        <TEXT>
+        {prompt}{completion}
+        </TEXT>
+
+        <ISSUE>
+        {issue}
+        </ISSUE>
+
+        What are the TEXT's arguments (pros and cons) that address the ISSUE?
+        
+        Let me give you more detailed instructions:
+
+        - Go through the text from beginning to end and extract all arguments in the order of appearance.
+        - For each argument, sketch the argument's gist in one or two grammatically correct sentences, staying close to the original wording, and provide a telling title (2-4 words). I.e.:
+            ```
+            - title: "a very short title"
+              gist: "the argument's gist in 1-2 sentences."
+            ```
+        - Avoid repeating one and the same argument in different words.
+        - You don't have to distinguish between pro and con arguments.
+        - IMPORTANT: Stay faithful to the text! Don't invent your own reasons. Only provide reasons which are either presented or discussed in the text.
+        - Use yaml syntax and "```" code fences to structure your answer.
+
+        ### Assistant
+        
+        The TEXT sets forth the following arguments:
+
+        ```yaml
+        arguments:"""
+        reasons = []
+        marker = ""
+        n = 0
+        while n<MAX_N_REASONS:
+            n += 1
+            "[MARKER]" where MARKER in set(["\n```", "\n- "])
+            marker = MARKER
+            if marker == "\n```":
+                break
+            else:
+                "title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and len(TITLE) < MAX_LEN_TITLE
+                if not TITLE.endswith('\"'):
+                    "\" "
+                title = TITLE.strip('\"')
+                "\n  gist: \"[GIST]" where STOPS_AT(GIST, "\"") and len(GIST) < MAX_LEN_GIST
+                if not GIST.endswith('\"'):
+                    "\" "
+                gist = GIST.strip('\"')
+                reasons.append(Claim(label=title, text=gist))
+        return reasons
+    '''
+
+
+@lmql.query
+def hello(reasons, issue):
+    '''lmql
+    sample(temperature=.4)
+        """
+        ### System
+        
+        You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+
+
+
+        ### User
+
+        Assignment: Organize an unstructured set of reasons as a pros & cons list.
+
+        Let's begin by thinking through the basic issue addressed by the reasons:
+        
+        <issue>{issue}</issue>
+        
+        What are the basic options available to an agent who needs to address this issue? Keep your answer short: sketch each option in a few words only, one per line. Use "<options>"/"</options>" tags.
+        
+        ### Assistant
+        
+        The options available to an agent who faces the above issue are:
+        
+        <options>
+        """
+        options = []
+        marker = ""
+        n = 0
+        while n<10:
+            n += 1
+            "[MARKER]" where MARKER in set(["</options>", "- "])
+            marker = MARKER
+            if marker == "</options>":
+                break
+            else:
+                "[OPTION]" where STOPS_AT(OPTION, "\n") and len(OPTION) < 32
+                options.append(OPTION.strip("\n "))
+        """
+
+        ### User
+
+        Thanks, let's keep that in mind.
+
+        Let us now come back to the main assignemnt: constructing a pros & cons list from a set of reasons. 
+
+        You'll be given a set of reasons, which you're supposed to organize as a pros and cons list. To do so, you have to find a fitting target claim (root statement) the reasons are arguing for (pros) or against (cons).
+
+        Use the following inputs (a list of reasons that address an issue) to solve your assignment.
+
+        <inputs>
+        <issue>{issue}</issue>
+        <reasons>
+        """
+        for reason in reasons:
+            title = reason.label
+            gist = reason.text
+            "- \"[[{title}]]: {gist}\"\n"
+        """</reasons>
+        </inputs>
+
+        Let me show you a few examples to illustrate the task / intended output:
+        
+        <example>
+        ```yaml
+        reasons:
+        - "[[Cultural value]]: Bullfighting is part of history and local cultures."
+        - "[[Cruelty]]: Bullfighting is cruelty for the purpose of entertainment."
+        - "[[Economic benefits]]: Bullfighting may benefit national economies."
+        issue: "Bullfighting?"
+        pros_and_cons:
+        - root: "(Bullfighting ban): Bullfighting should be banned."
+          pros:
+          - "[[Cruelty]]"
+          cons:
+          - "[[Economic benefits]]"
+          - "[[Cultural value]]"
+        </example>
+        
+        <example>
+        ```yaml
+        reasons:
+        - "[[Culture]]: New York has incredible cultural events to offer."
+        - "[[Costs]]: Spending holidays in a big city is too expensive."
+        - "[[Swimming]]: Florida has wonderful beaches and a warm ocean."
+        - "[[No Novelty]]: We've been in Los Angeles last year."
+        issue: "Our next holiday"
+        pros_and_cons:
+        - root: "(New York): Let's spend our next holiday in New York."
+          pros:
+          - [[Culture]]
+          cons:
+          - [[Costs]]
+        - root: "(Florida): Let's spend our next holiday in Florida."
+          pros:
+          - [[Swimming]]
+          cons: 
+        - root: "(Los Angeles): Let's spend our next holiday in Los Angeles."
+          pros:
+          cons:
+          - "[[No Novelty]]"
+          - "[[Costs]]"
+        </example>
+        
+        <example>
+        ```yaml
+        reasons:
+        - "[[Readability]]: Draft-1 is easier to read than the other drafts."
+        - "[[Engagement]]: Draft-1 is much more funny than the other drafts."
+        issue: "Pick best draft"
+        pros_and_cons:
+        - root: "(Draft-1): Draft-1 is the best draft."
+          pros:
+          - "[[Readability]]"
+          - "[[Engagement]]"
+          cons:        
+        ```        
+        </example>   
+
+        
+        Please consider carefully the following further, more specific instructions:
+
+        * Be bold: Render the root claim(s) as general, and strong, and unequivocal statement(s).
+        * No reasoning: Your root claim(s) must not contain any reasoning (or comments, or explanations).
+        * Keep it short: Try to identify a single root claim. Add further root claims only if necessary (e.g., if reasons address three alternative decision options).
+        * Recall options: Use the options you've identified above to construct the pros and cons list.
+        * Be exhaustive: All reasons must figure in your pros and cons list.
+        * !!Re-organize!!: Don't stick to the order of the original reason list.
+
+        Moreover:
+
+        * Use simple and plain language.
+        * If you identify multiple root claims, make sure they are mutually exclusive alternatives.
+        * Avoid repeating one and the same root claim in different words.
+        * Use yaml syntax and "```" code fences to structure your answer.
+
+
+        ### Assistant
+        
+        ```yaml
+        """
+        "reasons:\n"
+        for reason in reasons:
+            title = reason.label
+            gist = reason.text
+            "- \"[[{title}]]: {gist}\"\n"        
+        "issue: \"{issue}\"\n"
+        "pros_and_cons:\n"
+        unused_reasons = copy.deepcopy(reasons)
+        roots = []
+        "[MARKER]" where MARKER in set(["```", "- "])
+        marker = MARKER
+        while len(roots)<MAX_N_ROOTS and unused_reasons:
+            if marker == "```":
+                break
+            elif marker == "- ":  # new root
+                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
+                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
+                root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
+                "  pros:\n"
+                while unused_reasons:
+                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new pro
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                        root.pros.append(selected_reason)
+                        unused_reasons.remove(selected_reason)
+                    else:
+                        break
+                # cons
+                while unused_reasons:
+                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new con
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                        root.cons.append(selected_reason)
+                        unused_reasons.remove(selected_reason)
+                    else:
+                        break
+
+                roots.append(root)
+
+        if not unused_reasons:
+            return ProsConsList(roots=roots)
+            
+        """
+        ### User 
+        
+        Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
+        """
+        for reason in unused_reasons:
+            "- [[{reason.get(title)}]]\n"
+        """
+        Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
+
+        ### Assistant
+        
+        ```yaml
+        """
+        "reasons:\n"
+        for reason in reasons:
+            title = reason.get('title')
+            gist = reason.get('gist')
+            "- \"[[{title}]]: {gist}\"\n"        
+        "issue: \"{issue}\"\n"
+        "pros_and_cons:\n"
+        unused_reasons = [reason.get('title') for reason in reasons]
+        pros_and_cons = []
+        n_roots = 0
+        "[MARKER]" where MARKER in set(["```", "- "])
+        marker = MARKER
+        while n_roots<10 and unused_reasons:
+            n_roots += 1
+            if marker == "```":
+                break
+            elif marker == "- ":  # new root
+                root = {}
+                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
+                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
+                root["claim"] = CLAIM.strip('\"')
+                root["title"] = TITLE.strip(')')
+                root["pros"] = []
+                root["cons"] = []
+                "  pros:\n"
+                n_reasons = 0
+                while n_reasons<10 and unused_reasons:
+                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new pro
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set(unused_reasons)
+                        root["pros"].append(REASON_TITLE)
+                        unused_reasons.remove(REASON_TITLE)
+                    else:
+                        break
+                # cons
+                n_reasons = 0
+                while n_reasons<10 and unused_reasons:
+                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new con
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set(unused_reasons)
+                        root["cons"].append(REASON_TITLE)
+                        unused_reasons.remove(REASON_TITLE)
+                    else:
+                        break
+
+                pros_and_cons.append(root)
+
+        return pros_and_cons
+    '''
 
 
 
@@ -49,7 +372,41 @@ class ProsConsBuilderLMQL(LMQLDebugger):
     def get_description() -> str:
         return ProsConsBuilderLMQL._KW_DESCRIPTION
 
-    def doublecheck(self, pros_and_cons: List[Dict], reasons: List[Dict], issue: str) -> List[Dict]:
+    def ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
+        """Revises labels of reasons to ensure uniqueness
+
+        Args:
+            reasons (List[Claim]): list of reasons
+
+        Returns:
+            List[Claim]: list of reasons with unique labels
+        """
+
+        labels = [reason.label for reason in reasons]
+        duplicate_labels = [
+            label for label in labels
+            if labels.count(label) > 1
+        ]
+        if not duplicate_labels:
+            return reasons
+
+        unique_reasons = copy.deepcopy(reasons)
+        for reason in unique_reasons:
+            if reason.label in duplicate_labels:
+                i = 1
+                new_label = f"{reason.label}-{str(i)}"
+                while new_label in labels:
+                    if i >= MAX_N_REASONS:
+                        self.logger.warning("Failed to ensure unique labels for reasons.")
+                        break
+                    i += 1
+                    new_label = f"{reason.label}-{str(i)}"
+                reason.label = new_label
+
+        return unique_reasons
+
+
+    def doublecheck(self, pros_and_cons: ProsConsList, reasons: List[Claim], issue: str) -> ProsConsList:
         """Checks and revises a pros & cons list
 
         Args:
@@ -69,7 +426,22 @@ class ProsConsBuilderLMQL(LMQLDebugger):
 
 
     def _debug(self, debug_state: DebugState):
-        """Extract pros and cons of text (prompt/completion)."""
+        """Extract pros and cons of text (prompt/completion).
+
+        Args:
+            debug_state (DebugState): current debug_state to which new artifact is added
+
+        Raises:
+            ValueError: Failure to create pros and cons list
+
+        Proceeds as follows:
+
+        1. Mine (i.e., extract) all individual reasons from prompt/completion text
+        2. Organize reasons into pros and cons list
+        3. Double-check and revise pros and cons list
+        4. Unpack each individual reason into separate claims (if possible)
+
+        """
 
         prompt, completion = debug_state.get_prompt_completion()
         issue = next(a.data for a in debug_state.artifacts if a.id == "issue")
@@ -78,8 +450,9 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             raise ValueError(f"Prompt or completion is None. {self.__class__} requires both prompt and completion to debug.")
 
         # mine reasons
-        reasons = reason_mining(prompt=prompt, completion=completion, issue=issue, model=self._model)
-        reasons = reasons[0]
+        reasons = mine_reasons(prompt=prompt, completion=completion, issue=issue, model=self._model)
+        reasons: List[Claim] = reasons[0]
+        reasons = self.ensure_unique_labels(reasons)
 
         # build pros and cons list
         pros_and_cons = build_pros_and_cons(reasons=reasons, issue=issue, model=self._model)
@@ -89,13 +462,21 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         # double-check and revise
         pros_and_cons = self.doublecheck(pros_and_cons, reasons, issue)
 
+        # unpack individual reasons
+        pros_and_cons = unpack_reasons(pros_and_cons, issue)
+
         if pros_and_cons is None:
             self.logger.warning("Failed to build pros and cons list (pros_and_cons is None).")
+
+        try:
+            pros_and_cons_data = pros_and_cons.model_dump()  # type: ignore
+        except AttributeError:
+            pros_and_cons_data = pros_and_cons.dict()
 
         artifact = Artifact(
             id=self._KW_PRODUCT,
             description=self._KW_DESCRIPTION,
-            data=issue,
+            data=pros_and_cons_data,
         )
 
         debug_state.artifacts.append(artifact)
