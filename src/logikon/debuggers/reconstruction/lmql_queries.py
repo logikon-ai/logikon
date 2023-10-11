@@ -1,7 +1,4 @@
-"""LMQL Queries shared by Logikon Reconstruction Debuggers
-
-
-"""
+"""LMQL Queries shared by Logikon Reconstruction Debuggers"""
 
 
 from __future__ import annotations
