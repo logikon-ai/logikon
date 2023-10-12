@@ -10,11 +10,12 @@ import uuid
 import lmql
 
 from logikon.debuggers.reconstruction.lmql_debugger import LMQLDebugger
+import logikon.debuggers.reconstruction.lmql_queries as lmql_queries
 from logikon.schemas.results import Artifact, DebugState
 from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
 
 MAX_N_REASONS = 50
-MAX_N_ROOTS = 50
+MAX_N_ROOTS = 10
 MAX_LEN_TITLE = 32
 MAX_LEN_GIST = 180
 N_DRAFTS = 3
@@ -23,17 +24,20 @@ LABELS = "ABCDEFG"
 # examples
 
 
-# lmql queries
+# formatters
 
+def format_reason(reason: Claim) -> str:
+    return f"- \"[[{reason.label}]]: {reason.text}\"\n"
+
+
+# lmql queries
 
 @lmql.query
 def mine_reasons(prompt, completion, issue) -> List[Claim]:
     '''lmql
     sample(temperature=.4)
         """
-        ### System
-        
-        You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+        {lmql_queries.system_prompt()}
 
         ### User
 
@@ -92,17 +96,60 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:
         return reasons
     '''
 
+@lmql.query
+def roots(reasons, issue):
+    '''lmql
+    "reasons:\n"
+    for reason in reasons:
+        format_reason(reason)      
+    "issue: \"{issue}\"\n"
+    "pros_and_cons:\n"
+    unused_reasons = copy.deepcopy(reasons)
+    roots = []
+    "[MARKER]" where MARKER in set(["```", "- "])
+    marker = MARKER
+    while len(roots)<MAX_N_ROOTS and unused_reasons:
+        if marker == "```":
+            break
+        elif marker == "- ":  # new root
+            "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
+            "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
+            root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
+            "  pros:\n"
+            while unused_reasons:
+                "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
+                marker = MARKER
+                if marker == "  - ":  # new pro
+                    "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                    selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                    root.pros.append(selected_reason)
+                    unused_reasons.remove(selected_reason)
+                else:
+                    break
+            # cons
+            while unused_reasons:
+                "[MARKER]" where MARKER in set(["```", "- ", "  - "])
+                marker = MARKER
+                if marker == "  - ":  # new con
+                    "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                    selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                    root.cons.append(selected_reason)
+                    unused_reasons.remove(selected_reason)
+                else:
+                    break
+
+            roots.append(root)
+
+    return (roots, unused_reasons)
+
+    '''
 
 @lmql.query
-def hello(reasons, issue):
+def build_pros_and_cons(reasons, issue):
     '''lmql
     sample(temperature=.4)
         """
-        ### System
-        
-        You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
-
-
+        {lmql_queries.system_prompt()}
 
         ### User
 
@@ -122,9 +169,7 @@ def hello(reasons, issue):
         """
         options = []
         marker = ""
-        n = 0
-        while n<10:
-            n += 1
+        while len(options)<MAX_N_ROOTS:
             "[MARKER]" where MARKER in set(["</options>", "- "])
             marker = MARKER
             if marker == "</options>":
@@ -138,7 +183,7 @@ def hello(reasons, issue):
 
         Thanks, let's keep that in mind.
 
-        Let us now come back to the main assignemnt: constructing a pros & cons list from a set of reasons. 
+        Let us now come back to the main assignment: constructing a pros & cons list from a set of reasons. 
 
         You'll be given a set of reasons, which you're supposed to organize as a pros and cons list. To do so, you have to find a fitting target claim (root statement) the reasons are arguing for (pros) or against (cons).
 
@@ -149,9 +194,7 @@ def hello(reasons, issue):
         <reasons>
         """
         for reason in reasons:
-            title = reason.label
-            gist = reason.text
-            "- \"[[{title}]]: {gist}\"\n"
+            format_reason(reason)
         """</reasons>
         </inputs>
 
@@ -230,54 +273,13 @@ def hello(reasons, issue):
         * Avoid repeating one and the same root claim in different words.
         * Use yaml syntax and "```" code fences to structure your answer.
 
-
         ### Assistant
         
         ```yaml
+        [ROOTS: roots(reasons,issue)]
         """
-        "reasons:\n"
-        for reason in reasons:
-            title = reason.label
-            gist = reason.text
-            "- \"[[{title}]]: {gist}\"\n"        
-        "issue: \"{issue}\"\n"
-        "pros_and_cons:\n"
-        unused_reasons = copy.deepcopy(reasons)
-        roots = []
-        "[MARKER]" where MARKER in set(["```", "- "])
-        marker = MARKER
-        while len(roots)<MAX_N_ROOTS and unused_reasons:
-            if marker == "```":
-                break
-            elif marker == "- ":  # new root
-                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
-                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
-                root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
-                "  pros:\n"
-                while unused_reasons:
-                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
-                    marker = MARKER
-                    if marker == "  - ":  # new pro
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                        root.pros.append(selected_reason)
-                        unused_reasons.remove(selected_reason)
-                    else:
-                        break
-                # cons
-                while unused_reasons:
-                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
-                    marker = MARKER
-                    if marker == "  - ":  # new con
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                        root.cons.append(selected_reason)
-                        unused_reasons.remove(selected_reason)
-                    else:
-                        break
 
-                roots.append(root)
-
+        roots, unused_reasons = ROOTS
         if not unused_reasons:
             return ProsConsList(roots=roots)
             
@@ -287,67 +289,157 @@ def hello(reasons, issue):
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
         """
         for reason in unused_reasons:
-            "- [[{reason.get(title)}]]\n"
+            format_reason(reason)
         """
         Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
 
         ### Assistant
         
         ```yaml
+        [ROOTS: roots(reasons,issue)]
         """
-        "reasons:\n"
-        for reason in reasons:
-            title = reason.get('title')
-            gist = reason.get('gist')
-            "- \"[[{title}]]: {gist}\"\n"        
-        "issue: \"{issue}\"\n"
-        "pros_and_cons:\n"
-        unused_reasons = [reason.get('title') for reason in reasons]
-        pros_and_cons = []
-        n_roots = 0
-        "[MARKER]" where MARKER in set(["```", "- "])
-        marker = MARKER
-        while n_roots<10 and unused_reasons:
-            n_roots += 1
-            if marker == "```":
-                break
-            elif marker == "- ":  # new root
-                root = {}
-                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
-                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
-                root["claim"] = CLAIM.strip('\"')
-                root["title"] = TITLE.strip(')')
-                root["pros"] = []
-                root["cons"] = []
-                "  pros:\n"
-                n_reasons = 0
-                while n_reasons<10 and unused_reasons:
-                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
-                    marker = MARKER
-                    if marker == "  - ":  # new pro
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set(unused_reasons)
-                        root["pros"].append(REASON_TITLE)
-                        unused_reasons.remove(REASON_TITLE)
-                    else:
-                        break
-                # cons
-                n_reasons = 0
-                while n_reasons<10 and unused_reasons:
-                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
-                    marker = MARKER
-                    if marker == "  - ":  # new con
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set(unused_reasons)
-                        root["cons"].append(REASON_TITLE)
-                        unused_reasons.remove(REASON_TITLE)
-                    else:
-                        break
+        roots, unused_reasons = ROOTS
+        return ProsConsList(roots=roots)
 
-                pros_and_cons.append(root)
-
-        return pros_and_cons
     '''
 
+@lmql.query
+def unpack_reason(reason, issue):
+    '''lmql
+    sample(temperature=.4)
+        """
+        {lmql_queries.system_prompt()}
 
+        ### User
+
+        Your Assignment: Unpack the individual claims contained in an argumentation.
+
+        Use the following inputs (the title and gist of an argumentation that addresses an issue) to solve your assignment.
+
+        <inputs>
+        <issue>{issue}</issue>        
+        <argumentation>
+        <title>{reason.label}</title>
+        <gist>{reason.text}</gist>
+        </argumentation>
+        </inputs>
+
+        What are the individual claims and basic reasons contained in this argumentation?
+        
+        Let me give you more detailed instructions:
+
+        - Read the gist carefully and extract all individual claims it sets forth.
+        - State each claim clearly in simple and plain language.
+        - The basic claims you extract must not contain any reasoning (as indicated, e.g., by "because", "since", "therefore" ...). 
+        - For each argumentation, state all the claims it makes in one grammatically correct sentences, staying close to the original wording. Provide a distinct title, too. I.e.:
+            ```
+            argumentation:
+              issue: "repeat argumentation issue"
+              title: "repeat argumentation title"
+              gist: "repeat argumentation gist"
+              claims:
+              - title: "first claim title"
+                claim: "state first claim in one sentence."
+              - ...
+            ```
+        - The individual claims you extract may mutually support each other, or represent independent reasons for one and the same conclusion; yet such argumentative relations need not be recorded (at this point).
+        - If the argumentation gist contains a single claim, just include that very claim in your list. 
+        - Avoid repeating one and the same claim in different words.
+        - IMPORTANT: Stay faithful to the gist! Don't invent your own claims. Don't uncover implicit assumptions. Only provide claims which are explicitly contained in the gist.
+        - Use yaml syntax and "```" code fences to structure your answer.
+
+        I'll give you a few examples that illustrate the task.
+
+        <example>
+        ```yaml
+        argumentation:
+          issue: "Eating animals?"
+          title: "Climate impact"
+          gist: "Animal farming contributes to climate change because it is extremely energy intensive and causes the degradation of natural carbon sinks through land use change."
+          claims:
+          - title: "Climate impact"
+            claim: "Animal farming contributes to climate change."
+          - title: "High energy consumption"
+            claim: "Animal farming is extremely energy intensive."
+          - title: "Land use change"
+            claim: "Animal farming causes the degradation of natural carbon sinks through land use change."
+        ```        
+        </example>
+
+        <example>
+        ```yaml
+        argumentation:
+          issue: "Should Bullfighting be Banned?"
+          title: "Economic benefit"
+          gist: "Bullfighting can benefit national economies with an underdeveloped industrial base."
+          claims:
+          - title: "Economic benefit"
+            claim: "Bullfighting can benefit national economies with an underdeveloped industrial base."
+        ```        
+        </example>
+
+        <example>
+        ```yaml
+        argumentation:
+          issue: "Video games: good or bad?"
+          title: "Toxic communities"
+          gist: "Many video gaming communities are widely regarded as toxic since online games create opportunities for players to stalk and abuse each other."
+          claims:
+          - title: "Toxic communities"
+            claim: "Many video gaming communities are widely regarded as toxic."
+          - title: "Opportunities for abuse"
+            claim: "Online games create opportunities for players to stalk and abuse each other."
+        ```        
+        </example>
+
+        <example>
+        ```yaml
+        argumentation:
+          issue: "Pick best draft"
+          title: "Readability"
+          gist: "Draft 1 is easier to read and much more funny than the other drafts."
+          claims:
+          - title: "Readability"
+            claim: "Draft 1 is easier to read than the other drafts."
+          - title: "Engagement"
+            claim: "Draft 1 is much more funny than the other drafts."
+        ```        
+        </example>
+
+        Please, process the above inputs and unpack the individual claims contained in the argumentation.
+
+        ### Assistant
+        
+        The argumentation makes the following basic claims:
+
+        ```yaml
+        argumentation:
+          issue: "{issue}"
+          title: "{reason.label}"
+          gist: "{reason.text}"
+          claims:"""
+        claims = []
+        marker = ""
+        n = 0
+        while n<10:
+            n += 1
+            "[MARKER]" where MARKER in set(["\n```", "\n  - "])
+            marker = MARKER
+            if marker == "\n```":
+                break
+            else:
+                "title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and len(TITLE) < 24
+                if not TITLE.endswith('\"'):
+                    "\" "
+                title = TITLE.strip('\"')
+                "\n    claim: \"[CLAIM]" where STOPS_AT(CLAIM, "\"") and len(CLAIM) < 180
+                if not CLAIM.endswith('\"'):
+                    "\" "
+                claim = CLAIM.strip('\"')
+                claims.append(Claim(label=title, text=claim))
+        return claims
+
+    '''
 
 class ProsConsBuilderLMQL(LMQLDebugger):
     """ProsConsBuilderLMQL
@@ -425,6 +517,31 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         pass
 
 
+    def unpack_reasons(self, pros_and_cons: ProsConsList, issue: str) -> ProsConsList:
+        """Unpacks each individual reason in a pros and cons list
+
+        Args:
+            pros_and_cons (ProsConsList): pros and cons list with reason to be unpacked
+            issue (str): overarching issue addressed by pros and cons
+
+        Returns:
+            ProsConsList: pros and cons list with unpacked reasons
+        """
+        pros_and_cons = copy.deepcopy(pros_and_cons)
+        for root in pros_and_cons.roots:
+            for pro in root.pros:
+                unpacked_pros = unpack_reason(reason=pro, issue=issue)
+                if len(unpacked_pros) > 1:
+                    root.pros.remove(pro)
+                    root.pros.extend(unpacked_pros)
+            for con in root.cons:
+                unpacked_cons = unpack_reason(reason=con, issue=issue)
+                if len(unpacked_cons) > 1:
+                    root.cons.remove(con)
+                    root.cons.extend(unpacked_cons)
+
+        return pros_and_cons
+
     def _debug(self, debug_state: DebugState):
         """Extract pros and cons of text (prompt/completion).
 
@@ -463,7 +580,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         pros_and_cons = self.doublecheck(pros_and_cons, reasons, issue)
 
         # unpack individual reasons
-        pros_and_cons = unpack_reasons(pros_and_cons, issue)
+        pros_and_cons = self.unpack_reasons(pros_and_cons, issue)
 
         if pros_and_cons is None:
             self.logger.warning("Failed to build pros and cons list (pros_and_cons is None).")

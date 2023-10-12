@@ -17,3 +17,4 @@ class RootClaim(Claim):
 
 class ProsConsList(BaseModel):
     roots: List[RootClaim] = []
+    options: Optional[List[str]] = []
