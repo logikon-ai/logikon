@@ -2,9 +2,13 @@
 
 
 from __future__ import annotations
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 import lmql
+
+PRO = "pro"
+CON = "con"
+
 
 def system_prompt() -> str:
     """Returns the system prompt used in all lmql queries"""
@@ -21,9 +25,7 @@ def supports_q(argument, claim):
     '''lmql
     argmax
         """
-        ### System
-        
-        You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+        {system_prompt()}
 
         ### User
 
@@ -59,9 +61,7 @@ def attacks_q(argument, claim):
     '''lmql
     argmax
         """
-        ### System
-        
-        You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+        {system_prompt()}
 
         ### User
 
@@ -98,9 +98,7 @@ def most_confirmed(argument, claims):
         assert len(claims) <= 10
         labels = [l for l in "ABCDEFGHIJ"][:len(claims)]
         """
-        ### System
-        
-        You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+        {system_prompt()}
 
         ### User
 
@@ -135,9 +133,7 @@ def most_disconfirmed(argument, claims):
         assert len(claims) <= 10
         labels = [l for l in "ABCDEFGHIJ"][:len(claims)]
         """
-        ### System
-        
-        You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+        {system_prompt()}
 
         ### User
 
@@ -175,9 +171,7 @@ def valence(argument, claim):
     '''lmql
     argmax
         """
-        ### System
-        
-        You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+        {system_prompt()}
 
         ### User
 
@@ -215,10 +209,40 @@ def valence(argument, claim):
         LABEL in ["A", "B"]
     '''
 
+def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str,float]]:
+    """Extracts the distribution from an LMQL result
+
+    Args:
+        result (lmql.LMQLResult): LMQL Result object obtained from distribution query
+
+    Raises:
+        ValueError: No distribution found in LMQL result
+
+    Returns:
+        List[Tuple[str,float]]: Discrete distribution over labels (label, probability)
+    """
+    try:
+        return result.variables[f'P{result.distribution_variable}']
+    except:
+        raise ValueError(f"Failed to extract distribution from LMQL result: {result}")
+
+def label_to_idx(label):
+    try:
+        idx = "ABCDEFGHIJ".index(label)
+    except ValueError:
+        raise ValueError(f"Unknown label {label}")
+    return idx
+
+def label_to_claim(label, claims):
+    idx = label_to_idx(label)
+    if idx >= len(claims):
+        raise ValueError(f"Too few claims for {label}")
+    return claims[idx]
+
 def label_to_valence(label):
     if label == "A":
-        return "pro"
+        return PRO
     elif label == "B":
-        return "con"
+        return CON
     else:
         raise ValueError(f"Unknown label {label}")

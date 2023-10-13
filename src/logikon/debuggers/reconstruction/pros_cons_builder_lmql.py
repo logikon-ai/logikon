@@ -1,7 +1,7 @@
-"""Building a Pros & Cons List with LMQL"""
+"""Module with debugger for building a pros & cons list with LMQL"""
 
 from __future__ import annotations
-from typing import List, Dict
+from typing import List, TypedDict
 
 import copy
 import functools as ft
@@ -21,16 +21,16 @@ MAX_LEN_GIST = 180
 N_DRAFTS = 3
 LABELS = "ABCDEFG"
 
-# examples
+### EXAMPLES ###
 
 
-# formatters
+### FORMATTERS ###
 
 def format_reason(reason: Claim) -> str:
     return f"- \"[[{reason.label}]]: {reason.text}\"\n"
 
 
-# lmql queries
+### LMQL QUERIES ###
 
 @lmql.query
 def mine_reasons(prompt, completion, issue) -> List[Claim]:
@@ -441,6 +441,7 @@ def unpack_reason(reason, issue):
 
     '''
 
+
 class ProsConsBuilderLMQL(LMQLDebugger):
     """ProsConsBuilderLMQL
 
@@ -456,13 +457,16 @@ class ProsConsBuilderLMQL(LMQLDebugger):
     def get_product() -> str:
         return ProsConsBuilderLMQL._KW_PRODUCT
 
+
     @staticmethod
     def get_requirements() -> list[str]:
         return ProsConsBuilderLMQL._KW_REQUIREMENTS
 
+
     @staticmethod
     def get_description() -> str:
         return ProsConsBuilderLMQL._KW_DESCRIPTION
+
 
     def ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
         """Revises labels of reasons to ensure uniqueness
@@ -498,7 +502,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         return unique_reasons
 
 
-    def doublecheck(self, pros_and_cons: ProsConsList, reasons: List[Claim], issue: str) -> ProsConsList:
+    def check_and_revise(self, pros_and_cons: ProsConsList, reasons: List[Claim], issue: str) -> ProsConsList:
         """Checks and revises a pros & cons list
 
         Args:
@@ -514,7 +518,72 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         - Revises map accordingly
 
         """
-        pass
+
+        class Revision(TypedDict):
+            reason: Claim
+            old_target_idx: int
+            old_val: str
+            new_target_idx: int
+            new_val: str
+
+        revisions: List[Revision] = []
+
+        revised_pros_and_cons = copy.deepcopy(pros_and_cons)
+
+        for enum, root in enumerate(revised_pros_and_cons.roots):
+
+            for pro in root.pros:
+
+                # check target
+                lmql_result = lmql_queries.most_confirmed(pro, revised_pros_and_cons.roots)
+                if lmql_result is None:
+                    continue
+                probs_confirmed = lmql_queries.get_distribution(lmql_result)
+                max_confirmed = max(probs_confirmed, key=lambda x: x[1])
+                if max_confirmed[1] < 2*probs_confirmed[enum][1]:
+                    continue
+
+                old_val = lmql_queries.PRO
+                new_val = old_val
+                old_target_idx = enum
+                new_target_idx = lmql_queries.label_to_idx(max_confirmed[0])
+
+                # check valence
+                lmql_result = lmql_queries.most_disconfirmed(pro, revised_pros_and_cons.roots)
+                if lmql_result is None:
+                    continue
+                probs_disconfirmed = lmql_queries.get_distribution(lmql_result)
+                max_disconfirmed = max(probs_disconfirmed, key=lambda x: x[1])
+                if max_confirmed[0] == max_disconfirmed[0]:
+                    lmql_result = lmql_queries.valence(pro, revised_pros_and_cons.roots[new_target_idx])
+                    if lmql_result is not None:
+                        new_val = lmql_queries.label_to_valence(
+                            lmql_result.variables[lmql_result.distribution_variable]
+                        )
+
+                revisions.append({
+                    "reason": pro,
+                    "old_target_idx": old_target_idx,
+                    "new_target_idx": new_target_idx,
+                    "old_val": old_val,
+                    "new_val": new_val
+                })
+
+        # revise pros and cons list accpording to revision instructions
+        for revision in revisions:
+            reason = revision["reason"]
+            old_root = revised_pros_and_cons.roots[revision["old_target_idx"]]
+            new_root = revised_pros_and_cons.roots[revision["new_target_idx"]]
+            if revision["old_val"] == lmql_queries.PRO:
+                old_root.pros.remove(reason)
+            elif revision["old_val"] == lmql_queries.CON:
+                old_root.cons.remove(reason)
+            if revision["new_val"] == lmql_queries.PRO:
+                new_root.pros.append(reason)
+            elif revision["new_val"] == lmql_queries.CON:
+                new_root.cons.append(reason)
+
+        return revised_pros_and_cons
 
 
     def unpack_reasons(self, pros_and_cons: ProsConsList, issue: str) -> ProsConsList:
@@ -541,6 +610,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                     root.cons.extend(unpacked_cons)
 
         return pros_and_cons
+
 
     def _debug(self, debug_state: DebugState):
         """Extract pros and cons of text (prompt/completion).
@@ -577,7 +647,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         pros_and_cons = pros_and_cons[0]
 
         # double-check and revise
-        pros_and_cons = self.doublecheck(pros_and_cons, reasons, issue)
+        pros_and_cons = self.check_and_revise(pros_and_cons, reasons, issue)
 
         # unpack individual reasons
         pros_and_cons = self.unpack_reasons(pros_and_cons, issue)
