@@ -697,14 +697,16 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                         )
 
                 revisions.append({
-                    "reason": pro,
+                    "reason": con,
                     "old_target_idx": old_target_idx,
                     "new_target_idx": new_target_idx,
                     "old_val": old_val,
                     "new_val": new_val
                 })
 
-        # revise pros and cons list accpording to revision instructions
+        self.logger.info(f"Identified {len(revisions)} revision of pros and cons list.")
+
+        # revise pros and cons list according to revision instructions
         for revision in revisions:
             reason = revision["reason"]
             old_root = revised_pros_and_cons.roots[revision["old_target_idx"]]
