@@ -96,56 +96,56 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
         return reasons
     '''
 
+#@lmql.query
+#def get_roots(reasons, issue):
+#    '''lmql
+#    "reasons:\n"
+#    for reason in reasons:
+#        format_reason(reason)    
+#    "issue: \"{issue}\"\n"
+#    "pros_and_cons:\n"
+#    unused_reasons = copy.deepcopy(reasons)
+#    roots = []
+#    "[MARKER]" where MARKER in set(["```", "- "])
+#    marker = MARKER
+#    while len(roots)<MAX_N_ROOTS and unused_reasons:
+#        if marker == "```":
+#            break
+#        elif marker == "- ":  # new root
+#            "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
+#            "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
+#            root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
+#            "  pros:\n"
+#            while unused_reasons:
+#                "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
+#                marker = MARKER
+#                if marker == "  - ":  # new pro
+#                    "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+#                    selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+#                    root.pros.append(selected_reason)
+#                    unused_reasons.remove(selected_reason)
+#                else:
+#                    break
+#            # cons
+#            while unused_reasons:
+#                "[MARKER]" where MARKER in set(["```", "- ", "  - "])
+#                marker = MARKER
+#                if marker == "  - ":  # new con
+#                    "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+#                    selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+#                    root.cons.append(selected_reason)
+#                    unused_reasons.remove(selected_reason)
+#                else:
+#                    break
+#
+#            roots.append(root)
+#
+#    return (roots, unused_reasons)
+#
+#    '''
+
 @lmql.query
-def get_roots(reasons, issue):
-    '''lmql
-    "reasons:\n"
-    for reason in reasons:
-        format_reason(reason)    
-    "issue: \"{issue}\"\n"
-    "pros_and_cons:\n"
-    unused_reasons = copy.deepcopy(reasons)
-    roots = []
-    "[MARKER]" where MARKER in set(["```", "- "])
-    marker = MARKER
-    while len(roots)<MAX_N_ROOTS and unused_reasons:
-        if marker == "```":
-            break
-        elif marker == "- ":  # new root
-            "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
-            "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
-            root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
-            "  pros:\n"
-            while unused_reasons:
-                "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
-                marker = MARKER
-                if marker == "  - ":  # new pro
-                    "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-                    selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                    root.pros.append(selected_reason)
-                    unused_reasons.remove(selected_reason)
-                else:
-                    break
-            # cons
-            while unused_reasons:
-                "[MARKER]" where MARKER in set(["```", "- ", "  - "])
-                marker = MARKER
-                if marker == "  - ":  # new con
-                    "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-                    selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                    root.cons.append(selected_reason)
-                    unused_reasons.remove(selected_reason)
-                else:
-                    break
-
-            roots.append(root)
-
-    return (roots, unused_reasons)
-
-    '''
-
-@lmql.query
-def build_pros_and_cons(reasons_data, issue):
+def build_pros_and_cons(reasons_data: list, issue: str):
     '''lmql
     sample(temperature=.4)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
@@ -277,8 +277,47 @@ def build_pros_and_cons(reasons_data, issue):
         ### Assistant
         
         ```yaml
-        [ROOTS: get_roots(reasons,issue)]
+        reasons:
         """
+        for reason in reasons:
+            format_reason(reason)    
+        "issue: \"{issue}\"\n"
+        "pros_and_cons:\n"
+        unused_reasons = copy.deepcopy(reasons)
+        roots = []
+        "[MARKER]" where MARKER in set(["```", "- "])
+        marker = MARKER
+        while len(roots)<MAX_N_ROOTS and unused_reasons:
+            if marker == "```":
+                break
+            elif marker == "- ":  # new root
+                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
+                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
+                root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
+                "  pros:\n"
+                while unused_reasons:
+                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new pro
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                        root.pros.append(selected_reason)
+                        unused_reasons.remove(selected_reason)
+                    else:
+                        break
+                # cons
+                while unused_reasons:
+                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new con
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                        root.cons.append(selected_reason)
+                        unused_reasons.remove(selected_reason)
+                    else:
+                        break
+
+                roots.append(root)        
 
         roots, unused_reasons = ROOTS
         if not unused_reasons:
@@ -297,17 +336,56 @@ def build_pros_and_cons(reasons_data, issue):
         ### Assistant
         
         ```yaml
-        [ROOTS: roots(reasons,issue)]
+        reasons:
         """
-        roots, unused_reasons = ROOTS
+        for reason in reasons:
+            format_reason(reason)    
+        "issue: \"{issue}\"\n"
+        "pros_and_cons:\n"
+        unused_reasons = copy.deepcopy(reasons)
+        roots = []
+        "[MARKER]" where MARKER in set(["```", "- "])
+        marker = MARKER
+        while len(roots)<MAX_N_ROOTS and unused_reasons:
+            if marker == "```":
+                break
+            elif marker == "- ":  # new root
+                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
+                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
+                root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
+                "  pros:\n"
+                while unused_reasons:
+                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new pro
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                        root.pros.append(selected_reason)
+                        unused_reasons.remove(selected_reason)
+                    else:
+                        break
+                # cons
+                while unused_reasons:
+                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new con
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                        root.cons.append(selected_reason)
+                        unused_reasons.remove(selected_reason)
+                    else:
+                        break
+
+                roots.append(root)
         return ProsConsList(roots=roots)
 
     '''
 
 @lmql.query
-def unpack_reason(reason, issue):
+def unpack_reason(reason_data: dict, issue: str):
     '''lmql
     sample(temperature=.4)
+        reason = Claim(**reason_data)
         """
         {lmql_queries.system_prompt()}
 
@@ -536,7 +614,12 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             for pro in root.pros:
 
                 # check target
-                lmql_result = lmql_queries.most_confirmed(pro, revised_pros_and_cons.roots, model=self._model, **self._generation_kwargs)
+                lmql_result = lmql_queries.most_confirmed(
+                    pro.dict(),
+                    [r.dict() for r in revised_pros_and_cons.roots],
+                    model=self._model,
+                    **self._generation_kwargs
+                )
                 if lmql_result is None:
                     continue
                 probs_confirmed = lmql_queries.get_distribution(lmql_result)
@@ -550,13 +633,65 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 new_target_idx = lmql_queries.label_to_idx(max_confirmed[0])
 
                 # check valence
-                lmql_result = lmql_queries.most_disconfirmed(pro, revised_pros_and_cons.roots, model=self._model, **self._generation_kwargs)
+                lmql_result = lmql_queries.most_disconfirmed(
+                    pro.dict(),
+                    [r.dict() for r in revised_pros_and_cons.roots],
+                    model=self._model,
+                    **self._generation_kwargs
+                )
                 if lmql_result is None:
                     continue
                 probs_disconfirmed = lmql_queries.get_distribution(lmql_result)
                 max_disconfirmed = max(probs_disconfirmed, key=lambda x: x[1])
                 if max_confirmed[0] == max_disconfirmed[0]:
-                    lmql_result = lmql_queries.valence(pro, revised_pros_and_cons.roots[new_target_idx], model=self._model, **self._generation_kwargs)
+                    lmql_result = lmql_queries.valence(pro.dict(), revised_pros_and_cons.roots[new_target_idx].dict(), model=self._model, **self._generation_kwargs)
+                    if lmql_result is not None:
+                        new_val = lmql_queries.label_to_valence(
+                            lmql_result.variables[lmql_result.distribution_variable]
+                        )
+
+                revisions.append({
+                    "reason": pro,
+                    "old_target_idx": old_target_idx,
+                    "new_target_idx": new_target_idx,
+                    "old_val": old_val,
+                    "new_val": new_val
+                })
+
+            for con in root.cons:
+
+                # check target
+                lmql_result = lmql_queries.most_disconfirmed(
+                    con.dict(),
+                    [r.dict() for r in revised_pros_and_cons.roots],
+                    model=self._model,
+                    **self._generation_kwargs
+                )
+                if lmql_result is None:
+                    continue
+                probs_disconfirmed = lmql_queries.get_distribution(lmql_result)
+                max_disconfirmed = max(probs_disconfirmed, key=lambda x: x[1])
+                if max_disconfirmed[1] < 2*probs_disconfirmed[enum][1]:
+                    continue
+
+                old_val = lmql_queries.CON
+                new_val = old_val
+                old_target_idx = enum
+                new_target_idx = lmql_queries.label_to_idx(max_disconfirmed[0])
+
+                # check valence
+                lmql_result = lmql_queries.most_confirmed(
+                    con.dict(),
+                    [r.dict() for r in revised_pros_and_cons.roots],
+                    model=self._model,
+                    **self._generation_kwargs
+                )
+                if lmql_result is None:
+                    continue
+                probs_confirmed = lmql_queries.get_distribution(lmql_result)
+                max_confirmed = max(probs_confirmed, key=lambda x: x[1])
+                if max_disconfirmed[0] == max_confirmed[0]:
+                    lmql_result = lmql_queries.valence(con.dict(), revised_pros_and_cons.roots[new_target_idx].dict(), model=self._model, **self._generation_kwargs)
                     if lmql_result is not None:
                         new_val = lmql_queries.label_to_valence(
                             lmql_result.variables[lmql_result.distribution_variable]
@@ -600,12 +735,12 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         pros_and_cons = copy.deepcopy(pros_and_cons)
         for root in pros_and_cons.roots:
             for pro in root.pros:
-                unpacked_pros = unpack_reason(reason=pro, issue=issue, model=self._model, **self._generation_kwargs)
+                unpacked_pros = unpack_reason(reason=pro.dict(), issue=issue, model=self._model, **self._generation_kwargs)
                 if len(unpacked_pros) > 1:
                     root.pros.remove(pro)
                     root.pros.extend(unpacked_pros)
             for con in root.cons:
-                unpacked_cons = unpack_reason(reason=con, issue=issue)
+                unpacked_cons = unpack_reason(reason=con.dict(), issue=issue)
                 if len(unpacked_cons) > 1:
                     root.cons.remove(con)
                     root.cons.extend(unpacked_cons)
@@ -644,7 +779,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         reasons = self.ensure_unique_labels(reasons)
 
         # build pros and cons list
-        pros_and_cons = build_pros_and_cons(reasons=[r.dict() for r in reasons], issue=issue, model=self._model, **self._generation_kwargs)
+        pros_and_cons = build_pros_and_cons(reasons_data=[r.dict() for r in reasons], issue=issue, model=self._model, **self._generation_kwargs)
         if not isinstance(pros_and_cons, ProsConsList):
             raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
         # TODO: consider drafting alternative pros&cons lists and choosing best

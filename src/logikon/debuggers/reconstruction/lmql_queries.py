@@ -6,6 +6,8 @@ from typing import List, Dict, Tuple
 
 import lmql
 
+from logikon.schemas.pros_cons import Claim
+
 PRO = "pro"
 CON = "con"
 
@@ -23,9 +25,11 @@ You are a helpful, honest and knowledgeable AI assistant with expertise in criti
 
 
 @lmql.query
-def supports_q(argument, claim):
+def supports_q(argument_data: dict, claim_data: dict):
     '''lmql
     argmax
+        argument = Claim(**argument_data)
+        claim = Claim(**claim_data)
         """
         {system_prompt()}
 
@@ -59,9 +63,11 @@ def supports_q(argument, claim):
 
 
 @lmql.query
-def attacks_q(argument, claim):
+def attacks_q(argument_data: dict, claim_data: dict):
     '''lmql
     argmax
+        argument = Claim(**argument_data)
+        claim = Claim(**claim_data)
         """
         {system_prompt()}
 
@@ -94,9 +100,11 @@ def attacks_q(argument, claim):
     '''
     
 @lmql.query
-def most_confirmed(argument, claims):
+def most_confirmed(argument_data: dict, claims_data: list):
     '''lmql
     argmax
+        argument = Claim(**argument_data)
+        claims = [Claim(**claim_data) for claim_data in claims_data]
         assert len(claims) <= 10
         labels = [l for l in "ABCDEFGHIJ"][:len(claims)]
         """
@@ -129,9 +137,11 @@ def most_confirmed(argument, claims):
     '''
 
 @lmql.query
-def most_disconfirmed(argument, claims):
+def most_disconfirmed(argument_data: dict, claims_data: list):
     '''lmql
     argmax
+        argument = Claim(**argument_data)
+        claims = [Claim(**claim_data) for claim_data in claims_data]
         assert len(claims) <= 10
         labels = [l for l in "ABCDEFGHIJ"][:len(claims)]
         """
@@ -169,9 +179,11 @@ def most_disconfirmed(argument, claims):
 
 
 @lmql.query
-def valence(argument, claim):
+def valence(argument_data: dict, claim_data: dict):
     '''lmql
     argmax
+        argument = Claim(**argument_data)
+        claim = Claim(**claim_data)
         """
         {system_prompt()}
 
