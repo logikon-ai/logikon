@@ -319,7 +319,6 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
                 roots.append(root)        
 
-        roots, unused_reasons = ROOTS
         if not unused_reasons:
             return ProsConsList(roots=roots)
             
