@@ -638,15 +638,15 @@ class ProsConsBuilderLMQL(LMQLDebugger):
 
         # mine reasons
         reasons = mine_reasons(prompt=prompt, completion=completion, issue=issue, model=self._model, **self._generation_kwargs)
-        if not all(isinstance(reason, Claim) for reason in reasons[0]):
+        if not all(isinstance(reason, Claim) for reason in reasons):
             raise ValueError(f"Reasons are not of type Claim. Got {reasons}.")
-        reasons = reasons[0]
         reasons = self.ensure_unique_labels(reasons)
 
         # build pros and cons list
         pros_and_cons = build_pros_and_cons(reasons=reasons, issue=issue, model=self._model, **self._generation_kwargs)
+        if not isinstance(pros_and_cons, ProsConsList):
+            raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
         # TODO: consider drafting alternative pros&cons lists and choosing best
-        pros_and_cons = pros_and_cons[0]
 
         # double-check and revise
         pros_and_cons = self.check_and_revise(pros_and_cons, reasons, issue)
