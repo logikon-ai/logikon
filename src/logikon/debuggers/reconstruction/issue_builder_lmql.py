@@ -27,7 +27,7 @@ def strip_issue_tag(text: str) -> str:
 @lmql.query
 def key_issue(prompt, completion):
     """
-    beam_sample(n=3, temperature=.4)
+    sample(n=3, temperature=.4)
         "### System\n\n"
         "You are a helpful argumentation analysis assistant.\n\n"
         "### User\n\n"
