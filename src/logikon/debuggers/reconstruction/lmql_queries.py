@@ -15,7 +15,8 @@ def system_prompt() -> str:
     system_prompt = """
 ### System
         
-You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible."""
+You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
+"""
 
     return system_prompt
 
