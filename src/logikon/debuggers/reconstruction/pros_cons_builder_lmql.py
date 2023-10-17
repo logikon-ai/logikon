@@ -33,7 +33,7 @@ def format_reason(reason: Claim) -> str:
 ### LMQL QUERIES ###
 
 @lmql.query
-def mine_reasons(prompt, completion, issue) -> List[Claim]:
+def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
     '''lmql
     sample(temperature=.4)
         """
@@ -535,7 +535,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             for pro in root.pros:
 
                 # check target
-                lmql_result = lmql_queries.most_confirmed(pro, revised_pros_and_cons.roots)
+                lmql_result = lmql_queries.most_confirmed(pro, revised_pros_and_cons.roots, model=self._model, **self._model_kwargs)
                 if lmql_result is None:
                     continue
                 probs_confirmed = lmql_queries.get_distribution(lmql_result)
@@ -549,13 +549,13 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 new_target_idx = lmql_queries.label_to_idx(max_confirmed[0])
 
                 # check valence
-                lmql_result = lmql_queries.most_disconfirmed(pro, revised_pros_and_cons.roots)
+                lmql_result = lmql_queries.most_disconfirmed(pro, revised_pros_and_cons.roots, model=self._model, **self._model_kwargs)
                 if lmql_result is None:
                     continue
                 probs_disconfirmed = lmql_queries.get_distribution(lmql_result)
                 max_disconfirmed = max(probs_disconfirmed, key=lambda x: x[1])
                 if max_confirmed[0] == max_disconfirmed[0]:
-                    lmql_result = lmql_queries.valence(pro, revised_pros_and_cons.roots[new_target_idx])
+                    lmql_result = lmql_queries.valence(pro, revised_pros_and_cons.roots[new_target_idx], model=self._model, **self._model_kwargs)
                     if lmql_result is not None:
                         new_val = lmql_queries.label_to_valence(
                             lmql_result.variables[lmql_result.distribution_variable]
@@ -599,7 +599,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         pros_and_cons = copy.deepcopy(pros_and_cons)
         for root in pros_and_cons.roots:
             for pro in root.pros:
-                unpacked_pros = unpack_reason(reason=pro, issue=issue)
+                unpacked_pros = unpack_reason(reason=pro, issue=issue, model=self._model, **self._model_kwargs)
                 if len(unpacked_pros) > 1:
                     root.pros.remove(pro)
                     root.pros.extend(unpacked_pros)
@@ -637,12 +637,12 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             raise ValueError(f"Prompt or completion is None. {self.__class__} requires both prompt and completion to debug.")
 
         # mine reasons
-        reasons = mine_reasons(prompt=prompt, completion=completion, issue=issue, model=self._model)
-        reasons: List[Claim] = reasons[0]
+        reasons = mine_reasons(prompt=prompt, completion=completion, issue=issue, model=self._model, **self._model_kwargs)
+        reasons = reasons[0]
         reasons = self.ensure_unique_labels(reasons)
 
         # build pros and cons list
-        pros_and_cons = build_pros_and_cons(reasons=reasons, issue=issue, model=self._model)
+        pros_and_cons = build_pros_and_cons(reasons=reasons, issue=issue, model=self._model, **self._model_kwargs)
         # TODO: consider drafting alternative pros&cons lists and choosing best
         pros_and_cons = pros_and_cons[0]
 

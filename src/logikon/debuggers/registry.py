@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from typing import MutableMapping, Mapping, List, Any
+from typing import Mapping, List
 
 from logikon.debuggers.base import Debugger, AbstractScoreDebugger, AbstractArtifactDebugger
 from logikon.debuggers.exporters.networkx_exporter import NetworkXExporter
 from logikon.debuggers.exporters.svgmap_exporter import SVGMapExporter
 from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
 from logikon.debuggers.reconstruction.informal_argmap_builder import InformalArgMapBuilder
+from logikon.debuggers.reconstruction.issue_builder_lmql import IssueBuilderLMQL
+from logikon.debuggers.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
 from logikon.debuggers.scorers.argmap_graph_scores import (
     ArgMapGraphAttackRatioScorer,
     ArgMapGraphAvgKatzCScorer,
@@ -17,6 +19,8 @@ from logikon.debuggers.scorers.argmap_graph_scores import (
 _DEBUGGER_REGISTRY: Mapping[str, List[type[Debugger]]] = {
     "informal_argmap": [InformalArgMapBuilder],
     "claims": [ClaimExtractor],
+    "issue": [IssueBuilderLMQL],
+    "proscons": [ProsConsBuilderLMQL],
     "networkx_graph": [NetworkXExporter],
     "svg_argmap": [SVGMapExporter],
     "argmap_size": [ArgMapGraphSizeScorer],
@@ -39,17 +43,3 @@ def get_debugger_registry() -> Mapping[str, List[type[Debugger]]]:
 
     return _DEBUGGER_REGISTRY
 
-
-_model_registry: MutableMapping[str, Any] = {}
-
-
-def register_model(model_id: str, model: Any):
-    if model_id in _model_registry:
-        raise ValueError(
-            f"Duplicate model id. Model of type {type(_model_registry[model_id])} already registered under id {model_id}."
-        )
-    _model_registry[model_id] = model
-
-
-def get_registry_model(model_id: str):
-    return _model_registry.get(model_id)
