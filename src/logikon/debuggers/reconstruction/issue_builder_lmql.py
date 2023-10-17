@@ -38,7 +38,7 @@ def key_issue(prompt, completion):
         "{prompt}{completion}\n"
         "</TEXT>\n\n"
         "## Step 1\n\n"
-        "Summarize the central issue / decision problem discussed in the TEXT in a few words.\n"
+        "State the central issue / decision problem discussed in the TEXT in a few words.\n"
         "Be as brief and concise as possible. Think of your answer as the headline of an argument or debate.\n"
         "Enclose your answer in \"<ISSUE>\" / \"</ISSUE>\" tags.\n\n"
         "### Assistant\n\n"
