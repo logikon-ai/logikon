@@ -49,7 +49,7 @@ def key_issue(prompt, completion):
 
 @lmql.query
 def rate_issue_drafts(alternatives, questions, prompt, completion):
-    """
+    '''lmql
     argmax
         labels = [alternative.get('label') for alternative in alternatives]
         "### System\n\n"
@@ -70,12 +70,10 @@ def rate_issue_drafts(alternatives, questions, prompt, completion):
         "### Assistant\n\n"
         for question in questions:
             "{question} \n"
-            "Answer: ([ANSWER])\n\n"
+            "Answer: ([ANSWER])\n\n" where ANSWER in set(labels)
         "So, all in all and given the above assessments, the best summarization of the text's key issue is which alternative?\n"
-        "Answer: ([FINAL_ANSWER])"
-    where
-        ANSWER in set(labels) and FINAL_ANSWER in set(labels)
-    """
+        "Answer: ([FINAL_ANSWER])" where FINAL_ANSWER in set(labels)   
+    '''
 
 
 class IssueBuilderLMQL(LMQLDebugger):
