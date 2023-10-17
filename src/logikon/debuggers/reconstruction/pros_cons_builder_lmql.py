@@ -26,7 +26,8 @@ LABELS = "ABCDEFG"
 
 ### FORMATTERS ###
 
-def format_reason(reason: Claim) -> str:
+def format_reason(reason_data: dict) -> str:
+    reason = Claim(**reason_data)
     return f"- \"[[{reason.label}]]: {reason.text}\"\n"
 
 
@@ -101,7 +102,7 @@ def get_roots(reasons, issue):
     '''lmql
     "reasons:\n"
     for reason in reasons:
-        format_reason(reason)      
+        format_reason(reason.dict())    
     "issue: \"{issue}\"\n"
     "pros_and_cons:\n"
     unused_reasons = copy.deepcopy(reasons)
@@ -194,7 +195,7 @@ def build_pros_and_cons(reasons, issue):
         <reasons>
         """
         for reason in reasons:
-            format_reason(reason)
+            format_reason(reason.dict())
         """</reasons>
         </inputs>
 
@@ -289,7 +290,7 @@ def build_pros_and_cons(reasons, issue):
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
         """
         for reason in unused_reasons:
-            format_reason(reason)
+            format_reason(reason.dict())
         """
         Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
 
