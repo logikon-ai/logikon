@@ -97,7 +97,7 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
     '''
 
 @lmql.query
-def roots(reasons, issue):
+def get_roots(reasons, issue):
     '''lmql
     "reasons:\n"
     for reason in reasons:
@@ -276,7 +276,7 @@ def build_pros_and_cons(reasons, issue):
         ### Assistant
         
         ```yaml
-        [ROOTS: roots(reasons,issue)]
+        [ROOTS: get_roots(reasons,issue)]
         """
 
         roots, unused_reasons = ROOTS
