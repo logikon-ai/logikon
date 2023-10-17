@@ -147,8 +147,8 @@ def get_roots(reasons, issue):
 @lmql.query
 def build_pros_and_cons(reasons_data, issue):
     '''lmql
-    reasons = [Claim(**reason_data) for reason_data in reasons_data]
     sample(temperature=.4)
+        reasons = [Claim(**reason_data) for reason_data in reasons_data]
         """
         {lmql_queries.system_prompt()}
 
