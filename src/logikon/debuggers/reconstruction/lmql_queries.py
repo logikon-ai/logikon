@@ -236,7 +236,7 @@ def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str,float]]:
         List[Tuple[str,float]]: Discrete distribution over labels (label, probability)
     """
     try:
-        return result.variables[f'P{result.distribution_variable}']
+        return result.variables[f'P({result.distribution_variable})']
     except:
         raise ValueError(f"Failed to extract distribution from LMQL result: {result}")
 
