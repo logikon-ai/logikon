@@ -20,6 +20,9 @@ QUESTIONS_EVAL = [
 
 # prompt templates
 
+def strip_issue_tag(text: str) -> str:
+    """Strip issue tag from text."""
+    return text.strip("</ISSUE>").strip("\n ")
 
 @lmql.query
 def key_issue(prompt, completion):
@@ -43,7 +46,7 @@ def key_issue(prompt, completion):
         "Enclose your answer in \"<ISSUE>\" / \"</ISSUE>\" tags.\n\n"
         "### Assistant\n\n"
         "<ISSUE>\n"
-        "[ISSUE]"
+        "[@strip_issue_tag ISSUE]"
     where
         STOPS_AT(ISSUE, "</ISSUE>")
     """
