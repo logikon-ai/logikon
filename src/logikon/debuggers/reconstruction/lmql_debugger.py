@@ -45,3 +45,4 @@ class LMQLDebugger(AbstractArtifactDebugger):
         model_kwargs.pop("tokenizer", None)
         self._model: lmql.LLM = model
         self._model_kwargs = model_kwargs
+        self._generation_kwargs = debug_config.generation_kwargs if debug_config.generation_kwargs is not None else {}

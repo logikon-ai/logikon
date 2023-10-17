@@ -105,15 +105,18 @@ class IssueBuilderLMQL(LMQLDebugger):
             prompt=prompt,
             completion=completion,
             model=self._model,
-            **self._model_kwargs,
+            **self._generation_kwargs,
         )
+        if not all(isinstance(result, lmql.LMQLResult) for result in results):
+            raise ValueError(f"Results are not of type lmql.LMQLResult. Got {results}.")
         issue_drafts = [
             {
-                "text": result.variables.get("ISSUE").strip("\n "),
+                "text": result.variables.get("ISSUE", "").strip("\n "),
                 "label": LABELS[enum],
             }
             for enum, result in enumerate(results)
         ]
+        self.logger.info(f"Drafts: {issue_drafts}")
 
         # rate summarizations and choose best
         result = rate_issue_drafts(
@@ -122,7 +125,7 @@ class IssueBuilderLMQL(LMQLDebugger):
             prompt=prompt,
             completion=completion,
             model=self._model,
-            **self._model_kwargs,
+            **self._generation_kwargs,
         )
         label = result.variables.get("FINAL_ANSWER")
         issue = next((draft["text"] for draft in issue_drafts if draft["label"] == label), None)
