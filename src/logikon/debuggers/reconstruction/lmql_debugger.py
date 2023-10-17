@@ -42,5 +42,6 @@ class LMQLDebugger(AbstractArtifactDebugger):
         if not isinstance(model, lmql.LLM):
             raise ValueError(f"Model {model_id} is not an lmql model.")
 
+        model_kwargs.pop("tokenizer", None)
         self._model: lmql.LLM = model
         self._model_kwargs = model_kwargs
