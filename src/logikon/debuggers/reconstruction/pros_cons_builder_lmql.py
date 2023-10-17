@@ -26,8 +26,7 @@ LABELS = "ABCDEFG"
 
 ### FORMATTERS ###
 
-def format_reason(reason_data: dict) -> str:
-    reason = Claim(**reason_data)
+def format_reason(reason: Claim) -> str:
     return f"- \"[[{reason.label}]]: {reason.text}\"\n"
 
 
@@ -102,7 +101,7 @@ def get_roots(reasons, issue):
     '''lmql
     "reasons:\n"
     for reason in reasons:
-        format_reason(reason.dict())    
+        format_reason(reason)    
     "issue: \"{issue}\"\n"
     "pros_and_cons:\n"
     unused_reasons = copy.deepcopy(reasons)
@@ -146,8 +145,9 @@ def get_roots(reasons, issue):
     '''
 
 @lmql.query
-def build_pros_and_cons(reasons, issue):
+def build_pros_and_cons(reasons_data, issue):
     '''lmql
+    reasons = [Claim(**reason_data) for reason_data in reasons_data]
     sample(temperature=.4)
         """
         {lmql_queries.system_prompt()}
@@ -195,7 +195,7 @@ def build_pros_and_cons(reasons, issue):
         <reasons>
         """
         for reason in reasons:
-            format_reason(reason.dict())
+            format_reason(reason)
         """</reasons>
         </inputs>
 
@@ -290,7 +290,7 @@ def build_pros_and_cons(reasons, issue):
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
         """
         for reason in unused_reasons:
-            format_reason(reason.dict())
+            format_reason(reason)
         """
         Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
 
@@ -644,7 +644,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         reasons = self.ensure_unique_labels(reasons)
 
         # build pros and cons list
-        pros_and_cons = build_pros_and_cons(reasons=reasons, issue=issue, model=self._model, **self._generation_kwargs)
+        pros_and_cons = build_pros_and_cons(reasons=[r.dict() for r in reasons], issue=issue, model=self._model, **self._generation_kwargs)
         if not isinstance(pros_and_cons, ProsConsList):
             raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
         # TODO: consider drafting alternative pros&cons lists and choosing best
