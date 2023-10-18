@@ -227,7 +227,7 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
     '''
 
 @lmql.query
-def get_roots(reasons_data, issue):
+def get_roots(reasons_data: list, issue: str):
     '''lmql
     sample(temperature=.4)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
