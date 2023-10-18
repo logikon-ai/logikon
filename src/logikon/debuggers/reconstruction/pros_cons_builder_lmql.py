@@ -168,7 +168,7 @@ def format_examples() -> str:
 @lmql.query
 def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
     '''lmql
-    sample(temperature=.4, top_k=100, top_p=0.95)
+    sample(temperature=.4)
         """
         {lmql_queries.system_prompt()}
 
