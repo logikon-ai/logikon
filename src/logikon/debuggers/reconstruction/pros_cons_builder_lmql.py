@@ -226,54 +226,57 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
         return reasons
     '''
 
-#@lmql.query
-#def get_roots(reasons, issue):
-#    '''lmql
-#    "reasons:\n"
-#    for reason in reasons:
-#       f_reason = format_reason(reason)
-#       "{f_reason}"
-#    "issue: \"{issue}\"\n"
-#    "pros_and_cons:\n"
-#    unused_reasons = copy.deepcopy(reasons)
-#    roots = []
-#    "[MARKER]" where MARKER in set(["```", "- "])
-#    marker = MARKER
-#    while len(roots)<MAX_N_ROOTS and unused_reasons:
-#        if marker == "```":
-#            break
-#        elif marker == "- ":  # new root
-#            "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
-#            "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
-#            root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
-#            "  pros:\n"
-#            while unused_reasons:
-#                "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
-#                marker = MARKER
-#                if marker == "  - ":  # new pro
-#                    "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-#                    selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-#                    root.pros.append(selected_reason)
-#                    unused_reasons.remove(selected_reason)
-#                else:
-#                    break
-#            # cons
-#            while unused_reasons:
-#                "[MARKER]" where MARKER in set(["```", "- ", "  - "])
-#                marker = MARKER
-#                if marker == "  - ":  # new con
-#                    "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-#                    selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-#                    root.cons.append(selected_reason)
-#                    unused_reasons.remove(selected_reason)
-#                else:
-#                    break
-#
-#            roots.append(root)
-#
-#    return (roots, unused_reasons)
-#
-#    '''
+@lmql.query
+def get_roots(reasons_data, issue):
+    '''lmql
+    sample(temperature=.4)
+        reasons = [Claim(**reason_data) for reason_data in reasons_data]
+        "```yaml\n"
+        "reasons:\n"
+        for reason in reasons:
+        f_reason = format_reason(reason)
+        "{f_reason}"
+        "issue: \"{issue}\"\n"
+        "pros_and_cons:\n"
+        unused_reasons = copy.deepcopy(reasons)
+        roots = []
+        "[MARKER]" where MARKER in set(["```", "- "])
+        marker = MARKER
+        while len(roots)<MAX_N_ROOTS and unused_reasons:
+            if marker == "```":
+                break
+            elif marker == "- ":  # new root
+                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
+                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
+                root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
+                "  pros:\n"
+                while unused_reasons:
+                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new pro
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                        root.pros.append(selected_reason)
+                        unused_reasons.remove(selected_reason)
+                    else:
+                        break
+                # cons
+                while unused_reasons:
+                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
+                    marker = MARKER
+                    if marker == "  - ":  # new con
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+                        root.cons.append(selected_reason)
+                        unused_reasons.remove(selected_reason)
+                    else:
+                        break
+
+                roots.append(root)
+
+        return (roots, unused_reasons)
+
+    '''
 
 @lmql.query
 def build_pros_and_cons(reasons_data: list, issue: str):
@@ -352,54 +355,14 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         * Use yaml syntax and "```" code fences to structure your answer.
 
         ### Assistant
-        
-        ```yaml
-        reasons:
+
         """
-        for reason in reasons:
-            f_reason = format_reason(reason)
-            "{f_reason}"
-        "issue: \"{issue}\"\n"
-        "pros_and_cons:\n"
-        unused_reasons = copy.deepcopy(reasons)
-        roots = []
-        "[MARKER]" where MARKER in set(["```", "- "])
-        marker = MARKER
-        while len(roots)<MAX_N_ROOTS and unused_reasons:
-            if marker == "```":
-                break
-            elif marker == "- ":  # new root
-                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
-                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
-                root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
-                "  pros:\n"
-                while unused_reasons:
-                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
-                    marker = MARKER
-                    if marker == "  - ":  # new pro
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                        root.pros.append(selected_reason)
-                        unused_reasons.remove(selected_reason)
-                    else:
-                        break
-                # cons
-                while unused_reasons:
-                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
-                    marker = MARKER
-                    if marker == "  - ":  # new con
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                        root.cons.append(selected_reason)
-                        unused_reasons.remove(selected_reason)
-                    else:
-                        break
-
-                roots.append(root)        
-
+        "[GET_ROOTS: get_roots(reasons_data, issue)]"
+        roots, unused_reasons = GET_ROOTS
         if not unused_reasons:
             return ProsConsList(roots=roots, options=options)
-            
+        else:
+            "{format_proscons(issue, ProsConsList(roots=roots, options=options))}"
         """
         ### User 
         
@@ -413,49 +376,9 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
         ### Assistant
         
-        ```yaml
-        reasons:
         """
-        for reason in reasons:
-            f_reason = format_reason(reason)
-            "{f_reason}"
-        "issue: \"{issue}\"\n"
-        "pros_and_cons:\n"
-        unused_reasons = copy.deepcopy(reasons)
-        roots = []
-        "[MARKER]" where MARKER in set(["```", "- "])
-        marker = MARKER
-        while len(roots)<MAX_N_ROOTS and unused_reasons:
-            if marker == "```":
-                break
-            elif marker == "- ":  # new root
-                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
-                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
-                root = RootClaim(label=TITLE, text=CLAIM.strip('\"'))
-                "  pros:\n"
-                while unused_reasons:
-                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
-                    marker = MARKER
-                    if marker == "  - ":  # new pro
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                        root.pros.append(selected_reason)
-                        unused_reasons.remove(selected_reason)
-                    else:
-                        break
-                # cons
-                while unused_reasons:
-                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
-                    marker = MARKER
-                    if marker == "  - ":  # new con
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
-                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                        root.cons.append(selected_reason)
-                        unused_reasons.remove(selected_reason)
-                    else:
-                        break
-
-                roots.append(root)
+        "[GET_ROOTS: get_roots(reasons_data, issue)]"
+        roots, unused_reasons = GET_ROOTS
         return ProsConsList(roots=roots, options=options)
 
     '''
