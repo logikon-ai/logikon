@@ -30,21 +30,21 @@ EXAMPLES_ISSUE_PROSCONS = [
         ProsConsList(
             roots=[
                 RootClaim(
-                    label="(Bullfighting ban)",
+                    label="Bullfighting ban",
                     text="Bullfighting should be banned.",
                     pros=[
                         Claim(
-                            label="[[Cruelty]]",
+                            label="Cruelty",
                             text="Bullfighting is cruelty for the purpose of entertainment."
                         )
                     ],
                     cons=[
                         Claim(
-                            label="[[Economic benefits]]",
+                            label="Economic benefits",
                             text="Bullfighting may benefit national economies."
                         ),
                         Claim(
-                            label="[[Cultural value]]",
+                            label="Cultural value",
                             text="Bullfighting is part of history and local cultures."
                         )
                     ]
@@ -57,39 +57,39 @@ EXAMPLES_ISSUE_PROSCONS = [
         ProsConsList(
             roots=[
                 RootClaim(
-                    label="(New York)",
+                    label="New York",
                     text="Let's spend our next holiday in New York.",
                     pros=[
                         Claim(
-                            label="[[Culture]]",
+                            label="Culture",
                             text="New York has incredible cultural events to offer."
                         )
                     ],
                     cons=[
                         Claim(
-                            label="[[Costs]]",
+                            label="Costs",
                             text="Spending holidays in a big city is too expensive."
                         )
                     ]
                 ),
                 RootClaim(
-                    label="(Florida)",
+                    label="Florida",
                     text="Let's spend our next holiday in Florida.",
                     pros=[
                         Claim(
-                            label="[[Swimming]]",
+                            label="Swimming",
                             text="Florida has wonderful beaches and a warm ocean."
                         )
                     ],
                     cons=[]
                 ),
                 RootClaim(
-                    label="(Los Angeles)",
+                    label="Los Angeles",
                     text="Let's spend our next holiday in Los Angeles.",
                     pros=[],
                     cons=[
                         Claim(
-                            label="[[No Novelty]]",
+                            label="No Novelty",
                             text="We've been in Los Angeles last year."
                         )
                     ]
@@ -102,15 +102,15 @@ EXAMPLES_ISSUE_PROSCONS = [
         ProsConsList(
             roots=[
                 RootClaim(
-                    label="(Draft-1)",
+                    label="Draft-1",
                     text="Draft-1 is the best draft.",
                     pros=[
                         Claim(
-                            label="[[Readability]]",
+                            label="Readability",
                             text="Draft-1 is easier to read than the other drafts."
                         ),
                         Claim(
-                            label="[[Engagement]]",
+                            label="Engagement",
                             text="Draft-1 is much more funny than the other drafts."
                         )
                     ],
@@ -151,6 +151,7 @@ def format_proscons(issue: str, proscons: ProsConsList) -> str:
         for con in root.cons:
             formatted += f"  - \"[[{con.label}]]\"\n"
     formatted += "```\n"
+    print(formatted)
     return formatted
 
 
@@ -273,6 +274,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
     '''lmql
     sample(temperature=.4)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
+        formatted_examples = [format_proscons(*example) for example in EXAMPLES_ISSUE_PROSCONS]
         """
         {lmql_queries.system_prompt()}
 
@@ -325,8 +327,8 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
         Let me show you a few examples to illustrate the task / intended output:
         """
-        for ex_issue, ex_proscons in EXAMPLES_ISSUE_PROSCONS:
-            "<example>\n{format_proscons(ex_issue, ex_proscons)}</example>\n"
+        for example in formatted_examples:
+            "<example>\n{example}</example>\n"
                     
 #        <example>
 #        ```yaml
