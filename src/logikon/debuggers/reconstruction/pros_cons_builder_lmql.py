@@ -160,7 +160,7 @@ def format_proscons(issue: str, proscons: ProsConsList) -> str:
 @lmql.query
 def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
     '''lmql
-    sample(temperature=.4)
+    sample(temperature=.4, )
         """
         {lmql_queries.system_prompt()}
 
@@ -226,7 +226,8 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
 #    '''lmql
 #    "reasons:\n"
 #    for reason in reasons:
-#        format_reason(reason)    
+#       f_reason = format_reason(reason)
+#       "{f_reason}"
 #    "issue: \"{issue}\"\n"
 #    "pros_and_cons:\n"
 #    unused_reasons = copy.deepcopy(reasons)
@@ -321,7 +322,8 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         <reasons>
         """
         for reason in reasons:
-            format_reason(reason)
+            f_reason = format_reason(reason)
+            "{f_reason}"
         """</reasons>
         </inputs>
 
@@ -410,7 +412,8 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         reasons:
         """
         for reason in reasons:
-            format_reason(reason)    
+            f_reason = format_reason(reason)
+            "{f_reason}"
         "issue: \"{issue}\"\n"
         "pros_and_cons:\n"
         unused_reasons = copy.deepcopy(reasons)
@@ -458,7 +461,8 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
         """
         for reason in unused_reasons:
-            format_reason(reason)
+            f_reason = format_reason(reason)
+            "{f_reason}"
         """
         Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
 
@@ -468,7 +472,8 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         reasons:
         """
         for reason in reasons:
-            format_reason(reason)    
+            f_reason = format_reason(reason)
+            "{f_reason}"
         "issue: \"{issue}\"\n"
         "pros_and_cons:\n"
         unused_reasons = copy.deepcopy(reasons)
