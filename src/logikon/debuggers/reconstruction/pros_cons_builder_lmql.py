@@ -131,6 +131,7 @@ def format_reason(reason: Claim) -> str:
 def format_proscons(issue: str, proscons: ProsConsList) -> str:
     formatted = "```yaml\n"
     # reasons block
+    formatted += "reasons:\n"
     reasons = []
     for root in proscons.roots:
         reasons.extend(root.pros)
@@ -151,7 +152,6 @@ def format_proscons(issue: str, proscons: ProsConsList) -> str:
         for con in root.cons:
             formatted += f"  - \"[{con.label}]\"\n"
     formatted += "```\n"
-    print(formatted)
     return formatted
 
 
@@ -275,7 +275,6 @@ def build_pros_and_cons(reasons_data: list, issue: str):
     '''lmql
     sample(temperature=.4)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
-        formatted_examples = [format_proscons(*example) for example in EXAMPLES_ISSUE_PROSCONS]
         """
         {lmql_queries.system_prompt()}
 
@@ -329,8 +328,9 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
         Let me show you a few examples to illustrate the task / intended output:
         """
-        for example in formatted_examples:
-            "<example>\n{example}</example>\n"
+        for ex_issue, ex_proscons in EXAMPLES_ISSUE_PROSCONS:
+            formatted_example = format_proscons(ex_issue, ex_proscons)
+            "<example>\n{formatted_example}</example>\n"
                     
 #        <example>
 #        ```yaml
@@ -389,8 +389,9 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 #          cons:        
 #        ```        
 #        </example>   
-
-        """Please consider carefully the following further, more specific instructions:
+        """
+        
+        Please consider carefully the following further, more specific instructions:
 
         * Be bold: Render the root claim(s) as general, and strong, and unequivocal statement(s).
         * No reasoning: Your root claim(s) must not contain any reasoning (or comments, or explanations).
