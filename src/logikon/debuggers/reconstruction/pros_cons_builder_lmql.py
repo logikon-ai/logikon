@@ -310,7 +310,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
         Please consider carefully the following further, more specific instructions:
 
-        * Be bold: Your root claim(s) should be plain and unequivocal, capturing in the style of a headline the basic options.
+        * Be bold: Your root claim(s) should be simple and unequivocal, and correspond to the basic options you have identified above.
         * No reasoning: Your root claim(s) must not contain any reasoning (or comments, or explanations).
         * Keep it short: Try to identify a single root claim. Add further root claims only if necessary (e.g., if reasons address three alternative decision options).
         * Recall options: Use the options you've identified above to construct the pros and cons list.
