@@ -666,6 +666,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         For each pro (con) reason *r* targeting root claim *c*:
 
         - Checks if *r* supports (attacks) another root claim *c'* more strongly
+        - Two sanity checks
         - Revises map accordingly
 
         """
@@ -702,7 +703,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 old_target_idx = enum
                 new_target_idx = lmql_queries.label_to_idx(max_confirmed[0])
 
-                # check valence
+                # sanity check 1
                 lmql_result = lmql_queries.most_disconfirmed(
                     pro.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
@@ -714,16 +715,22 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 probs_disconfirmed = lmql_queries.get_distribution(lmql_result)
                 max_disconfirmed = max(probs_disconfirmed, key=lambda x: x[1])
                 if max_confirmed[0] == max_disconfirmed[0]:
-                    lmql_result = lmql_queries.valence(
-                        pro.dict(),
-                        revised_pros_and_cons.roots[new_target_idx].dict(),
-                        model=self._model,
-                        **self._generation_kwargs,
-                    )
-                    if lmql_result is not None:
-                        new_val = lmql_queries.label_to_valence(
-                            lmql_result.variables[lmql_result.distribution_variable]
-                        )
+                    continue
+
+                # sanity check 2
+                lmql_result = lmql_queries.valence(
+                    pro.dict(),
+                    revised_pros_and_cons.roots[new_target_idx].dict(),
+                    model=self._model,
+                    **self._generation_kwargs,
+                )
+                if lmql_result is None:
+                    continue
+                new_val = lmql_queries.label_to_valence(
+                    lmql_result.variables[lmql_result.distribution_variable]
+                )
+                if new_val != lmql_queries.PRO:  # never change valence
+                    continue
 
                 revisions.append(
                     {
@@ -755,7 +762,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 old_target_idx = enum
                 new_target_idx = lmql_queries.label_to_idx(max_disconfirmed[0])
 
-                # check valence
+                # sanity check 1
                 lmql_result = lmql_queries.most_confirmed(
                     con.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
@@ -767,16 +774,22 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 probs_confirmed = lmql_queries.get_distribution(lmql_result)
                 max_confirmed = max(probs_confirmed, key=lambda x: x[1])
                 if max_disconfirmed[0] == max_confirmed[0]:
-                    lmql_result = lmql_queries.valence(
-                        con.dict(),
-                        revised_pros_and_cons.roots[new_target_idx].dict(),
-                        model=self._model,
-                        **self._generation_kwargs,
-                    )
-                    if lmql_result is not None:
-                        new_val = lmql_queries.label_to_valence(
-                            lmql_result.variables[lmql_result.distribution_variable]
-                        )
+                    continue
+
+                # sanity check 2
+                lmql_result = lmql_queries.valence(
+                    con.dict(),
+                    revised_pros_and_cons.roots[new_target_idx].dict(),
+                    model=self._model,
+                    **self._generation_kwargs,
+                )
+                if lmql_result is None:
+                    continue            
+                new_val = lmql_queries.label_to_valence(
+                    lmql_result.variables[lmql_result.distribution_variable]
+                )
+                if new_val != lmql_queries.CON:  # never change valence
+                    continue
 
                 revisions.append(
                     {
