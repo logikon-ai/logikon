@@ -407,10 +407,29 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
                 roots.append(root)        
 
-        if not unused_reasons:
-            return ProsConsList(roots=roots, options=options)
-            
+        return ProsConsList(roots=roots, options=options), unused_reasons
+
+    '''
+
+@lmql.query
+def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict, unused_reasons_data: list):
+    '''lmql
+    sample(temperature=.4)
+        reasons = [Claim(**reason_data) for reason_data in reasons_data]
+        unused_reasons = [Claim(**reason_data) for reason_data in unused_reasons_data]
+        pros_and_cons = ProsConsList(**pros_and_cons_data)
+        formatted_pcl = format_proscons(issue, pros_and_cons)
         """
+        {lmql_queries.system_prompt()}
+
+        ### User
+
+        Assignment: Organize the aforementioned unstructured set of reasons as a pros & cons list.
+
+        ### Assistant
+
+        {formatted_pcl}        
+
         ### User 
         
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
@@ -466,9 +485,11 @@ def build_pros_and_cons(reasons_data: list, issue: str):
                         break
 
                 roots.append(root)
-        return ProsConsList(roots=roots, options=options)
+
+        return ProsConsList(roots=roots, options=options), unused_reasons
 
     '''
+
 
 @lmql.query
 def unpack_reason(reason_data: dict, issue: str):
@@ -869,12 +890,25 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         if not all(isinstance(reason, Claim) for reason in reasons):
             raise ValueError(f"Reasons are not of type Claim. Got {reasons}.")
         reasons = self.ensure_unique_labels(reasons)
-        self.logger.info(f"Mined reasons: {pprint.pformat(reasons.dict())}")
+        self.logger.info(f"Mined reasons: {pprint.pformat(reasons)}")
 
         # build pros and cons list
-        pros_and_cons = build_pros_and_cons(reasons_data=[r.dict() for r in reasons], issue=issue, model=self._model, **self._generation_kwargs)
+        pros_and_cons, unused_reasons = build_pros_and_cons(reasons_data=[r.dict() for r in reasons], issue=issue, model=self._model, **self._generation_kwargs)
         if not isinstance(pros_and_cons, ProsConsList):
             raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
+        # add unused reasons
+        if unused_reasons:
+            self.logger.info(f"Unused reasons: {pprint.pformat(unused_reasons)}")
+            pros_and_cons, unused_reasons = add_unused_reasons(
+                reasons_data=[r.dict() for r in reasons],
+                issue=issue,
+                pros_and_cons_data=pros_and_cons.dict(),
+                unused_reasons_data=[r.dict() for r in unused_reasons],
+                model=self._model,
+                **self._generation_kwargs,
+            )
+            if unused_reasons:
+                self.logger.info(f"Failed to integrate the following reasons: {pprint.pformat(unused_reasons)}")
         # TODO: consider drafting alternative pros&cons lists and choosing best
         self.logger.info(f"Built pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
