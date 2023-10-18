@@ -326,9 +326,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         Let me show you a few examples to illustrate the task / intended output:
         """
         for ex_issue, ex_proscons in EXAMPLES_ISSUE_PROSCONS:
-            "<example>\n"
-            format_proscons(ex_issue, ex_proscons)
-            "</example>\n"
+            "<example>\n{format_proscons(ex_issue, ex_proscons)}</example>\n"
                     
 #        <example>
 #        ```yaml
@@ -388,8 +386,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 #        ```        
 #        </example>   
 
-        """        
-        Please consider carefully the following further, more specific instructions:
+        """Please consider carefully the following further, more specific instructions:
 
         * Be bold: Render the root claim(s) as general, and strong, and unequivocal statement(s).
         * No reasoning: Your root claim(s) must not contain any reasoning (or comments, or explanations).
@@ -508,7 +505,6 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
                 roots.append(root)
         return ProsConsList(roots=roots, options=options)
-        """
 
     '''
 
