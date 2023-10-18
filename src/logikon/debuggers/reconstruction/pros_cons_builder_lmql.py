@@ -126,7 +126,7 @@ EXAMPLES_ISSUE_PROSCONS = [
 ### FORMATTERS ###
 
 def format_reason(reason: Claim) -> str:
-    return f"- \"[[{reason.label}]]: {reason.text}\"\n"
+    return f"- \"[{reason.label}]: {reason.text}\"\n"
 
 def format_proscons(issue: str, proscons: ProsConsList) -> str:
     formatted = "```yaml\n"
@@ -146,10 +146,10 @@ def format_proscons(issue: str, proscons: ProsConsList) -> str:
         formatted += f"- root: \"({root.label}): {root.text}\"\n"
         formatted += "  pros:\n"
         for pro in root.pros:
-            formatted += f"  - \"[[{pro.label}]]\"\n"
+            formatted += f"  - \"[{pro.label}]\"\n"
         formatted += "  cons:\n"
         for con in root.cons:
-            formatted += f"  - \"[[{con.label}]]\"\n"
+            formatted += f"  - \"[{con.label}]\"\n"
     formatted += "```\n"
     print(formatted)
     return formatted
@@ -160,7 +160,7 @@ def format_proscons(issue: str, proscons: ProsConsList) -> str:
 @lmql.query
 def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
     '''lmql
-    sample(temperature=.4, )
+    sample(temperature=.4, top_k=100, top_p=0.95)
         """
         {lmql_queries.system_prompt()}
 
