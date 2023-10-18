@@ -20,9 +20,11 @@ QUESTIONS_EVAL = [
 
 # prompt templates
 
+
 def strip_issue_tag(text: str) -> str:
     """Strip issue tag from text."""
     return text.strip("</ISSUE>").strip("\n ")
+
 
 @lmql.query
 def key_issue(prompt, completion):
@@ -77,7 +79,7 @@ def rate_issue_drafts(alternatives, questions, prompt, completion):
             "{question} \n"
             "Answer: ([ANSWER])\n\n" where ANSWER in set(labels)
         "So, all in all and given the above assessments, the best summarization of the text's key issue is which alternative?\n"
-        "Answer: ([FINAL_ANSWER])" where FINAL_ANSWER in set(labels)   
+        "Answer: ([FINAL_ANSWER])" where FINAL_ANSWER in set(labels)
     '''
 
 
@@ -103,7 +105,9 @@ class IssueBuilderLMQL(LMQLDebugger):
 
         prompt, completion = debug_state.get_prompt_completion()
         if prompt is None or completion is None:
-            raise ValueError(f"Prompt or completion is None. {self.__class__} requires both prompt and completion to debug.")
+            raise ValueError(
+                f"Prompt or completion is None. {self.__class__} requires both prompt and completion to debug."
+            )
 
         # draft summarizations
         results = key_issue(

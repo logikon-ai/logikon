@@ -11,9 +11,11 @@ class Claim(BaseModel):
     text: str
     label: str
 
+
 class RootClaim(Claim):
     pros: List[Claim] = []
     cons: List[Claim] = []
+
 
 class ProsConsList(BaseModel):
     roots: List[RootClaim] = []

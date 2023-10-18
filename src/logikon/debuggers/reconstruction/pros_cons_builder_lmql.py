@@ -33,25 +33,14 @@ EXAMPLES_ISSUE_PROSCONS = [
                 RootClaim(
                     label="Bullfighting ban",
                     text="Bullfighting should be banned.",
-                    pros=[
-                        Claim(
-                            label="Cruelty",
-                            text="Bullfighting is cruelty for the purpose of entertainment."
-                        )
-                    ],
+                    pros=[Claim(label="Cruelty", text="Bullfighting is cruelty for the purpose of entertainment.")],
                     cons=[
-                        Claim(
-                            label="Economic benefits",
-                            text="Bullfighting may benefit national economies."
-                        ),
-                        Claim(
-                            label="Cultural value",
-                            text="Bullfighting is part of history and local cultures."
-                        )
-                    ]
+                        Claim(label="Economic benefits", text="Bullfighting may benefit national economies."),
+                        Claim(label="Cultural value", text="Bullfighting is part of history and local cultures."),
+                    ],
                 )
             ]
-        )
+        ),
     ),
     (
         "Our next holiday",
@@ -60,43 +49,23 @@ EXAMPLES_ISSUE_PROSCONS = [
                 RootClaim(
                     label="New York",
                     text="Let's spend our next holiday in New York.",
-                    pros=[
-                        Claim(
-                            label="Culture",
-                            text="New York has incredible cultural events to offer."
-                        )
-                    ],
-                    cons=[
-                        Claim(
-                            label="Costs",
-                            text="Spending holidays in a big city is too expensive."
-                        )
-                    ]
+                    pros=[Claim(label="Culture", text="New York has incredible cultural events to offer.")],
+                    cons=[Claim(label="Costs", text="Spending holidays in a big city is too expensive.")],
                 ),
                 RootClaim(
                     label="Florida",
                     text="Let's spend our next holiday in Florida.",
-                    pros=[
-                        Claim(
-                            label="Swimming",
-                            text="Florida has wonderful beaches and a warm ocean."
-                        )
-                    ],
-                    cons=[]
+                    pros=[Claim(label="Swimming", text="Florida has wonderful beaches and a warm ocean.")],
+                    cons=[],
                 ),
                 RootClaim(
                     label="Los Angeles",
                     text="Let's spend our next holiday in Los Angeles.",
                     pros=[],
-                    cons=[
-                        Claim(
-                            label="No Novelty",
-                            text="We've been in Los Angeles last year."
-                        )
-                    ]
-                )
+                    cons=[Claim(label="No Novelty", text="We've been in Los Angeles last year.")],
+                ),
             ]
-        )
+        ),
     ),
     (
         "Pick best draft",
@@ -106,31 +75,26 @@ EXAMPLES_ISSUE_PROSCONS = [
                     label="Draft-1",
                     text="Draft-1 is the best draft.",
                     pros=[
-                        Claim(
-                            label="Readability",
-                            text="Draft-1 is easier to read than the other drafts."
-                        ),
-                        Claim(
-                            label="Engagement",
-                            text="Draft-1 is much more funny than the other drafts."
-                        )
+                        Claim(label="Readability", text="Draft-1 is easier to read than the other drafts."),
+                        Claim(label="Engagement", text="Draft-1 is much more funny than the other drafts."),
                     ],
-                    cons=[]
+                    cons=[],
                 )
             ]
-        )
+        ),
     ),
 ]
 
 
-
 ### FORMATTERS ###
+
 
 def format_reason(reason: Claim, max_len: int = -1) -> str:
     label_text = f"[{reason.label}]: {reason.text}"
     if max_len > 0 and len(label_text) > max_len:
         label_text = label_text[:max_len] + "..."
     return f"- \"{label_text}\"\n"
+
 
 def format_proscons(issue: str, proscons: ProsConsList) -> str:
     formatted = "```yaml\n"
@@ -144,7 +108,7 @@ def format_proscons(issue: str, proscons: ProsConsList) -> str:
     for reason in reasons:
         formatted += format_reason(reason)
     # issue
-    formatted += f"issue: \"{issue}\"\n"    
+    formatted += f"issue: \"{issue}\"\n"
     # pros and cons block
     formatted += "pros_and_cons:\n"
     for root in proscons.roots:
@@ -158,13 +122,16 @@ def format_proscons(issue: str, proscons: ProsConsList) -> str:
     formatted += "```\n"
     return formatted
 
+
 def format_examples() -> str:
     formatted = [format_proscons(*example) for example in EXAMPLES_ISSUE_PROSCONS]
     formatted = ["<example>\n" + example + "</example>" for example in formatted]
-    formatted = "\n".join(formatted)
-    return formatted
+    formatted_s = "\n".join(formatted)
+    return formatted_s
+
 
 ### LMQL QUERIES ###
+
 
 @lmql.query
 def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
@@ -188,7 +155,7 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
         </ISSUE>
 
         What are the TEXT's arguments (pros and cons) that address the ISSUE?
-        
+
         Let me give you more detailed instructions:
 
         - Go through the text from beginning to end and extract all arguments in the order of appearance.
@@ -203,7 +170,7 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
         - Use yaml syntax and "```" code fences to structure your answer.
 
         ### Assistant
-        
+
         The TEXT sets forth the following arguments:
 
         ```yaml
@@ -229,6 +196,7 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
                 reasons.append(Claim(label=title, text=gist))
         return reasons
     '''
+
 
 # @lmql.query
 # def get_roots(reasons, issue):
@@ -272,12 +240,13 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
 #                     unused_reasons.remove(selected_reason)
 #                 else:
 #                     break
-# 
+#
 #             roots.append(root)
-# 
+#
 #     return (roots, unused_reasons)
-# 
+#
 #     '''
+
 
 @lmql.query
 def build_pros_and_cons(reasons_data: list, issue: str):
@@ -292,15 +261,15 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         Assignment: Organize an unstructured set of reasons as a pros & cons list.
 
         Let's begin by thinking through the basic issue addressed by the reasons:
-        
+
         <issue>{issue}</issue>
-        
+
         What are the basic options available to an agent who needs to address this issue? Keep your answer short: sketch each option in a few words only, one per line. Use "<options>"/"</options>" tags.
-        
+
         ### Assistant
-        
+
         The options available to an agent who faces the above issue are:
-        
+
         <options>
         """
         options = []
@@ -319,7 +288,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
         Thanks, let's keep that in mind.
 
-        Let us now come back to the main assignment: constructing a pros & cons list from a set of reasons. 
+        Let us now come back to the main assignment: constructing a pros & cons list from a set of reasons.
 
         You'll be given a set of reasons, which you're supposed to organize as a pros and cons list. To do so, you have to find a fitting target claim (root statement) the reasons are arguing for (pros) or against (cons).
 
@@ -338,7 +307,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         Let me show you a few examples to illustrate the task / intended output:
 
         {format_examples()}
-        
+
         Please consider carefully the following further, more specific instructions:
 
         * Be bold: Render the root claim(s) as general, and strong, and unequivocal statement(s).
@@ -356,7 +325,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         * Use yaml syntax and "```" code fences to structure your answer.
 
         ### Assistant
-        
+
         Let me recall the basic options before producing the pros and cons list:
         """
         for option in options:
@@ -405,11 +374,12 @@ def build_pros_and_cons(reasons_data: list, issue: str):
                     else:
                         break
 
-                roots.append(root)        
+                roots.append(root)
 
         return ProsConsList(roots=roots, options=options), unused_reasons
 
     '''
+
 
 @lmql.query
 def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict, unused_reasons_data: list):
@@ -428,10 +398,10 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
 
         ### Assistant
 
-        {formatted_pcl}        
+        {formatted_pcl}
 
-        ### User 
-        
+        ### User
+
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
         """
         for reason in unused_reasons:
@@ -441,7 +411,7 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
         Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
 
         ### Assistant
-        
+
         ```yaml
         reasons:
         """
@@ -506,7 +476,7 @@ def unpack_reason(reason_data: dict, issue: str):
         Use the following inputs (the title and gist of an argumentation that addresses an issue) to solve your assignment.
 
         <inputs>
-        <issue>{issue}</issue>        
+        <issue>{issue}</issue>
         <argumentation>
         <title>{reason.label}</title>
         <gist>{reason.text}</gist>
@@ -514,12 +484,12 @@ def unpack_reason(reason_data: dict, issue: str):
         </inputs>
 
         What are the individual claims and basic reasons contained in this argumentation?
-        
+
         Let me give you more detailed instructions:
 
         - Read the gist carefully and extract all individual claims it sets forth.
         - State each claim clearly in simple and plain language.
-        - The basic claims you extract must not contain any reasoning (as indicated, e.g., by "because", "since", "therefore" ...). 
+        - The basic claims you extract must not contain any reasoning (as indicated, e.g., by "because", "since", "therefore" ...).
         - For each argumentation, state all the claims it makes in one grammatically correct sentences, staying close to the original wording. Provide a distinct title, too. I.e.:
             ```
             argumentation:
@@ -532,7 +502,7 @@ def unpack_reason(reason_data: dict, issue: str):
               - ...
             ```
         - The individual claims you extract may mutually support each other, or represent independent reasons for one and the same conclusion; yet such argumentative relations need not be recorded (at this point).
-        - If the argumentation gist contains a single claim, just include that very claim in your list. 
+        - If the argumentation gist contains a single claim, just include that very claim in your list.
         - Avoid repeating one and the same claim in different words.
         - IMPORTANT: Stay faithful to the gist! Don't invent your own claims. Don't uncover implicit assumptions. Only provide claims which are explicitly contained in the gist.
         - Use yaml syntax and "```" code fences to structure your answer.
@@ -552,7 +522,7 @@ def unpack_reason(reason_data: dict, issue: str):
             claim: "Animal farming is extremely energy intensive."
           - title: "Land use change"
             claim: "Animal farming causes the degradation of natural carbon sinks through land use change."
-        ```        
+        ```
         </example>
 
         <example>
@@ -564,7 +534,7 @@ def unpack_reason(reason_data: dict, issue: str):
           claims:
           - title: "Economic benefit"
             claim: "Bullfighting can benefit national economies with an underdeveloped industrial base."
-        ```        
+        ```
         </example>
 
         <example>
@@ -578,7 +548,7 @@ def unpack_reason(reason_data: dict, issue: str):
             claim: "Many video gaming communities are widely regarded as toxic."
           - title: "Opportunities for abuse"
             claim: "Online games create opportunities for players to stalk and abuse each other."
-        ```        
+        ```
         </example>
 
         <example>
@@ -592,13 +562,13 @@ def unpack_reason(reason_data: dict, issue: str):
             claim: "Draft 1 is easier to read than the other drafts."
           - title: "Engagement"
             claim: "Draft 1 is much more funny than the other drafts."
-        ```        
+        ```
         </example>
 
         Please, process the above inputs and unpack the individual claims contained in the argumentation.
 
         ### Assistant
-        
+
         The argumentation makes the following basic claims:
 
         ```yaml
@@ -641,21 +611,17 @@ class ProsConsBuilderLMQL(LMQLDebugger):
     _KW_PRODUCT = "proscons"
     _KW_REQUIREMENTS = ["issue"]
 
-
     @staticmethod
     def get_product() -> str:
         return ProsConsBuilderLMQL._KW_PRODUCT
-
 
     @staticmethod
     def get_requirements() -> list[str]:
         return ProsConsBuilderLMQL._KW_REQUIREMENTS
 
-
     @staticmethod
     def get_description() -> str:
         return ProsConsBuilderLMQL._KW_DESCRIPTION
-
 
     def ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
         """Revises labels of reasons to ensure uniqueness
@@ -668,10 +634,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         """
 
         labels = [reason.label for reason in reasons]
-        duplicate_labels = [
-            label for label in labels
-            if labels.count(label) > 1
-        ]
+        duplicate_labels = [label for label in labels if labels.count(label) > 1]
         if not duplicate_labels:
             return reasons
 
@@ -689,7 +652,6 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 reason.label = new_label
 
         return unique_reasons
-
 
     def check_and_revise(self, pros_and_cons: ProsConsList, reasons: List[Claim], issue: str) -> ProsConsList:
         """Checks and revises a pros & cons list
@@ -720,21 +682,19 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         revised_pros_and_cons = copy.deepcopy(pros_and_cons)
 
         for enum, root in enumerate(revised_pros_and_cons.roots):
-
             for pro in root.pros:
-
                 # check target
                 lmql_result = lmql_queries.most_confirmed(
                     pro.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
                     model=self._model,
-                    **self._generation_kwargs
+                    **self._generation_kwargs,
                 )
                 if lmql_result is None:
                     continue
                 probs_confirmed = lmql_queries.get_distribution(lmql_result)
                 max_confirmed = max(probs_confirmed, key=lambda x: x[1])
-                if max_confirmed[1] < 2*probs_confirmed[enum][1]:
+                if max_confirmed[1] < 2 * probs_confirmed[enum][1]:
                     continue
 
                 old_val = lmql_queries.PRO
@@ -747,41 +707,47 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                     pro.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
                     model=self._model,
-                    **self._generation_kwargs
+                    **self._generation_kwargs,
                 )
                 if lmql_result is None:
                     continue
                 probs_disconfirmed = lmql_queries.get_distribution(lmql_result)
                 max_disconfirmed = max(probs_disconfirmed, key=lambda x: x[1])
                 if max_confirmed[0] == max_disconfirmed[0]:
-                    lmql_result = lmql_queries.valence(pro.dict(), revised_pros_and_cons.roots[new_target_idx].dict(), model=self._model, **self._generation_kwargs)
+                    lmql_result = lmql_queries.valence(
+                        pro.dict(),
+                        revised_pros_and_cons.roots[new_target_idx].dict(),
+                        model=self._model,
+                        **self._generation_kwargs,
+                    )
                     if lmql_result is not None:
                         new_val = lmql_queries.label_to_valence(
                             lmql_result.variables[lmql_result.distribution_variable]
                         )
 
-                revisions.append({
-                    "reason": pro,
-                    "old_target_idx": old_target_idx,
-                    "new_target_idx": new_target_idx,
-                    "old_val": old_val,
-                    "new_val": new_val
-                })
+                revisions.append(
+                    {
+                        "reason": pro,
+                        "old_target_idx": old_target_idx,
+                        "new_target_idx": new_target_idx,
+                        "old_val": old_val,
+                        "new_val": new_val,
+                    }
+                )
 
             for con in root.cons:
-
                 # check target
                 lmql_result = lmql_queries.most_disconfirmed(
                     con.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
                     model=self._model,
-                    **self._generation_kwargs
+                    **self._generation_kwargs,
                 )
                 if lmql_result is None:
                     continue
                 probs_disconfirmed = lmql_queries.get_distribution(lmql_result)
                 max_disconfirmed = max(probs_disconfirmed, key=lambda x: x[1])
-                if max_disconfirmed[1] < 2*probs_disconfirmed[enum][1]:
+                if max_disconfirmed[1] < 2 * probs_disconfirmed[enum][1]:
                     continue
 
                 old_val = lmql_queries.CON
@@ -794,26 +760,33 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                     con.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
                     model=self._model,
-                    **self._generation_kwargs
+                    **self._generation_kwargs,
                 )
                 if lmql_result is None:
                     continue
                 probs_confirmed = lmql_queries.get_distribution(lmql_result)
                 max_confirmed = max(probs_confirmed, key=lambda x: x[1])
                 if max_disconfirmed[0] == max_confirmed[0]:
-                    lmql_result = lmql_queries.valence(con.dict(), revised_pros_and_cons.roots[new_target_idx].dict(), model=self._model, **self._generation_kwargs)
+                    lmql_result = lmql_queries.valence(
+                        con.dict(),
+                        revised_pros_and_cons.roots[new_target_idx].dict(),
+                        model=self._model,
+                        **self._generation_kwargs,
+                    )
                     if lmql_result is not None:
                         new_val = lmql_queries.label_to_valence(
                             lmql_result.variables[lmql_result.distribution_variable]
                         )
 
-                revisions.append({
-                    "reason": con,
-                    "old_target_idx": old_target_idx,
-                    "new_target_idx": new_target_idx,
-                    "old_val": old_val,
-                    "new_val": new_val
-                })
+                revisions.append(
+                    {
+                        "reason": con,
+                        "old_target_idx": old_target_idx,
+                        "new_target_idx": new_target_idx,
+                        "old_val": old_val,
+                        "new_val": new_val,
+                    }
+                )
 
         self.logger.info(f"Identified {len(revisions)} revision of pros and cons list.")
 
@@ -833,7 +806,6 @@ class ProsConsBuilderLMQL(LMQLDebugger):
 
         return revised_pros_and_cons
 
-
     def unpack_reasons(self, pros_and_cons: ProsConsList, issue: str) -> ProsConsList:
         """Unpacks each individual reason in a pros and cons list
 
@@ -847,18 +819,21 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         pros_and_cons = copy.deepcopy(pros_and_cons)
         for root in pros_and_cons.roots:
             for pro in root.pros:
-                unpacked_pros = unpack_reason(reason_data=pro.dict(), issue=issue, model=self._model, **self._generation_kwargs)
+                unpacked_pros = unpack_reason(
+                    reason_data=pro.dict(), issue=issue, model=self._model, **self._generation_kwargs
+                )
                 if len(unpacked_pros) > 1:
                     root.pros.remove(pro)
                     root.pros.extend(unpacked_pros)
             for con in root.cons:
-                unpacked_cons = unpack_reason(reason_data=con.dict(), issue=issue, model=self._model, **self._generation_kwargs)
+                unpacked_cons = unpack_reason(
+                    reason_data=con.dict(), issue=issue, model=self._model, **self._generation_kwargs
+                )
                 if len(unpacked_cons) > 1:
                     root.cons.remove(con)
                     root.cons.extend(unpacked_cons)
 
         return pros_and_cons
-
 
     def _debug(self, debug_state: DebugState):
         """Extract pros and cons of text (prompt/completion).
@@ -883,17 +858,23 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         self.logger.info(f"Identified issue: {issue}")
 
         if prompt is None or completion is None:
-            raise ValueError(f"Prompt or completion is None. {self.__class__} requires both prompt and completion to debug.")
+            raise ValueError(
+                f"Prompt or completion is None. {self.__class__} requires both prompt and completion to debug."
+            )
 
         # mine reasons
-        reasons = mine_reasons(prompt=prompt, completion=completion, issue=issue, model=self._model, **self._generation_kwargs)
+        reasons = mine_reasons(
+            prompt=prompt, completion=completion, issue=issue, model=self._model, **self._generation_kwargs
+        )
         if not all(isinstance(reason, Claim) for reason in reasons):
             raise ValueError(f"Reasons are not of type Claim. Got {reasons}.")
         reasons = self.ensure_unique_labels(reasons)
         self.logger.info(f"Mined reasons: {pprint.pformat(reasons)}")
 
         # build pros and cons list
-        pros_and_cons, unused_reasons = build_pros_and_cons(reasons_data=[r.dict() for r in reasons], issue=issue, model=self._model, **self._generation_kwargs)
+        pros_and_cons, unused_reasons = build_pros_and_cons(
+            reasons_data=[r.dict() for r in reasons], issue=issue, model=self._model, **self._generation_kwargs
+        )
         if not isinstance(pros_and_cons, ProsConsList):
             raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
         # add unused reasons

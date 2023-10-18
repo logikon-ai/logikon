@@ -23,7 +23,6 @@ You are a helpful, honest and knowledgeable AI assistant with expertise in criti
     return system_prompt
 
 
-
 @lmql.query
 def supports_q(argument_data: dict, claim_data: dict):
     '''lmql
@@ -40,7 +39,7 @@ def supports_q(argument_data: dict, claim_data: dict):
         Read the following argument carefully.
 
         <argument>
-        {argument.label}: {argument.text} 
+        {argument.label}: {argument.text}
         </argument>
 
         Does this argument provide evidence for the following claim?
@@ -52,10 +51,10 @@ def supports_q(argument_data: dict, claim_data: dict):
         (A) Yes, the argument supports the claim.
         (B) No, the argument does not support the claim.
 
-        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on. 
+        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on.
 
         ### Assistant
-        
+
         Answer: ([LABEL]"""
     distribution
         LABEL in ["A", "B"]
@@ -78,7 +77,7 @@ def attacks_q(argument_data: dict, claim_data: dict):
         Read the following argument carefully.
 
         <argument>
-        {argument.label}: {argument.text} 
+        {argument.label}: {argument.text}
         </argument>
 
         Does this argument provide evidence against the following claim?
@@ -90,15 +89,16 @@ def attacks_q(argument_data: dict, claim_data: dict):
         (A) Yes, the argument disconfirms the claim.
         (B) No, the argument does not disconfirm the claim.
 
-        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on. 
+        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on.
 
         ### Assistant
-        
+
         Answer: ([LABEL]"""
     distribution
         LABEL in ["A", "B"]
     '''
-    
+
+
 @lmql.query
 def most_confirmed(argument_data: dict, claims_data: list):
     '''lmql
@@ -117,24 +117,25 @@ def most_confirmed(argument_data: dict, claims_data: list):
         Read the following argument carefully.
 
         <argument>
-        {argument.label}: {argument.text} 
+        {argument.label}: {argument.text}
         </argument>
 
         I'll show you a list of claims. Please identify the claim which is most strongly supported by the argument.
-        
+
         The argument speaks in favor of:\n
         """
         for label, claim in zip(labels, claims):
             "({label}) \"{claim.label}: {claim.text}\"\n"
         """
-        Just answer with ({'/'.join(labels)}). You'll be asked to justify your answer later on. 
+        Just answer with ({'/'.join(labels)}). You'll be asked to justify your answer later on.
 
         ### Assistant
-        
+
         Answer: ([LABEL]"""
     distribution
         LABEL in labels
     '''
+
 
 @lmql.query
 def most_disconfirmed(argument_data: dict, claims_data: list):
@@ -154,12 +155,12 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
         Read the following argument carefully.
 
         <argument>
-        {argument.label}: {argument.text} 
+        {argument.label}: {argument.text}
         </argument>
-        
+
         I'll show you a list of claims. Please identify the claim which is supported by the argument.
 
-        Note that all these claims are negations. 
+        Note that all these claims are negations.
 
         The argument speaks in favor of:\n
         """
@@ -168,10 +169,10 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
             text = text[0].lower() + text[1:]
             "({label}) \"It is not the case that {text}\"\n"
         """
-        Just answer with ({'/'.join(labels)}). You'll be asked to justify your answer later on. 
+        Just answer with ({'/'.join(labels)}). You'll be asked to justify your answer later on.
 
         ### Assistant
-        
+
         Answer: ([LABEL]"""
     distribution
         LABEL in labels
@@ -194,36 +195,37 @@ def valence(argument_data: dict, claim_data: dict):
         Read the following argument and claim carefully.
 
         <argument>
-        {argument.label}: {argument.text} 
+        {argument.label}: {argument.text}
         </argument>
         <claim>
-        {claim.label}: {claim.text}        
+        {claim.label}: {claim.text}
         </claim>
-        
+
         Does the argument a pro reason for, or a con reason against against the claim?
-        
+
         Here is a simple test: Which of the following is more plausible:
-        
+
         (A) "{claim.text} BECAUSE {argument.text}"
         (B) "{claim.text} ALTHOUGH {argument.text}"
 
-        In case (A), the argument speaks for (supports) the claim. In case (B) the argument speaks against (disconfirms) the claim. 
+        In case (A), the argument speaks for (supports) the claim. In case (B) the argument speaks against (disconfirms) the claim.
 
         So, given your thorough assessment, which is correct:
-        
+
         (A) The argument speaks for the claim.
         (B) The argument speaks against the claim.
 
-        Just answer with (A/B). You'll be asked to justify your answer later on. 
+        Just answer with (A/B). You'll be asked to justify your answer later on.
 
         ### Assistant
-        
+
         Answer: ([LABEL]"""
     distribution
         LABEL in ["A", "B"]
     '''
 
-def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str,float]]:
+
+def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str, float]]:
     """Extracts the distribution from an LMQL result
 
     Args:
@@ -240,6 +242,7 @@ def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str,float]]:
     except:
         raise ValueError(f"Failed to extract distribution from LMQL result: {result}")
 
+
 def label_to_idx(label):
     try:
         idx = "ABCDEFGHIJ".index(label)
@@ -247,11 +250,13 @@ def label_to_idx(label):
         raise ValueError(f"Unknown label {label}")
     return idx
 
+
 def label_to_claim(label, claims):
     idx = label_to_idx(label)
     if idx >= len(claims):
         raise ValueError(f"Too few claims for {label}")
     return claims[idx]
+
 
 def label_to_valence(label):
     if label == "A":

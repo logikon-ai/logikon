@@ -42,4 +42,3 @@ def get_debugger_registry() -> Mapping[str, List[type[Debugger]]]:
             assert all(issubclass(d, AbstractScoreDebugger) for d in debuggers)
 
     return _DEBUGGER_REGISTRY
-

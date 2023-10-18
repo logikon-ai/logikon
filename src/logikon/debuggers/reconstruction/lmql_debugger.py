@@ -36,7 +36,7 @@ class LMQLDebugger(AbstractArtifactDebugger):
             if model is None:
                 msg = f"Model framework unknown or incompatible with lmql: {debug_config.llm_framework}"
                 raise ValueError(msg)
-            
+
             register_model(model_id, model)
 
         if not isinstance(model, lmql.LLM):
