@@ -5,6 +5,7 @@ from typing import List, TypedDict
 
 import copy
 import functools as ft
+import pprint
 import random
 import uuid
 
@@ -868,22 +869,22 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         if not all(isinstance(reason, Claim) for reason in reasons):
             raise ValueError(f"Reasons are not of type Claim. Got {reasons}.")
         reasons = self.ensure_unique_labels(reasons)
-        self.logger.info(f"Mined reasons: {reasons}")
+        self.logger.info(f"Mined reasons: {pprint.pformat(reasons.dict())}")
 
         # build pros and cons list
         pros_and_cons = build_pros_and_cons(reasons_data=[r.dict() for r in reasons], issue=issue, model=self._model, **self._generation_kwargs)
         if not isinstance(pros_and_cons, ProsConsList):
             raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
         # TODO: consider drafting alternative pros&cons lists and choosing best
-        self.logger.info(f"Built pros and cons list: {pros_and_cons}")
+        self.logger.info(f"Built pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         # double-check and revise
         pros_and_cons = self.check_and_revise(pros_and_cons, reasons, issue)
-        self.logger.info(f"Revised pros and cons list: {pros_and_cons}")
+        self.logger.info(f"Revised pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         # unpack individual reasons
         pros_and_cons = self.unpack_reasons(pros_and_cons, issue)
-        self.logger.info(f"Unpacked pros and cons list: {pros_and_cons}")
+        self.logger.info(f"Unpacked pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         if pros_and_cons is None:
             self.logger.warning("Failed to build pros and cons list (pros_and_cons is None).")
