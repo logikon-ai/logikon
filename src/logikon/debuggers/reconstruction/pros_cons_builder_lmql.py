@@ -818,20 +818,30 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         """
         pros_and_cons = copy.deepcopy(pros_and_cons)
         for root in pros_and_cons.roots:
+            to_be_added = []
+            to_be_removed = []
             for pro in root.pros:
                 unpacked_pros = unpack_reason(
                     reason_data=pro.dict(), issue=issue, model=self._model, **self._generation_kwargs
                 )
                 if len(unpacked_pros) > 1:
-                    root.pros.remove(pro)
-                    root.pros.extend(unpacked_pros)
+                    to_be_removed.append(pro)
+                    to_be_added.extend(unpacked_pros)
+            for pro in to_be_removed:
+                root.pros.remove(pro)
+            root.pros.extend(to_be_added)
+            to_be_added = []
+            to_be_removed = []
             for con in root.cons:
                 unpacked_cons = unpack_reason(
                     reason_data=con.dict(), issue=issue, model=self._model, **self._generation_kwargs
                 )
                 if len(unpacked_cons) > 1:
-                    root.cons.remove(con)
-                    root.cons.extend(unpacked_cons)
+                    to_be_removed.append(con)
+                    to_be_added.extend(unpacked_cons)
+            for con in to_be_removed:    
+                root.cons.remove(con)
+            root.cons.extend(to_be_added)
 
         return pros_and_cons
 
