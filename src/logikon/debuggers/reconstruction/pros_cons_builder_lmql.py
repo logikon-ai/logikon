@@ -409,7 +409,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
         """
         for reason in unused_reasons:
-            f_reason = format_reason(reason)
+            f_reason = format_reason(reason, 50)
             "{f_reason}"
         """
         Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
