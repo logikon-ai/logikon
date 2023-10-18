@@ -185,11 +185,11 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
             if marker == "\n```":
                 break
             else:
-                "title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and len(TITLE) < MAX_LEN_TITLE
+                "title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and STOPS_AT(TITLE, "\n") and len(TITLE) < MAX_LEN_TITLE
                 if not TITLE.endswith('\"'):
                     "\" "
                 title = TITLE.strip('\"')
-                "\n  gist: \"[GIST]" where STOPS_AT(GIST, "\"") and len(GIST) < MAX_LEN_GIST
+                "\n  gist: \"[GIST]" where STOPS_AT(GIST, "\"") and STOPS_AT(GIST, "\n") and len(GIST) < MAX_LEN_GIST
                 if not GIST.endswith('\"'):
                     "\" "
                 gist = GIST.strip('\"')
@@ -587,11 +587,11 @@ def unpack_reason(reason_data: dict, issue: str):
             if marker == "\n```":
                 break
             else:
-                "title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and len(TITLE) < 24
+                "title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and STOPS_AT(TITLE, "\n") and len(TITLE) < MAX_LEN_TITLE
                 if not TITLE.endswith('\"'):
                     "\" "
                 title = TITLE.strip('\"')
-                "\n    claim: \"[CLAIM]" where STOPS_AT(CLAIM, "\"") and len(CLAIM) < 180
+                "\n    claim: \"[CLAIM]" where STOPS_AT(CLAIM, "\"") and STOPS_AT(CLAIM, "\n") and len(CLAIM) < MAX_LEN_GIST
                 if not CLAIM.endswith('\"'):
                     "\" "
                 claim = CLAIM.strip('\"')
