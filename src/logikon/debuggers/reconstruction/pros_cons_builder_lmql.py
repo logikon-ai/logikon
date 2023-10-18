@@ -5,6 +5,7 @@ from typing import List, TypedDict
 
 import copy
 import functools as ft
+import random
 import uuid
 
 import lmql
@@ -23,11 +24,134 @@ LABELS = "ABCDEFG"
 
 ### EXAMPLES ###
 
+EXAMPLES_ISSUE_PROSCONS = [
+    (
+        "Bullfighting?",
+        ProsConsList(
+            roots=[
+                RootClaim(
+                    label="(Bullfighting ban)",
+                    text="Bullfighting should be banned.",
+                    pros=[
+                        Claim(
+                            label="[[Cruelty]]",
+                            text="Bullfighting is cruelty for the purpose of entertainment."
+                        )
+                    ],
+                    cons=[
+                        Claim(
+                            label="[[Economic benefits]]",
+                            text="Bullfighting may benefit national economies."
+                        ),
+                        Claim(
+                            label="[[Cultural value]]",
+                            text="Bullfighting is part of history and local cultures."
+                        )
+                    ]
+                )
+            ]
+        )
+    ),
+    (
+        "Our next holiday",
+        ProsConsList(
+            roots=[
+                RootClaim(
+                    label="(New York)",
+                    text="Let's spend our next holiday in New York.",
+                    pros=[
+                        Claim(
+                            label="[[Culture]]",
+                            text="New York has incredible cultural events to offer."
+                        )
+                    ],
+                    cons=[
+                        Claim(
+                            label="[[Costs]]",
+                            text="Spending holidays in a big city is too expensive."
+                        )
+                    ]
+                ),
+                RootClaim(
+                    label="(Florida)",
+                    text="Let's spend our next holiday in Florida.",
+                    pros=[
+                        Claim(
+                            label="[[Swimming]]",
+                            text="Florida has wonderful beaches and a warm ocean."
+                        )
+                    ],
+                    cons=[]
+                ),
+                RootClaim(
+                    label="(Los Angeles)",
+                    text="Let's spend our next holiday in Los Angeles.",
+                    pros=[],
+                    cons=[
+                        Claim(
+                            label="[[No Novelty]]",
+                            text="We've been in Los Angeles last year."
+                        )
+                    ]
+                )
+            ]
+        )
+    ),
+    (
+        "Pick best draft",
+        ProsConsList(
+            roots=[
+                RootClaim(
+                    label="(Draft-1)",
+                    text="Draft-1 is the best draft.",
+                    pros=[
+                        Claim(
+                            label="[[Readability]]",
+                            text="Draft-1 is easier to read than the other drafts."
+                        ),
+                        Claim(
+                            label="[[Engagement]]",
+                            text="Draft-1 is much more funny than the other drafts."
+                        )
+                    ],
+                    cons=[]
+                )
+            ]
+        )
+    ),
+]
+
+
 
 ### FORMATTERS ###
 
 def format_reason(reason: Claim) -> str:
     return f"- \"[[{reason.label}]]: {reason.text}\"\n"
+
+def format_proscons(issue: str, proscons: ProsConsList) -> str:
+    formatted = "```yaml\n"
+    # reasons block
+    reasons = []
+    for root in proscons.roots:
+        reasons.extend(root.pros)
+        reasons.extend(root.cons)
+    reasons = random.Random(42).sample(reasons, min(len(reasons), MAX_N_REASONS))
+    for reason in reasons:
+        formatted += format_reason(reason)
+    # issue
+    formatted += f"issue: \"{issue}\"\n"    
+    # pros and cons block
+    formatted += "pros_and_cons:\n"
+    for root in proscons.roots:
+        formatted += f"- root: \"({root.label}): {root.text}\"\n"
+        formatted += "  pros:\n"
+        for pro in root.pros:
+            formatted += f"  - \"[[{pro.label}]]\"\n"
+        formatted += "  cons:\n"
+        for con in root.cons:
+            formatted += f"  - \"[[{con.label}]]\"\n"
+    formatted += "```"
+    return formatted
 
 
 ### LMQL QUERIES ###
@@ -200,64 +324,73 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         </inputs>
 
         Let me show you a few examples to illustrate the task / intended output:
-        
-        <example>
-        ```yaml
-        reasons:
-        - "[[Cultural value]]: Bullfighting is part of history and local cultures."
-        - "[[Cruelty]]: Bullfighting is cruelty for the purpose of entertainment."
-        - "[[Economic benefits]]: Bullfighting may benefit national economies."
-        issue: "Bullfighting?"
-        pros_and_cons:
-        - root: "(Bullfighting ban): Bullfighting should be banned."
-          pros:
-          - "[[Cruelty]]"
-          cons:
-          - "[[Economic benefits]]"
-          - "[[Cultural value]]"
-        </example>
-        
-        <example>
-        ```yaml
-        reasons:
-        - "[[Culture]]: New York has incredible cultural events to offer."
-        - "[[Costs]]: Spending holidays in a big city is too expensive."
-        - "[[Swimming]]: Florida has wonderful beaches and a warm ocean."
-        - "[[No Novelty]]: We've been in Los Angeles last year."
-        issue: "Our next holiday"
-        pros_and_cons:
-        - root: "(New York): Let's spend our next holiday in New York."
-          pros:
-          - [[Culture]]
-          cons:
-          - [[Costs]]
-        - root: "(Florida): Let's spend our next holiday in Florida."
-          pros:
-          - [[Swimming]]
-          cons: 
-        - root: "(Los Angeles): Let's spend our next holiday in Los Angeles."
-          pros:
-          cons:
-          - "[[No Novelty]]"
-          - "[[Costs]]"
-        </example>
-        
-        <example>
-        ```yaml
-        reasons:
-        - "[[Readability]]: Draft-1 is easier to read than the other drafts."
-        - "[[Engagement]]: Draft-1 is much more funny than the other drafts."
-        issue: "Pick best draft"
-        pros_and_cons:
-        - root: "(Draft-1): Draft-1 is the best draft."
-          pros:
-          - "[[Readability]]"
-          - "[[Engagement]]"
-          cons:        
-        ```        
-        </example>   
+        """
+        for ex_issue, ex_proscons in EXAMPLES_ISSUE_PROSCONS:
+            f"""
+            <example>
+            {format_proscons(ex_issue, ex_proscons)}
+            </example>
+            """
+                    
+#        <example>
+#        ```yaml
+#        reasons:
+#        - "[[Cultural value]]: Bullfighting is part of history and local cultures."
+#        - "[[Cruelty]]: Bullfighting is cruelty for the purpose of entertainment."
+#        - "[[Economic benefits]]: Bullfighting may benefit national economies."
+#        issue: "Bullfighting?"
+#        pros_and_cons:
+#        - root: "(Bullfighting ban): Bullfighting should be banned."
+#          pros:
+#          - "[[Cruelty]]"
+#          cons:
+#          - "[[Economic benefits]]"
+#          - "[[Cultural value]]"
+#        ```
+#        </example>
+#        
+#        <example>
+#        ```yaml
+#        reasons:
+#        - "[[Culture]]: New York has incredible cultural events to offer."
+#        - "[[Costs]]: Spending holidays in a big city is too expensive."
+#        - "[[Swimming]]: Florida has wonderful beaches and a warm ocean."
+#        - "[[No Novelty]]: We've been in Los Angeles last year."
+#        issue: "Our next holiday"
+#        pros_and_cons:
+#        - root: "(New York): Let's spend our next holiday in New York."
+#          pros:
+#          - [[Culture]]
+#          cons:
+#          - [[Costs]]
+#        - root: "(Florida): Let's spend our next holiday in Florida."
+#          pros:
+#          - [[Swimming]]
+#          cons: 
+#        - root: "(Los Angeles): Let's spend our next holiday in Los Angeles."
+#          pros:
+#          cons:
+#          - "[[No Novelty]]"
+#          - "[[Costs]]"
+#        ```
+#        </example>
+#        
+#        <example>
+#        ```yaml
+#        reasons:
+#        - "[[Readability]]: Draft-1 is easier to read than the other drafts."
+#        - "[[Engagement]]: Draft-1 is much more funny than the other drafts."
+#        issue: "Pick best draft"
+#        pros_and_cons:
+#        - root: "(Draft-1): Draft-1 is the best draft."
+#          pros:
+#          - "[[Readability]]"
+#          - "[[Engagement]]"
+#          cons:        
+#        ```        
+#        </example>   
 
-        
+        """        
         Please consider carefully the following further, more specific instructions:
 
         * Be bold: Render the root claim(s) as general, and strong, and unequivocal statement(s).
@@ -741,7 +874,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                     root.pros.remove(pro)
                     root.pros.extend(unpacked_pros)
             for con in root.cons:
-                unpacked_cons = unpack_reason(reason_data=con.dict(), issue=issue)
+                unpacked_cons = unpack_reason(reason_data=con.dict(), issue=issue, model=self._model, **self._generation_kwargs)
                 if len(unpacked_cons) > 1:
                     root.cons.remove(con)
                     root.cons.extend(unpacked_cons)
