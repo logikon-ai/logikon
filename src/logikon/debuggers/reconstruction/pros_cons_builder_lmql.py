@@ -150,7 +150,7 @@ def format_proscons(issue: str, proscons: ProsConsList) -> str:
         formatted += "  cons:\n"
         for con in root.cons:
             formatted += f"  - \"[[{con.label}]]\"\n"
-    formatted += "```"
+    formatted += "```\n"
     return formatted
 
 
@@ -326,11 +326,9 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         Let me show you a few examples to illustrate the task / intended output:
         """
         for ex_issue, ex_proscons in EXAMPLES_ISSUE_PROSCONS:
-            f"""
-            <example>
-            {format_proscons(ex_issue, ex_proscons)}
-            </example>
-            """
+            "<example>\n"
+            "{format_proscons(ex_issue, ex_proscons)}"
+            "</example>\n"
                     
 #        <example>
 #        ```yaml
