@@ -154,6 +154,11 @@ def format_proscons(issue: str, proscons: ProsConsList) -> str:
     formatted += "```\n"
     return formatted
 
+def format_examples() -> str:
+    formatted = [format_proscons(*example) for example in EXAMPLES_ISSUE_PROSCONS]
+    formatted = ["<example>\n" + example + "</example>" for example in formatted]
+    formatted = "\n".join(formatted)
+    return formatted
 
 ### LMQL QUERIES ###
 
@@ -327,69 +332,8 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         </inputs>
 
         Let me show you a few examples to illustrate the task / intended output:
-        """
-        for ex_issue, ex_proscons in EXAMPLES_ISSUE_PROSCONS:
-            formatted_example = format_proscons(ex_issue, ex_proscons)
-            "<example>\n{formatted_example}</example>\n"
-                    
-#        <example>
-#        ```yaml
-#        reasons:
-#        - "[[Cultural value]]: Bullfighting is part of history and local cultures."
-#        - "[[Cruelty]]: Bullfighting is cruelty for the purpose of entertainment."
-#        - "[[Economic benefits]]: Bullfighting may benefit national economies."
-#        issue: "Bullfighting?"
-#        pros_and_cons:
-#        - root: "(Bullfighting ban): Bullfighting should be banned."
-#          pros:
-#          - "[[Cruelty]]"
-#          cons:
-#          - "[[Economic benefits]]"
-#          - "[[Cultural value]]"
-#        ```
-#        </example>
-#        
-#        <example>
-#        ```yaml
-#        reasons:
-#        - "[[Culture]]: New York has incredible cultural events to offer."
-#        - "[[Costs]]: Spending holidays in a big city is too expensive."
-#        - "[[Swimming]]: Florida has wonderful beaches and a warm ocean."
-#        - "[[No Novelty]]: We've been in Los Angeles last year."
-#        issue: "Our next holiday"
-#        pros_and_cons:
-#        - root: "(New York): Let's spend our next holiday in New York."
-#          pros:
-#          - [[Culture]]
-#          cons:
-#          - [[Costs]]
-#        - root: "(Florida): Let's spend our next holiday in Florida."
-#          pros:
-#          - [[Swimming]]
-#          cons: 
-#        - root: "(Los Angeles): Let's spend our next holiday in Los Angeles."
-#          pros:
-#          cons:
-#          - "[[No Novelty]]"
-#          - "[[Costs]]"
-#        ```
-#        </example>
-#        
-#        <example>
-#        ```yaml
-#        reasons:
-#        - "[[Readability]]: Draft-1 is easier to read than the other drafts."
-#        - "[[Engagement]]: Draft-1 is much more funny than the other drafts."
-#        issue: "Pick best draft"
-#        pros_and_cons:
-#        - root: "(Draft-1): Draft-1 is the best draft."
-#          pros:
-#          - "[[Readability]]"
-#          - "[[Engagement]]"
-#          cons:        
-#        ```        
-#        </example>   
-        """
+
+        {format_examples()}
         
         Please consider carefully the following further, more specific instructions:
 
@@ -519,7 +463,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 @lmql.query
 def unpack_reason(reason_data: dict, issue: str):
     '''lmql
-    sample(temperature=.4)
+    sample(temperature=.4, top_k=100, top_p=0.95)
         reason = Claim(**reason_data)
         """
         {lmql_queries.system_prompt()}
