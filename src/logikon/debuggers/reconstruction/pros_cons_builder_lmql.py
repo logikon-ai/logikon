@@ -18,7 +18,7 @@ from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
 MAX_N_REASONS = 50
 MAX_N_ROOTS = 10
 MAX_LEN_TITLE = 32
-MAX_LEN_GIST = 160
+MAX_LEN_GIST = 180
 N_DRAFTS = 3
 LABELS = "ABCDEFG"
 
@@ -356,6 +356,12 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
         ### Assistant
         
+        Let me recall the basic options before producing the pros and cons list:
+        """
+        for option in options:
+            "- {option}\n"
+        """
+
         ```yaml
         reasons:
         """
