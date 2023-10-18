@@ -456,7 +456,7 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
 
                 roots.append(root)
 
-        return ProsConsList(roots=roots, options=options), unused_reasons
+        return ProsConsList(roots=roots, options=pros_and_cons.options), unused_reasons
 
     '''
 
