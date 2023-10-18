@@ -234,8 +234,8 @@ def get_roots(reasons_data, issue):
         "```yaml\n"
         "reasons:\n"
         for reason in reasons:
-        f_reason = format_reason(reason)
-        "{f_reason}"
+            f_reason = format_reason(reason)
+            "{f_reason}"
         "issue: \"{issue}\"\n"
         "pros_and_cons:\n"
         unused_reasons = copy.deepcopy(reasons)
