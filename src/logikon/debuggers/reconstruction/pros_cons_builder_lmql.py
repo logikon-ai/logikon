@@ -327,7 +327,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         """
         for ex_issue, ex_proscons in EXAMPLES_ISSUE_PROSCONS:
             "<example>\n"
-            "{format_proscons(ex_issue, ex_proscons)}"
+            format_proscons(ex_issue, ex_proscons)
             "</example>\n"
                     
 #        <example>
@@ -451,7 +451,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
                 roots.append(root)        
 
         if not unused_reasons:
-            return ProsConsList(roots=roots)
+            return ProsConsList(roots=roots, options=options)
             
         """
         ### User 
@@ -507,7 +507,8 @@ def build_pros_and_cons(reasons_data: list, issue: str):
                         break
 
                 roots.append(root)
-        return ProsConsList(roots=roots)
+        return ProsConsList(roots=roots, options=options)
+        """
 
     '''
 
