@@ -18,7 +18,7 @@ from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
 MAX_N_REASONS = 50
 MAX_N_ROOTS = 10
 MAX_LEN_TITLE = 32
-MAX_LEN_GIST = 180
+MAX_LEN_GIST = 160
 N_DRAFTS = 3
 LABELS = "ABCDEFG"
 
@@ -125,8 +125,11 @@ EXAMPLES_ISSUE_PROSCONS = [
 
 ### FORMATTERS ###
 
-def format_reason(reason: Claim) -> str:
-    return f"- \"[{reason.label}]: {reason.text}\"\n"
+def format_reason(reason: Claim, max_len: int = -1) -> str:
+    label_text = f"[{reason.label}]: {reason.text}"
+    if max_len > 0 and len(label_text) > max_len:
+        label_text = label_text[:max_len] + "..."
+    return f"- \"{label_text}\"\n"
 
 def format_proscons(issue: str, proscons: ProsConsList) -> str:
     formatted = "```yaml\n"
@@ -326,7 +329,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         <reasons>
         """
         for reason in reasons:
-            f_reason = format_reason(reason)
+            f_reason = format_reason(reason, 50)
             "{f_reason}"
         """</reasons>
         </inputs>
