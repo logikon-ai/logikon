@@ -839,7 +839,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 if len(unpacked_cons) > 1:
                     to_be_removed.append(con)
                     to_be_added.extend(unpacked_cons)
-            for con in to_be_removed:    
+            for con in to_be_removed:
                 root.cons.remove(con)
             root.cons.extend(to_be_added)
 
