@@ -41,6 +41,7 @@ import functools as ft
 import pprint
 import random
 import uuid
+import tqdm
 
 import lmql
 
@@ -410,7 +411,7 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
 
         # create fuzzy argmap from fuzzy pros and cons list (reason-root edges)
         fuzzy_argmap = FuzzyArgMap()
-        for root in pros_and_cons.roots:
+        for root in tqdm.tqdm(pros_and_cons.roots):
             target_node = self._add_node(fuzzy_argmap, root, type=am.CENTRAL_CLAIM)
             for pro in root.pros:
                 source_node = self._add_node(fuzzy_argmap, pro, type=am.REASON)
@@ -420,7 +421,7 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
                 self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node, valence=am.ATTACK)
 
         # add fuzzy reason-reason edges
-        for target_node in fuzzy_argmap.nodelist:
+        for target_node in tqdm.tqdm(fuzzy_argmap.nodelist):
             for source_node in fuzzy_argmap.nodelist:
                 if source_node.id == target_node.id:
                     continue
