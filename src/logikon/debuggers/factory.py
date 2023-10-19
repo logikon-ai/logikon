@@ -126,7 +126,7 @@ class DebuggerFactory:
 
         if not pipeline:
             return None
-        
+
         self.logger.info("Built debugger pipeline:" + " -> ".join([str(type(debugger)) for debugger in pipeline]))
 
         # chain the debuggers via set_next()
