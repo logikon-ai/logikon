@@ -494,21 +494,19 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
     '''
 
 
-
 class ProsConsBuilderLMQL(LMQLDebugger):
     """ProsConsBuilderLMQL
 
     This LMQLDebugger is responsible for reconstructing a pros and cons list for a given issue.
 
-    
 
-            
+
+
     """
 
     __pdescription__ = "Pros and cons list with multiple root claims"
     __product__ = "proscons"
     __requirements__ = ["issue"]
-
 
     def ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
         """Revises labels of reasons to ensure uniqueness
@@ -613,9 +611,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 )
                 if lmql_result is None:
                     continue
-                new_val = lmql_queries.label_to_valence(
-                    lmql_result.variables[lmql_result.distribution_variable]
-                )
+                new_val = lmql_queries.label_to_valence(lmql_result.variables[lmql_result.distribution_variable])
                 if new_val != lmql_queries.PRO:  # never change valence
                     continue
 
@@ -671,10 +667,8 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                     **self._generation_kwargs,
                 )
                 if lmql_result is None:
-                    continue            
-                new_val = lmql_queries.label_to_valence(
-                    lmql_result.variables[lmql_result.distribution_variable]
-                )
+                    continue
+                new_val = lmql_queries.label_to_valence(lmql_result.variables[lmql_result.distribution_variable])
                 if new_val != lmql_queries.CON:  # never change valence
                     continue
 
@@ -705,9 +699,6 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 new_root.cons.append(reason)
 
         return revised_pros_and_cons
-
-
-
 
     def _debug(self, debug_state: DebugState):
         """Extract pros and cons of text (prompt/completion).

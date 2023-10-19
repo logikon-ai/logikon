@@ -23,7 +23,6 @@ class NetworkXExporter(AbstractArtifactDebugger):
     __product__ = "networkx_graph"
     __requirements__ = ["informal_argmap"]
 
-
     def to_nx(self, argument_map: InformalArgMap) -> nx.DiGraph:
         """builds nx graph from nodes-links argument map"""
         try:
@@ -52,7 +51,7 @@ class NetworkXExporter(AbstractArtifactDebugger):
             informal_argmap: InformalArgMap = next(
                 InformalArgMap(**artifact.data)
                 for artifact in debug_state.artifacts
-                if artifact.id == "informal_argmap"
+                if artifact.id == self.get_requirements()[0]
             )
         except StopIteration:
             msg = "Missing required artifact: informal_argmap"

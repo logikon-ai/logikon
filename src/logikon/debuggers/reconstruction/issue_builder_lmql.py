@@ -92,7 +92,6 @@ class IssueBuilderLMQL(LMQLDebugger):
     __pdescription__ = "Issue or decision problem addressed in the deliberation"
     __product__ = "issue"
 
-
     def _debug(self, debug_state: DebugState):
         """Extract central issue of text (prompt/completion)."""
 

@@ -44,7 +44,6 @@ class SVGMapExporter(AbstractArtifactDebugger):
                 "Graphviz dot command not found. To create SVG argument map, install graphviz on this system."
             )
 
-
     def _preprocess_string(self, value: str) -> str:
         new_value = unidecode(value)
         if ":" in new_value:

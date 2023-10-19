@@ -21,7 +21,6 @@ class AbstractGraphScorer(AbstractScoreDebugger):
 
     __requirements__ = ["networkx_graph"]
 
-
     @abstractmethod
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         pass
@@ -51,20 +50,16 @@ class AbstractGraphScorer(AbstractScoreDebugger):
 
 
 class ArgMapGraphSizeScorer(AbstractGraphScorer):
-
     __pdescription__ = "Measure the size of the argument map (number of nodes)"
     __product__ = "argmap_size"
-
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         return len(digraph.nodes), "", None
 
 
 class ArgMapGraphAvgKatzCScorer(AbstractGraphScorer):
-
     __pdescription__ = "Average Katz centrality of all nodes in the graph"
     __product__ = "argmap_avg_katz_centrality"
-
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         centrality = nx.katz_centrality(digraph)
@@ -74,10 +69,8 @@ class ArgMapGraphAvgKatzCScorer(AbstractGraphScorer):
 
 
 class ArgMapGraphAttackRatioScorer(AbstractGraphScorer):
-
     __pdescription__ = "Ratio of attacking reasons (cons) in the informal argmap"
     __product__ = "argmap_attack_ratio"
-
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         edge_data = digraph.edges.data("valence")

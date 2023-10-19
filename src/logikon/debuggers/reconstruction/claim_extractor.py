@@ -330,7 +330,6 @@ class ClaimExtractor(AbstractArtifactDebugger):
     __pdescription__ = "Key claims in the deliberation"
     __product__ = "claims"
 
-
     def _debug(self, debug_state: DebugState):
         """Extract central claims tha address and answer key question of trace."""
 

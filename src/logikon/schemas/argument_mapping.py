@@ -10,6 +10,7 @@ REASON = "reason"
 ATTACK = "attack"
 SUPPORT = "support"
 
+
 class AnnotationSpan(BaseModel):
     start: int
     end: int

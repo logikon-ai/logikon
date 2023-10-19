@@ -756,7 +756,6 @@ class InformalArgMapBuilder(AbstractArtifactDebugger):
     __product__ = "informal_argmap"
     __requirements__ = ["claims"]
 
-
     def _debug(self, debug_state: DebugState):
         """Reconstruct reasoning as argmap."""
 

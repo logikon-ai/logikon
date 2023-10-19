@@ -9,6 +9,7 @@ from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
 from logikon.debuggers.reconstruction.informal_argmap_builder import InformalArgMapBuilder
 from logikon.debuggers.reconstruction.issue_builder_lmql import IssueBuilderLMQL
 from logikon.debuggers.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
+from logikon.debuggers.reconstruction.fuzzy_argmap_builder_lmql import FuzzyArgMapBuilderLMQL
 from logikon.debuggers.scorers.argmap_graph_scores import (
     ArgMapGraphAttackRatioScorer,
     ArgMapGraphAvgKatzCScorer,
@@ -21,6 +22,7 @@ _DEBUGGER_REGISTRY: Mapping[str, List[type[Debugger]]] = {
     "claims": [ClaimExtractor],
     "issue": [IssueBuilderLMQL],
     "proscons": [ProsConsBuilderLMQL],
+    "fuzzy_argmap": [FuzzyArgMapBuilderLMQL],
     "networkx_graph": [NetworkXExporter],
     "svg_argmap": [SVGMapExporter],
     "argmap_size": [ArgMapGraphSizeScorer],

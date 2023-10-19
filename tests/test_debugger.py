@@ -14,7 +14,6 @@ class DummyDebugger1(AbstractArtifactDebugger):
     __pdescription__ = "dummy_debugger1"
     __product__ = "dummy_artifact1"
 
-
     def _debug(self, debug_state: DebugState):
         prompt, completion = debug_state.get_prompt_completion()
         """Concat prompt and completion."""
