@@ -11,25 +11,17 @@ from logikon.schemas.results import Artifact, DebugState, Score, INPUT_KWS
 class DummyDebugger1(AbstractArtifactDebugger):
     """Dummy Debugger"""
 
-    _KW_DESCRIPTION = "dummy_debugger1"
-    _KW_PRODUCT = "dummy_artifact1"
-    _KW_REQUIREMENTS: List[str] = []
+    __pdescription__ = "dummy_debugger1"
+    __product__ = "dummy_artifact1"
 
-    @staticmethod
-    def get_product() -> str:
-        return DummyDebugger1._KW_PRODUCT
-
-    @staticmethod
-    def get_requirements() -> List[str]:
-        return DummyDebugger1._KW_REQUIREMENTS
 
     def _debug(self, debug_state: DebugState):
         prompt, completion = debug_state.get_prompt_completion()
         """Concat prompt and completion."""
         data = prompt + completion if prompt and completion else "None"
         artifact = Artifact(
-            id=self._KW_PRODUCT,
-            description=self._KW_DESCRIPTION,
+            id=self.get_product(),
+            description=self.get_description(),
             data=data,
         )
         debug_state.artifacts.append(artifact)
@@ -38,25 +30,17 @@ class DummyDebugger1(AbstractArtifactDebugger):
 class DummyDebugger2(AbstractScoreDebugger):
     """Dummy Debugger"""
 
-    _KW_DESCRIPTION = "dummy_debugger2"
-    _KW_PRODUCT = "dummy_metric2"
-    _KW_REQUIREMENTS = ["dummy_artifact1"]
-
-    @staticmethod
-    def get_product() -> str:
-        return DummyDebugger2._KW_PRODUCT
-
-    @staticmethod
-    def get_requirements() -> List[str]:
-        return DummyDebugger2._KW_REQUIREMENTS
+    __pdescription__ = "dummy_debugger2"
+    __product__ = "dummy_metric2"
+    __requirements__ = ["dummy_artifact1"]
 
     def _debug(self, debug_state: DebugState):
         """Length of prompt."""
         prompt, _ = debug_state.get_prompt_completion()
         value = len(prompt) if prompt else 0
         score = Score(
-            id=self._KW_PRODUCT,
-            description=self._KW_DESCRIPTION,
+            id=self.get_product(),
+            description=self.get_description(),
             value=value,
         )
         debug_state.scores.append(score)

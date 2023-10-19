@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Optional, Union
 
 import networkx as nx
 import numpy as np
@@ -19,16 +19,8 @@ class AbstractGraphScorer(AbstractScoreDebugger):
     - networkx_graph
     """
 
-    _KW_REQUIREMENTS = ["networkx_graph"]
+    __requirements__ = ["networkx_graph"]
 
-    @staticmethod
-    def get_requirements() -> list[str]:
-        return AbstractGraphScorer._KW_REQUIREMENTS
-
-    @staticmethod
-    @abstractmethod
-    def get_description() -> str:
-        pass
 
     @abstractmethod
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
@@ -59,32 +51,20 @@ class AbstractGraphScorer(AbstractScoreDebugger):
 
 
 class ArgMapGraphSizeScorer(AbstractGraphScorer):
-    _KW_DESCRIPTION = "Measure the size of the argument map (number of nodes)"
-    _KW_PRODUCT = "argmap_size"
 
-    @staticmethod
-    def get_product() -> str:
-        return ArgMapGraphSizeScorer._KW_PRODUCT
+    __pdescription__ = "Measure the size of the argument map (number of nodes)"
+    __product__ = "argmap_size"
 
-    @staticmethod
-    def get_description() -> str:
-        return ArgMapGraphSizeScorer._KW_DESCRIPTION
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         return len(digraph.nodes), "", None
 
 
 class ArgMapGraphAvgKatzCScorer(AbstractGraphScorer):
-    _KW_DESCRIPTION = "Average Katz centrality of all nodes in the graph"
-    _KW_PRODUCT = "argmap_avg_katz_centrality"
 
-    @staticmethod
-    def get_product() -> str:
-        return ArgMapGraphAvgKatzCScorer._KW_PRODUCT
+    __pdescription__ = "Average Katz centrality of all nodes in the graph"
+    __product__ = "argmap_avg_katz_centrality"
 
-    @staticmethod
-    def get_description() -> str:
-        return ArgMapGraphAvgKatzCScorer._KW_DESCRIPTION
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         centrality = nx.katz_centrality(digraph)
@@ -94,16 +74,10 @@ class ArgMapGraphAvgKatzCScorer(AbstractGraphScorer):
 
 
 class ArgMapGraphAttackRatioScorer(AbstractGraphScorer):
-    _KW_DESCRIPTION = "Ratio of attacking reasons (cons) in the informal argmap"
-    _KW_PRODUCT = "argmap_attack_ratio"
 
-    @staticmethod
-    def get_product() -> str:
-        return ArgMapGraphAttackRatioScorer._KW_PRODUCT
+    __pdescription__ = "Ratio of attacking reasons (cons) in the informal argmap"
+    __product__ = "argmap_attack_ratio"
 
-    @staticmethod
-    def get_description() -> str:
-        return ArgMapGraphAttackRatioScorer._KW_DESCRIPTION
 
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         edge_data = digraph.edges.data("valence")

@@ -20,15 +20,15 @@ class Debugger(ABC):
     def __call__(self, debug_state):
         pass
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def get_product() -> str:
+    def get_product(cls) -> str:
         """Get config keyword of artifact / metric produced by debugger."""
         pass
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def get_requirements() -> List[str]:
+    def get_requirements(cls) -> List[str]:
         """Get config keywords of metrics / artifacts that are required for the debugger."""
         pass
 

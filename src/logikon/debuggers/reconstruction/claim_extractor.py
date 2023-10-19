@@ -327,16 +327,9 @@ class ClaimExtractor(AbstractArtifactDebugger):
     prompt and completion.
     """
 
-    _KW_DESCRIPTION = "Key claims in the deliberation"
-    _KW_PRODUCT = "claims"
+    __pdescription__ = "Key claims in the deliberation"
+    __product__ = "claims"
 
-    @staticmethod
-    def get_product() -> str:
-        return ClaimExtractor._KW_PRODUCT
-
-    @staticmethod
-    def get_description() -> str:
-        return ClaimExtractor._KW_DESCRIPTION
 
     def _debug(self, debug_state: DebugState):
         """Extract central claims tha address and answer key question of trace."""
@@ -348,8 +341,8 @@ class ClaimExtractor(AbstractArtifactDebugger):
         claims = llmchain.run(prompt=prompt, completion=completion)
 
         artifact = Artifact(
-            id=self._KW_PRODUCT,
-            description=self._KW_DESCRIPTION,
+            id=self.get_product(),
+            description=self.get_description(),
             data=claims,
         )
 

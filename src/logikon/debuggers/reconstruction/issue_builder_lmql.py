@@ -89,16 +89,9 @@ class IssueBuilderLMQL(LMQLDebugger):
     This LMQLDebugger is responsible for summarizing the issue discussed in a text.
     """
 
-    _KW_DESCRIPTION = "Issue or decision problem addressed in the deliberation"
-    _KW_PRODUCT = "issue"
+    __pdescription__ = "Issue or decision problem addressed in the deliberation"
+    __product__ = "issue"
 
-    @staticmethod
-    def get_product() -> str:
-        return IssueBuilderLMQL._KW_PRODUCT
-
-    @staticmethod
-    def get_description() -> str:
-        return IssueBuilderLMQL._KW_DESCRIPTION
 
     def _debug(self, debug_state: DebugState):
         """Extract central issue of text (prompt/completion)."""
@@ -143,8 +136,8 @@ class IssueBuilderLMQL(LMQLDebugger):
             self.logger.warning("Failed to elicit issue (issue is None).")
 
         artifact = Artifact(
-            id=self._KW_PRODUCT,
-            description=self._KW_DESCRIPTION,
+            id=self.get_product(),
+            description=self.get_description(),
             data=issue,
         )
 

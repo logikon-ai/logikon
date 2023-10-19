@@ -4,6 +4,11 @@ from typing import List
 
 from pydantic import BaseModel
 
+CENTRAL_CLAIM = "central_claim"
+REASON = "reason"
+
+ATTACK = "attack"
+SUPPORT = "support"
 
 class AnnotationSpan(BaseModel):
     start: int
@@ -15,7 +20,7 @@ class ArgMapNode(BaseModel):
     text: str
     label: str
     annotations: list[AnnotationSpan] = []
-    nodeType: str = "proposition"
+    nodeType: str = REASON
 
 
 class ArgMapEdge(BaseModel):
@@ -27,3 +32,12 @@ class ArgMapEdge(BaseModel):
 class InformalArgMap(BaseModel):
     nodelist: list[ArgMapNode] = []
     edgelist: list[ArgMapEdge] = []
+
+
+class FuzzyArgMapEdge(ArgMapEdge):
+    weight: float
+
+
+class FuzzyArgMap(BaseModel):
+    nodelist: list[ArgMapNode] = []
+    edgelist: list[FuzzyArgMapEdge] = []

@@ -23,9 +23,9 @@ class SVGMapExporter(AbstractArtifactDebugger):
     - networkx_graph
     """
 
-    _KW_DESCRIPTION = "Exports an informal argmap as a networkx graph"
-    _KW_PRODUCT = "svg_argmap"
-    _KW_REQUIREMENTS = ["networkx_graph"]
+    __pdescription__ = "Exports an informal argmap as a networkx graph"
+    __product__ = "svg_argmap"
+    __requirements__ = ["networkx_graph"]
 
     _NODE_TEMPLATE = """<
     <TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
@@ -44,13 +44,6 @@ class SVGMapExporter(AbstractArtifactDebugger):
                 "Graphviz dot command not found. To create SVG argument map, install graphviz on this system."
             )
 
-    @staticmethod
-    def get_product() -> str:
-        return SVGMapExporter._KW_PRODUCT
-
-    @staticmethod
-    def get_requirements() -> list[str]:
-        return SVGMapExporter._KW_REQUIREMENTS
 
     def _preprocess_string(self, value: str) -> str:
         new_value = unidecode(value)
@@ -142,8 +135,8 @@ class SVGMapExporter(AbstractArtifactDebugger):
         svg_argmap = self._to_svg(networkx_graph)
 
         artifact = Artifact(
-            id=self._KW_PRODUCT,
-            description=self._KW_DESCRIPTION,
+            id=self.get_product(),
+            description=self.get_description(),
             data=svg_argmap,
         )
 

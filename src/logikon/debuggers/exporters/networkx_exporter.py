@@ -19,17 +19,10 @@ class NetworkXExporter(AbstractArtifactDebugger):
     - informal_argmap
     """
 
-    _KW_DESCRIPTION = "Exports an informal argmap as a networkx graph"
-    _KW_PRODUCT = "networkx_graph"
-    _KW_REQUIREMENTS = ["informal_argmap"]
+    __pdescription__ = "Exports an informal argmap as a networkx graph"
+    __product__ = "networkx_graph"
+    __requirements__ = ["informal_argmap"]
 
-    @staticmethod
-    def get_product() -> str:
-        return NetworkXExporter._KW_PRODUCT
-
-    @staticmethod
-    def get_requirements() -> list[str]:
-        return NetworkXExporter._KW_REQUIREMENTS
 
     def to_nx(self, argument_map: InformalArgMap) -> nx.DiGraph:
         """builds nx graph from nodes-links argument map"""
@@ -68,8 +61,8 @@ class NetworkXExporter(AbstractArtifactDebugger):
         networkx_graph = self.to_nx(informal_argmap)
 
         artifact = Artifact(
-            id=self._KW_PRODUCT,
-            description=self._KW_DESCRIPTION,
+            id=self.get_product(),
+            description=self.get_description(),
             data=networkx_graph,
         )
 

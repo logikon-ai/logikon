@@ -15,6 +15,10 @@ class AbstractDebugger(Debugger):
     Base debugger class with default __call__ implementation.
     """
 
+    __product__: Optional[str] = None
+    __requirements__: List[str] = []
+    __pdescription__: Optional[str] = None
+
     def __init__(self, debug_config: DebugConfig):
         self._debug_config = debug_config
 
@@ -30,10 +34,21 @@ class AbstractDebugger(Debugger):
 
         return debug_state
 
-    @staticmethod
-    def get_requirements() -> List[str]:
-        """Default implementation: no requirements."""
-        return []
+    @classmethod
+    def get_product(cls) -> str:
+        if cls.__product__ is None:
+            raise ValueError(f"Product type not defined for {cls.__name__}.")
+        return cls.__product__
+
+    @classmethod
+    def get_requirements(cls) -> list[str]:
+        return cls.__requirements__
+
+    @classmethod
+    def get_description(cls) -> str:
+        if cls.__pdescription__ is None:
+            raise ValueError(f"Product description not defined for {cls.__name__}.")
+        return cls.__pdescription__
 
     @property
     def logger(self) -> logging.Logger:

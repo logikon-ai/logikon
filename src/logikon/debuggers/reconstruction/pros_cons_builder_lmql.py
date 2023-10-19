@@ -494,145 +494,6 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
     '''
 
 
-@lmql.query
-def unpack_reason(reason_data: dict, issue: str):
-    '''lmql
-    sample(temperature=.4, top_k=100, top_p=0.95)
-        reason = Claim(**reason_data)
-        """
-        {lmql_queries.system_prompt()}
-
-        ### User
-
-        Your Assignment: Unpack the individual claims contained in an argumentation.
-
-        Use the following inputs (the title and gist of an argumentation that addresses an issue) to solve your assignment.
-
-        <inputs>
-        <issue>{issue}</issue>
-        <argumentation>
-        <title>{reason.label}</title>
-        <gist>{reason.text}</gist>
-        </argumentation>
-        </inputs>
-
-        What are the individual claims and basic reasons contained in this argumentation?
-
-        Let me give you more detailed instructions:
-
-        - Read the gist carefully and extract all individual claims it sets forth.
-        - State each claim clearly in simple and plain language.
-        - The basic claims you extract must not contain any reasoning (as indicated, e.g., by "because", "since", "therefore" ...).
-        - For each argumentation, state all the claims it makes in one grammatically correct sentences, staying close to the original wording. Provide a distinct title, too. I.e.:
-            ```
-            argumentation:
-              issue: "repeat argumentation issue"
-              title: "repeat argumentation title"
-              gist: "repeat argumentation gist"
-              claims:
-              - title: "first claim title"
-                claim: "state first claim in one sentence."
-              - ...
-            ```
-        - The individual claims you extract may mutually support each other, or represent independent reasons for one and the same conclusion; yet such argumentative relations need not be recorded (at this point).
-        - If the argumentation gist contains a single claim, just include that very claim in your list.
-        - Avoid repeating one and the same claim in different words.
-        - IMPORTANT: Stay faithful to the gist! Don't invent your own claims. Don't uncover implicit assumptions. Only provide claims which are explicitly contained in the gist.
-        - Use yaml syntax and "```" code fences to structure your answer.
-
-        I'll give you a few examples that illustrate the task.
-
-        <example>
-        ```yaml
-        argumentation:
-          issue: "Eating animals?"
-          title: "Climate impact"
-          gist: "Animal farming contributes to climate change because it is extremely energy intensive and causes the degradation of natural carbon sinks through land use change."
-          claims:
-          - title: "Climate impact"
-            claim: "Animal farming contributes to climate change."
-          - title: "High energy consumption"
-            claim: "Animal farming is extremely energy intensive."
-          - title: "Land use change"
-            claim: "Animal farming causes the degradation of natural carbon sinks through land use change."
-        ```
-        </example>
-
-        <example>
-        ```yaml
-        argumentation:
-          issue: "Should Bullfighting be Banned?"
-          title: "Economic benefit"
-          gist: "Bullfighting can benefit national economies with an underdeveloped industrial base."
-          claims:
-          - title: "Economic benefit"
-            claim: "Bullfighting can benefit national economies with an underdeveloped industrial base."
-        ```
-        </example>
-
-        <example>
-        ```yaml
-        argumentation:
-          issue: "Video games: good or bad?"
-          title: "Toxic communities"
-          gist: "Many video gaming communities are widely regarded as toxic since online games create opportunities for players to stalk and abuse each other."
-          claims:
-          - title: "Toxic communities"
-            claim: "Many video gaming communities are widely regarded as toxic."
-          - title: "Opportunities for abuse"
-            claim: "Online games create opportunities for players to stalk and abuse each other."
-        ```
-        </example>
-
-        <example>
-        ```yaml
-        argumentation:
-          issue: "Pick best draft"
-          title: "Readability"
-          gist: "Draft 1 is easier to read and much more funny than the other drafts."
-          claims:
-          - title: "Readability"
-            claim: "Draft 1 is easier to read than the other drafts."
-          - title: "Engagement"
-            claim: "Draft 1 is much more funny than the other drafts."
-        ```
-        </example>
-
-        Please, process the above inputs and unpack the individual claims contained in the argumentation.
-
-        ### Assistant
-
-        The argumentation makes the following basic claims:
-
-        ```yaml
-        argumentation:
-          issue: "{issue}"
-          title: "{reason.label}"
-          gist: "{reason.text}"
-          claims:"""
-        claims = []
-        marker = ""
-        n = 0
-        while n<10:
-            n += 1
-            "[MARKER]" where MARKER in set(["\n```", "\n  - "])
-            marker = MARKER
-            if marker == "\n```":
-                break
-            else:
-                "title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and STOPS_AT(TITLE, "\n") and len(TITLE) < MAX_LEN_TITLE
-                if not TITLE.endswith('\"'):
-                    "\" "
-                title = TITLE.strip('\"')
-                "\n    claim: \"[CLAIM]" where STOPS_AT(CLAIM, "\"") and STOPS_AT(CLAIM, "\n") and len(CLAIM) < MAX_LEN_GIST
-                if not CLAIM.endswith('\"'):
-                    "\" "
-                claim = CLAIM.strip('\"')
-                claims.append(Claim(label=title, text=claim))
-        return claims
-
-    '''
-
 
 class ProsConsBuilderLMQL(LMQLDebugger):
     """ProsConsBuilderLMQL
@@ -644,21 +505,10 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             
     """
 
-    _KW_DESCRIPTION = "Pros and cons list with multiple root claims"
-    _KW_PRODUCT = "proscons"
-    _KW_REQUIREMENTS = ["issue"]
+    __pdescription__ = "Pros and cons list with multiple root claims"
+    __product__ = "proscons"
+    __requirements__ = ["issue"]
 
-    @staticmethod
-    def get_product() -> str:
-        return ProsConsBuilderLMQL._KW_PRODUCT
-
-    @staticmethod
-    def get_requirements() -> list[str]:
-        return ProsConsBuilderLMQL._KW_REQUIREMENTS
-
-    @staticmethod
-    def get_description() -> str:
-        return ProsConsBuilderLMQL._KW_DESCRIPTION
 
     def ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
         """Revises labels of reasons to ensure uniqueness
@@ -856,44 +706,8 @@ class ProsConsBuilderLMQL(LMQLDebugger):
 
         return revised_pros_and_cons
 
-    def unpack_reasons(self, pros_and_cons: ProsConsList, issue: str) -> ProsConsList:
-        """Unpacks each individual reason in a pros and cons list
 
-        Args:
-            pros_and_cons (ProsConsList): pros and cons list with reason to be unpacked
-            issue (str): overarching issue addressed by pros and cons
 
-        Returns:
-            ProsConsList: pros and cons list with unpacked reasons
-        """
-        pros_and_cons = copy.deepcopy(pros_and_cons)
-        for root in pros_and_cons.roots:
-            to_be_added = []
-            to_be_removed = []
-            for pro in root.pros:
-                unpacked_pros = unpack_reason(
-                    reason_data=pro.dict(), issue=issue, model=self._model, **self._generation_kwargs
-                )
-                if len(unpacked_pros) > 1:
-                    to_be_removed.append(pro)
-                    to_be_added.extend(unpacked_pros)
-            for pro in to_be_removed:
-                root.pros.remove(pro)
-            root.pros.extend(to_be_added)
-            to_be_added = []
-            to_be_removed = []
-            for con in root.cons:
-                unpacked_cons = unpack_reason(
-                    reason_data=con.dict(), issue=issue, model=self._model, **self._generation_kwargs
-                )
-                if len(unpacked_cons) > 1:
-                    to_be_removed.append(con)
-                    to_be_added.extend(unpacked_cons)
-            for con in to_be_removed:
-                root.cons.remove(con)
-            root.cons.extend(to_be_added)
-
-        return pros_and_cons
 
     def _debug(self, debug_state: DebugState):
         """Extract pros and cons of text (prompt/completion).
@@ -909,7 +723,6 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         1. Mine (i.e., extract) all individual reasons from prompt/completion text
         2. Organize reasons into pros and cons list
         3. Double-check and revise pros and cons list
-        4. Unpack each individual reason into separate claims (if possible)
 
         """
 
@@ -957,10 +770,6 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         pros_and_cons = self.check_and_revise(pros_and_cons, reasons, issue)
         self.logger.info(f"Revised pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
-        # unpack individual reasons
-        pros_and_cons = self.unpack_reasons(pros_and_cons, issue)
-        self.logger.info(f"Unpacked pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
-
         if pros_and_cons is None:
             self.logger.warning("Failed to build pros and cons list (pros_and_cons is None).")
 
@@ -970,8 +779,8 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             pros_and_cons_data = pros_and_cons.dict()
 
         artifact = Artifact(
-            id=self._KW_PRODUCT,
-            description=self._KW_DESCRIPTION,
+            id=self.get_product(),
+            description=self.get_description(),
             data=pros_and_cons_data,
             metadata={"reasons_list": reasons, "unused_reasons_list": unused_reasons},
         )

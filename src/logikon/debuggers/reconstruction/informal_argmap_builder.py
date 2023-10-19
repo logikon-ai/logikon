@@ -752,21 +752,10 @@ class InformalArgMapBuilder(AbstractArtifactDebugger):
     - claims
     """
 
-    _KW_DESCRIPTION = "Informal Argument Map"
-    _KW_PRODUCT = "informal_argmap"
-    _KW_REQUIREMENTS = ["claims"]
+    __pdescription__ = "Informal Argument Map"
+    __product__ = "informal_argmap"
+    __requirements__ = ["claims"]
 
-    @staticmethod
-    def get_product() -> str:
-        return InformalArgMapBuilder._KW_PRODUCT
-
-    @staticmethod
-    def get_requirements() -> list[str]:
-        return InformalArgMapBuilder._KW_REQUIREMENTS
-
-    @staticmethod
-    def get_description() -> str:
-        return InformalArgMapBuilder._KW_DESCRIPTION
 
     def _debug(self, debug_state: DebugState):
         """Reconstruct reasoning as argmap."""
@@ -780,8 +769,8 @@ class InformalArgMapBuilder(AbstractArtifactDebugger):
         argmap = llmchain.run(prompt=prompt, completion=completion, claims=claims)
 
         artifact = Artifact(
-            id=self._KW_PRODUCT,
-            description=self._KW_DESCRIPTION,
+            id=self.get_product(),
+            description=self.get_description(),
             data=argmap,
         )
 
