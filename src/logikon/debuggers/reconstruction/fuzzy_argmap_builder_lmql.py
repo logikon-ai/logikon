@@ -34,7 +34,7 @@ flowchart TD
 """
 
 from __future__ import annotations
-from typing import List, TypedDict, Tuple
+from typing import List, Tuple, Optional
 
 import copy
 import functools as ft
@@ -62,7 +62,6 @@ LABELS = "ABCDEFG"
 ### EXAMPLES ###
 
 
-
 EXAMPLES_UNPACKING = [
     {
         "issue": "Eating animals?",
@@ -81,7 +80,7 @@ EXAMPLES_UNPACKING = [
                 "title": "Land use change",
                 "claim": "Animal farming causes the degradation of natural carbon sinks through land use change.",
             },
-        ]
+        ],
     },
     {
         "issue": "Should Bullfighting be Banned?",
@@ -92,7 +91,7 @@ EXAMPLES_UNPACKING = [
                 "title": "Economic benefit",
                 "claim": "Bullfighting can benefit national economies with an underdeveloped industrial base.",
             }
-        ]
+        ],
     },
     {
         "issue": "Video games: good or bad?",
@@ -106,8 +105,8 @@ EXAMPLES_UNPACKING = [
             {
                 "title": "Opportunities for abuse",
                 "claim": "Online games create opportunities for players to stalk and abuse each other.",
-            }
-        ]
+            },
+        ],
     },
     {
         "issue": "Pick best draft",
@@ -121,47 +120,14 @@ EXAMPLES_UNPACKING = [
             {
                 "title": "Engagement",
                 "claim": "Draft 1 is much more funny than the other drafts.",
-            }
-        ]
-    }
+            },
+        ],
+    },
 ]
 
 
 ### FORMATTERS ###
 
-
-def format_reason(reason: Claim, max_len: int = -1) -> str:
-    label_text = f"[{reason.label}]: {reason.text}"
-    if max_len > 0 and len(label_text) > max_len:
-        label_text = label_text[:max_len] + "..."
-    return f"- \"{label_text}\"\n"
-
-
-def format_proscons(issue: str, proscons: ProsConsList) -> str:
-    formatted = "```yaml\n"
-    # reasons block
-    formatted += "reasons:\n"
-    reasons = []
-    for root in proscons.roots:
-        reasons.extend(root.pros)
-        reasons.extend(root.cons)
-    reasons = random.Random(42).sample(reasons, min(len(reasons), MAX_N_REASONS))
-    for reason in reasons:
-        formatted += format_reason(reason)
-    # issue
-    formatted += f"issue: \"{issue}\"\n"
-    # pros and cons block
-    formatted += "pros_and_cons:\n"
-    for root in proscons.roots:
-        formatted += f"- root: \"({root.label}): {root.text}\"\n"
-        formatted += "  pros:\n"
-        for pro in root.pros:
-            formatted += f"  - \"[{pro.label}]\"\n"
-        formatted += "  cons:\n"
-        for con in root.cons:
-            formatted += f"  - \"[{con.label}]\"\n"
-    formatted += "```\n"
-    return formatted
 
 def format_example(example_data: dict) -> str:
     formatted = "```yaml\n"
@@ -177,6 +143,7 @@ def format_example(example_data: dict) -> str:
     formatted += "```\n"
     return formatted
 
+
 def format_examples() -> str:
     formatted = [format_example(example) for example in EXAMPLES_UNPACKING]
     formatted = ["<example>\n" + example + "</example>" for example in formatted]
@@ -188,7 +155,7 @@ def format_examples() -> str:
 
 
 @lmql.query
-def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:
+def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
     '''lmql
     sample(temperature=.4, top_k=100, top_p=0.95)
         reason = Claim(**reason_data)
@@ -277,47 +244,14 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
     """ProsConsBuilderLMQL
 
     This LMQLDebugger is responsible for creating a fuzzy argument map from a pros and cons list and a given issue.
-    
-            
+
     """
 
     __product__ = "fuzzy_argmap"
     __requirements__ = ["issue", "proscons"]
     __pdescription__ = "Fuzzy argument map with weighted support and attack relations"
 
-
-    def ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
-        """Revises labels of reasons to ensure uniqueness
-
-        Args:
-            reasons (List[Claim]): list of reasons
-
-        Returns:
-            List[Claim]: list of reasons with unique labels
-        """
-
-        labels = [reason.label for reason in reasons]
-        duplicate_labels = [label for label in labels if labels.count(label) > 1]
-        if not duplicate_labels:
-            return reasons
-
-        unique_reasons = copy.deepcopy(reasons)
-        for reason in unique_reasons:
-            if reason.label in duplicate_labels:
-                i = 1
-                new_label = f"{reason.label}-{str(i)}"
-                while new_label in labels:
-                    if i >= MAX_N_REASONS:
-                        self.logger.warning("Failed to ensure unique labels for reasons.")
-                        break
-                    i += 1
-                    new_label = f"{reason.label}-{str(i)}"
-                reason.label = new_label
-
-        return unique_reasons
-
-
-    def unpack_reasons(self, pros_and_cons: ProsConsList, issue: str) -> ProsConsList:
+    def _unpack_reasons(self, pros_and_cons: ProsConsList, issue: str) -> ProsConsList:
         """Unpacks each individual reason in a pros and cons list
 
         Args:
@@ -355,22 +289,53 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
             root.cons.extend(to_be_added)
 
         return pros_and_cons
-    
+
     # the following function calculates the strength of the argumentative relation between tow claims
-    def _relation_strength(self, target_claim: Claim, source_claim: Claim, valence: str = "") -> Tuple[float, str]:
-        """calculate the strength of the argumentative relation between two claims
+    def _relation_strength(
+        self, source_node: ArgMapNode, target_node: ArgMapNode, valence: Optional[str] = None
+    ) -> Tuple[float, str]:
+        """Calculate the valence and strength of an argumentative relation
+
+        Calculate the valence and strength of the argumentative relation between two
+        argument map nodes (from source to target).
 
         Args:
-            target_claim (Claim): _description_
-            source_claim (Claim): _description_
+            target_node (ArgMapNode): target
+            source_node (ArgMapNode): source
             valence (str, optional): calculate strength between source and target for this valence
 
         Returns:
-            Tuple[float, str]: strength and valence
+            Tuple[float, str]: strength, valence
         """
 
-    @staticmethod
-    def _add_node(map: FuzzyArgMap, claim: Claim, type: str = REASON) -> ArgMapNode:
+        # step 1: valence probs
+        lmql_result = lmql_queries.valence(
+            dict(label=source_node.label, text=source_node.text),
+            dict(label=target_node.label, text=target_node.text),
+            model=self._model,
+            **self._generation_kwargs,
+        )
+        if valence is None:
+            valence = lmql_queries.label_to_valence(lmql_result.variables[lmql_result.distribution_variable])
+        prob_1 = next(
+            prob
+            for label, prob in lmql_queries.get_distribution(lmql_result)
+            if lmql_queries.label_to_valence(label) == valence
+        )
+
+        # step 2: strength probs
+        query_fn = lmql_queries.supports_q if valence == SUPPORT else lmql_queries.attacks_q
+        lmql_result = query_fn(
+            dict(label=source_node.label, text=source_node.text),
+            dict(label=target_node.label, text=target_node.text),
+            model=self._model,
+            **self._generation_kwargs,
+        )
+        prob_2 = next(prob for label, prob in lmql_queries.get_distribution(lmql_result) if label == "A")
+
+        return prob_1 * prob_2, valence
+
+    def _add_node(self, map: FuzzyArgMap, claim: Claim, type: str = REASON) -> ArgMapNode:
         """Add node to fuzzy argmap
 
         Args:
@@ -384,11 +349,31 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
             id=str(uuid.uuid4()),
             label=claim.label,
             text=claim.text,
-            type=type,
+            nodeType=type,
         )
         map.nodelist.append(node)
         return node
 
+    def _add_fuzzy_edge(
+        self, map: FuzzyArgMap, source_node: ArgMapNode, target_node: ArgMapNode, valence: Optional[str] = None
+    ) -> FuzzyArgMapEdge:
+        """Add fuzzy edge to fuzzy argmap
+
+        Args:
+            map (FuzzyArgMap): fuzzy argmap
+            target_node (ArgMapNode): target node
+            source_node (ArgMapNode): source node
+            valence (str, optional): fixed valence to assume, automatically determines most likely val if None
+
+        Returns:
+            FuzzyArgMapEdge: newly added edge
+        """
+        w, val = self._relation_strength(source_node, target_node, valence=valence)
+        if valence is not None:
+            val = valence
+        edge = FuzzyArgMapEdge(source=source_node.id, target=target_node.id, valence=val, weight=w)
+        map.edgelist.append(edge)
+        return edge
 
     def _debug(self, debug_state: DebugState):
         """Build fuzzy argmap from pros and cons.
@@ -402,7 +387,8 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
         Proceeds as follows:
 
         1. Unpack each individual pro / con in pros cons list into separate claims (if possible)
-
+        2. Determine reason - root weights for all reasons subsumed under a root claim
+        3. Determine reason - reason weights for all reason pairs
 
         """
 
@@ -410,56 +396,50 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
         if issue is None:
             raise ValueError("Missing required artifact: issue. Available artifacts: " + str(debug_state.artifacts))
 
-        pros_and_cons = next((a.data for a in debug_state.artifacts if a.id == "proscons"), None)
-        if pros_and_cons is None:
+        pros_and_cons_data = next((a.data for a in debug_state.artifacts if a.id == "proscons"), None)
+        if pros_and_cons_data is None:
             raise ValueError("Missing required artifact: proscons. Available artifacts: " + str(debug_state.artifacts))
+        try:
+            pros_and_cons = ProsConsList(**pros_and_cons_data)
+        except:
+            raise ValueError(f"Failed to parse pros and cons list: {pros_and_cons_data}")
 
         # unpack individual reasons
-        pros_and_cons = self.unpack_reasons(pros_and_cons, issue)
+        pros_and_cons = self._unpack_reasons(pros_and_cons, issue)
         self.logger.info(f"Unpacked pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         # create fuzzy argmap from fuzzy pros and cons list (reason-root edges)
         fuzzy_argmap = FuzzyArgMap()
         for root in pros_and_cons.roots:
-            # add root node
             target_node = self._add_node(fuzzy_argmap, root, type=CENTRAL_CLAIM)
             for pro in root.pros:
-                # add pro reason node
-                source_node = self._add_node(fuzzy_argmap, pro)
-                # add fuzzy reason-root edges
-                w, _ = self._relation_strength(root, pro, valence=SUPPORT)
-                edge = FuzzyArgMapEdge(source=source_node.id, target=target_node.id, valence=SUPPORT, weight=w)
-                fuzzy_argmap.edgelist.append(edge)
+                source_node = self._add_node(fuzzy_argmap, pro, type=REASON)
+                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node, valence=SUPPORT)
             for con in root.cons:
-                # add con reason node
-                source_node = self._add_node(fuzzy_argmap, con)
-                # add fuzzy reason-root edges
-                w, _ = self._relation_strength(root, con, valence=ATTACK)
-                edge = FuzzyArgMapEdge(source=source_node.id, target=target_node.id, valence=ATTACK, weight=w)
-                fuzzy_argmap.edgelist.append(edge)
+                source_node = self._add_node(fuzzy_argmap, con, type=REASON)
+                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node, valence=ATTACK)
 
         # add fuzzy reason-reason edges
+        for target_node in fuzzy_argmap.nodelist:
+            for source_node in fuzzy_argmap.nodelist:
+                if source_node.id == target_node.id:
+                    continue
+                if source_node.nodeType == CENTRAL_CLAIM or target_node.nodeType == CENTRAL_CLAIM:
+                    continue
+                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node)
 
-
-
-
-
-
-
-
-
-        if pros_and_cons is None:
-            self.logger.warning("Failed to build pros and cons list (pros_and_cons is None).")
+        if fuzzy_argmap is None:
+            self.logger.warning("Failed to build fuzzy argument map (fuzzy_argmap is None).")
 
         try:
-            pros_and_cons_data = pros_and_cons.model_dump()  # type: ignore
+            fuzzy_argmap_data = fuzzy_argmap.model_dump()  # type: ignore
         except AttributeError:
-            pros_and_cons_data = pros_and_cons.dict()
+            fuzzy_argmap_data = fuzzy_argmap.dict()
 
         artifact = Artifact(
             id=self.get_product(),
             description=self.get_description(),
-            data=pros_and_cons_data,
+            data=fuzzy_argmap_data,
         )
 
         debug_state.artifacts.append(artifact)
