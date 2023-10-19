@@ -22,7 +22,7 @@ def argmap1() -> InformalArgMap:
 
 def test_nx_exporter(argmap1: InformalArgMap):
     nx_exporter = NetworkXExporter(DebugConfig())
-    nx_map = nx_exporter.to_nx(argmap1)
+    nx_map = nx_exporter._to_nx(argmap1.dict())
 
     print(nx.node_link_data(nx_map))
 
