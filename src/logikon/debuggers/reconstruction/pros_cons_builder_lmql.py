@@ -130,11 +130,11 @@ def format_reason(reason: Claim, max_len: int = -1) -> str:
     return f"- \"{label_text}\"\n"
 
 
-def format_proscons(issue: str, proscons: ProsConsList) -> str:
+def format_proscons(issue: str, proscons: ProsConsList, extra_reasons: list = []) -> str:
     formatted = "```yaml\n"
     # reasons block
     formatted += "reasons:\n"
-    reasons = []
+    reasons = extra_reasons
     for root in proscons.roots:
         reasons.extend(root.pros)
         reasons.extend(root.cons)
@@ -422,7 +422,7 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
         unused_reasons = [Claim(**reason_data) for reason_data in unused_reasons_data]
         pros_and_cons = ProsConsList(**pros_and_cons_data)
-        formatted_pcl = format_proscons(issue, pros_and_cons)
+        formatted_pcl = format_proscons(issue, pros_and_cons, unused_reasons)
         """
         {lmql_queries.system_prompt()}
 
