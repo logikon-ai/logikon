@@ -50,10 +50,17 @@ dependencies = [
   "pydantic==1.10.12",
   "pytest",
   "python-dotenv",
+  "lazydocs",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 test-cov = "coverage run -m pytest {args:tests}"
+apidocs = """lazydocs \
+    --output-path="./docs/api-docs" \
+    --overview-file="README.md" \
+    --src-base-url="https://github.com/logikon-ai/logikon/blob/main/" \
+    logikon
+    """
 cov-report = [
   "- coverage combine",
   "coverage report",
