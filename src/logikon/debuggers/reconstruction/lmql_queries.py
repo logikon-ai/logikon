@@ -7,9 +7,7 @@ from typing import List, Dict, Tuple
 import lmql
 
 from logikon.schemas.pros_cons import Claim
-
-PRO = "pro"
-CON = "con"
+import logikon.schemas.argument_mapping as am
 
 
 def system_prompt() -> str:
@@ -260,8 +258,8 @@ def label_to_claim(label, claims):
 
 def label_to_valence(label):
     if label == "A":
-        return PRO
+        return am.SUPPORT
     elif label == "B":
-        return CON
+        return am.ATTACK
     else:
         raise ValueError(f"Unknown label {label}")

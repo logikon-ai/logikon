@@ -50,7 +50,7 @@ from logikon.schemas.results import Artifact, DebugState
 from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
 from logikon.schemas.argument_mapping import FuzzyArgMap, FuzzyArgMapEdge, ArgMapNode
 
-from logikon.schemas.argument_mapping import ATTACK, SUPPORT, REASON, CENTRAL_CLAIM
+import logikon.schemas.argument_mapping as am
 
 MAX_N_REASONS = 50
 MAX_N_ROOTS = 10
@@ -324,7 +324,7 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
         )
 
         # step 2: strength probs
-        query_fn = lmql_queries.supports_q if valence == SUPPORT else lmql_queries.attacks_q
+        query_fn = lmql_queries.supports_q if valence == am.SUPPORT else lmql_queries.attacks_q
         lmql_result = query_fn(
             dict(label=source_node.label, text=source_node.text),
             dict(label=target_node.label, text=target_node.text),
@@ -335,7 +335,7 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
 
         return prob_1 * prob_2, valence
 
-    def _add_node(self, map: FuzzyArgMap, claim: Claim, type: str = REASON) -> ArgMapNode:
+    def _add_node(self, map: FuzzyArgMap, claim: Claim, type: str = am.REASON) -> ArgMapNode:
         """Add node to fuzzy argmap
 
         Args:
@@ -411,20 +411,20 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
         # create fuzzy argmap from fuzzy pros and cons list (reason-root edges)
         fuzzy_argmap = FuzzyArgMap()
         for root in pros_and_cons.roots:
-            target_node = self._add_node(fuzzy_argmap, root, type=CENTRAL_CLAIM)
+            target_node = self._add_node(fuzzy_argmap, root, type=am.CENTRAL_CLAIM)
             for pro in root.pros:
-                source_node = self._add_node(fuzzy_argmap, pro, type=REASON)
-                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node, valence=SUPPORT)
+                source_node = self._add_node(fuzzy_argmap, pro, type=am.REASON)
+                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node, valence=am.SUPPORT)
             for con in root.cons:
-                source_node = self._add_node(fuzzy_argmap, con, type=REASON)
-                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node, valence=ATTACK)
+                source_node = self._add_node(fuzzy_argmap, con, type=am.REASON)
+                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node, valence=am.ATTACK)
 
         # add fuzzy reason-reason edges
         for target_node in fuzzy_argmap.nodelist:
             for source_node in fuzzy_argmap.nodelist:
                 if source_node.id == target_node.id:
                     continue
-                if source_node.nodeType == CENTRAL_CLAIM or target_node.nodeType == CENTRAL_CLAIM:
+                if source_node.nodeType == am.CENTRAL_CLAIM or target_node.nodeType == am.CENTRAL_CLAIM:
                     continue
                 self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node)
 

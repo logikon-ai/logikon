@@ -48,6 +48,7 @@ from logikon.debuggers.reconstruction.lmql_debugger import LMQLDebugger
 import logikon.debuggers.reconstruction.lmql_queries as lmql_queries
 from logikon.schemas.results import Artifact, DebugState
 from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
+import logikon.schemas.argument_mapping as am
 
 MAX_N_REASONS = 50
 MAX_N_ROOTS = 10
@@ -583,7 +584,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 if max_confirmed[1] < 2 * probs_confirmed[enum][1]:
                     continue
 
-                old_val = lmql_queries.PRO
+                old_val = am.SUPPORT
                 new_val = old_val
                 old_target_idx = enum
                 new_target_idx = lmql_queries.label_to_idx(max_confirmed[0])
@@ -612,7 +613,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 if lmql_result is None:
                     continue
                 new_val = lmql_queries.label_to_valence(lmql_result.variables[lmql_result.distribution_variable])
-                if new_val != lmql_queries.PRO:  # never change valence
+                if new_val != am.SUPPORT:  # never change valence
                     continue
 
                 revisions.append(
@@ -640,7 +641,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 if max_disconfirmed[1] < 2 * probs_disconfirmed[enum][1]:
                     continue
 
-                old_val = lmql_queries.CON
+                old_val = am.ATTACK
                 new_val = old_val
                 old_target_idx = enum
                 new_target_idx = lmql_queries.label_to_idx(max_disconfirmed[0])
@@ -669,7 +670,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
                 if lmql_result is None:
                     continue
                 new_val = lmql_queries.label_to_valence(lmql_result.variables[lmql_result.distribution_variable])
-                if new_val != lmql_queries.CON:  # never change valence
+                if new_val != am.ATTACK:  # never change valence
                     continue
 
                 revisions.append(
@@ -689,13 +690,13 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             reason = revision["reason"]
             old_root = revised_pros_and_cons.roots[revision["old_target_idx"]]
             new_root = revised_pros_and_cons.roots[revision["new_target_idx"]]
-            if revision["old_val"] == lmql_queries.PRO:
+            if revision["old_val"] == am.SUPPORT:
                 old_root.pros.remove(reason)
-            elif revision["old_val"] == lmql_queries.CON:
+            elif revision["old_val"] == am.ATTACK:
                 old_root.cons.remove(reason)
-            if revision["new_val"] == lmql_queries.PRO:
+            if revision["new_val"] == am.SUPPORT:
                 new_root.pros.append(reason)
-            elif revision["new_val"] == lmql_queries.CON:
+            elif revision["new_val"] == am.ATTACK:
                 new_root.cons.append(reason)
 
         return revised_pros_and_cons
