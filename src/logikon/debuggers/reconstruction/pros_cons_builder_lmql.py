@@ -1,4 +1,37 @@
-"""Module with debugger for building a pros & cons list with LMQL"""
+"""Module with debugger for building a pros & cons list with LMQL
+
+```mermaid
+flowchart TD
+    p["`prompt`"]
+    c["`completion`"]
+    i["`issue`"]
+    r["`reasons (unstructured)`"]
+    pcl["`pros cons list`"]
+    ur["`reasons (unused)`"]
+    rm("`reason mining
+    >_reasons_`")
+    pco("`pros cons organizing
+    >_pros cons list_`")
+    add("`add unused reasons
+    >_pros cons list_`")
+    cr("`check and revise
+    >_pros cons list_`")
+    subgraph artifact
+    ad["`data`"]
+    am["`metadata`"]
+    end
+    p --> rm
+    c --> rm
+    i --> rm
+    rm --> r --> am
+    i --> pco
+    r --> pco --> add --> pco
+    i --> cr
+    pco --> cr --> pcl --> ad
+    pco --> ur --> am
+```
+
+"""
 
 from __future__ import annotations
 from typing import List, TypedDict
@@ -605,6 +638,10 @@ class ProsConsBuilderLMQL(LMQLDebugger):
     """ProsConsBuilderLMQL
 
     This LMQLDebugger is responsible for reconstructing a pros and cons list for a given issue.
+
+    
+
+            
     """
 
     _KW_DESCRIPTION = "Pros and cons list with multiple root claims"
@@ -936,6 +973,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             id=self._KW_PRODUCT,
             description=self._KW_DESCRIPTION,
             data=pros_and_cons_data,
+            metadata={"reasons_list": reasons, "unused_reasons_list": unused_reasons},
         )
 
         debug_state.artifacts.append(artifact)
