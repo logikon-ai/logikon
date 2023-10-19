@@ -8,7 +8,7 @@ import networkx as nx
 from unidecode import unidecode
 
 from logikon.debuggers.base import AbstractArtifactDebugger
-from logikon.schemas.argument_mapping import AnnotationSpan, ArgMapEdge, ArgMapNode, InformalArgMap
+from logikon.schemas.argument_mapping import InformalArgMap, FuzzyArgMap
 from logikon.schemas.results import Artifact, DebugState
 
 
@@ -82,10 +82,28 @@ class NetworkXExporter(AbstractNetworkXExporter):
     - informal_argmap
     """
 
-    __pdescription__ = "Exports an informal argmap as a networkx graph"
+    __pdescription__ = "Informal argmap rendered as a networkx graph"
     __product__ = "networkx_graph"
     __requirements__ = ["informal_argmap"]
 
     @property
     def __input_class__(self) -> type:
         return InformalArgMap
+
+
+class FuzzyNetworkXExporter(AbstractNetworkXExporter):
+    """FuzzyNetworkXExporter Debugger
+
+    This debugger exports a fuzzy argmap as a networkx graph.
+
+    It requires the following artifacts:
+    - fuzzy_argmap
+    """
+
+    __pdescription__ = "Fuzzy argmap rendered as a networkx graph"
+    __product__ = "fuzzy_nx_graph"
+    __requirements__ = ["fuzzy_argmap"]
+
+    @property
+    def __input_class__(self) -> type:
+        return FuzzyArgMap

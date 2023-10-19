@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Mapping, List
 
 from logikon.debuggers.base import Debugger, AbstractScoreDebugger, AbstractArtifactDebugger
-from logikon.debuggers.exporters.networkx_exporter import NetworkXExporter
+from logikon.debuggers.exporters.networkx_exporter import NetworkXExporter, FuzzyNetworkXExporter
 from logikon.debuggers.exporters.svgmap_exporter import SVGMapExporter
 from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
 from logikon.debuggers.reconstruction.informal_argmap_builder import InformalArgMapBuilder
@@ -24,6 +24,7 @@ _DEBUGGER_REGISTRY: Mapping[str, List[type[Debugger]]] = {
     "proscons": [ProsConsBuilderLMQL],
     "fuzzy_argmap": [FuzzyArgMapBuilderLMQL],
     "networkx_graph": [NetworkXExporter],
+    "fuzzy_nx_graph": [FuzzyNetworkXExporter],
     "svg_argmap": [SVGMapExporter],
     "argmap_size": [ArgMapGraphSizeScorer],
     "argmap_avg_katz_centrality": [ArgMapGraphAvgKatzCScorer],
