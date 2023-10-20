@@ -99,7 +99,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
             comment=f'Created with `logikon` python module version {logikon.__version__}',
             graph_attr=dict(
                 format="svg",
-                rankdir="RL",
+                rankdir="TD",
                 ratio="compress",
                 orientation="portrait",
                 overlap="compress",
