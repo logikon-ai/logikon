@@ -12,6 +12,7 @@ import copy
 import uuid
 
 import networkx as nx
+import numpy as np
 
 from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.results import Artifact, DebugState
@@ -117,8 +118,8 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
 
         return G
 
-    def _add_above_min_edges(self, fuzzy_argmap: nx.DiGraph, relevance_network: nx.DiGraph):
-        """add edges with weight above minimum from relevance network to fuzzy argmap (inplace)
+    def _add_above_threshold_edges(self, fuzzy_argmap: nx.DiGraph, relevance_network: nx.DiGraph):
+        """add edges with weight above threshold from relevance network to fuzzy argmap (inplace)
 
         Args:
             fuzzy_argmap (nx.DiGraph): _description_
@@ -136,15 +137,16 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
             if data['valence'] == am.ATTACK and not data.get('pseudo', False)
         ]
 
-        min_support_w = min(support_weights) if support_weights else None
-        min_attack_w = min(attack_weights) if attack_weights else None
+        thrsh_support_w = np.median(support_weights) if support_weights else None
+        thrsh_attack_w = np.median(attack_weights) if attack_weights else None
 
-        self.logger.info(f"Minimum support weight: {min_support_w}")
-        self.logger.info(f"Minimum attack weight: {min_attack_w}")
+        self.logger.info(f"Minimum support weight: {thrsh_support_w}")
+        self.logger.info(f"Minimum attack weight: {thrsh_attack_w}")
 
-        if min_support_w is None and min_attack_w is None:
+        if thrsh_support_w is None and thrsh_attack_w is None:
             return
 
+        # TODO: if there are more than _MAX_OUT_DEGREE outgoing edges from a node, we should only add the _MAX_OUT_DEGREE edges with the highest weights
         n_edges = len(fuzzy_argmap.edges)
         for u, v, data in relevance_network.edges(data=True):
             if fuzzy_argmap.has_edge(u, v) or fuzzy_argmap.has_edge(v, u):
@@ -152,9 +154,9 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
             # check degree
             if fuzzy_argmap.out_degree(u) >= _MAX_OUT_DEGREE:
                 continue
-            if data['valence'] == am.SUPPORT and min_support_w is not None and data['weight'] > min_support_w:
+            if data['valence'] == am.SUPPORT and thrsh_support_w is not None and data['weight'] > thrsh_support_w:
                 fuzzy_argmap.add_edge(u, v, **data)
-            elif data['valence'] == am.ATTACK and min_attack_w is not None and data['weight'] > min_attack_w:
+            elif data['valence'] == am.ATTACK and thrsh_attack_w is not None and data['weight'] > thrsh_attack_w:
                 fuzzy_argmap.add_edge(u, v, **data)
 
         self.logger.info(f"Added {len(fuzzy_argmap.edges) - n_edges} edges to fuzzy argmap.")
@@ -191,7 +193,7 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
             relevance_network, attr='weight', default=_DEFAULT_WEIGHT, preserve_attrs=True, partition=None
         )
 
-        self._add_above_min_edges(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
+        self._add_above_threshold_edges(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
 
         fuzzy_argmap = self._post_process_fuzzy_argmap(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
 

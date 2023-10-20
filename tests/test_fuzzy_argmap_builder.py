@@ -91,7 +91,7 @@ def test_reduction_workflow(nx_map1: nx.DiGraph):
 
     print(f"Maximum branching:\n{nx.node_link_data(fuzzy_argmap)}")
 
-    debugger._add_above_min_edges(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
+    debugger._add_above_threshold_edges(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
 
     print(f"Expanded branching:\n{nx.node_link_data(fuzzy_argmap)}")
 
