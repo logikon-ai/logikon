@@ -89,7 +89,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
                     if linkdata["valence"] == am.ATTACK
                     else sns.color_palette("blend:darkgrey,darkgreen", as_cmap=True)
                 )
-                color = cmap(1.2 * linkdata.pop("weight"))  # dropping weight from edge data
+                color = cmap(.2 + linkdata.pop("weight"))  # dropping weight from edge data
                 linkdata["color"] = matplotlib.colors.to_hex(color)
             else:
                 linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
