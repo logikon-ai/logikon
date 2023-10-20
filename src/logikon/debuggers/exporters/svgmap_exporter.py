@@ -84,10 +84,14 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
         for _, linkdata in digraph.edges.items():
             if "weight" in linkdata:
-                cmap = sns.color_palette("blend:darkgrey,red", as_cmap=True) if linkdata["valence"] == am.ATTACK else sns.color_palette("blend:darkgrey,darkgreen", as_cmap=True)
-                color = cmap(1.2*linkdata.pop("weight"))  # dropping weight from edge data
+                cmap = (
+                    sns.color_palette("blend:darkgrey,red", as_cmap=True)
+                    if linkdata["valence"] == am.ATTACK
+                    else sns.color_palette("blend:darkgrey,darkgreen", as_cmap=True)
+                )
+                color = cmap(1.2 * linkdata.pop("weight"))  # dropping weight from edge data
                 linkdata["color"] = matplotlib.colors.to_hex(color)
-            else: 
+            else:
                 linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
 
             linkdata["penwidth"] = "1.5"
@@ -107,7 +111,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
                 rankdir="TD",
                 ratio="compress",
                 orientation="portrait",
-                #overlap="compress",
+                # overlap="compress",
             ),
         )
 
