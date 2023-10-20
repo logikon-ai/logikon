@@ -5,7 +5,9 @@ import textwrap
 from typing import Dict, List, Optional, Tuple
 
 import graphviz
+import seaborn as sns
 import networkx as nx
+import matplotlib.colors
 from unidecode import unidecode
 
 import logikon
@@ -81,9 +83,14 @@ class SVGMapExporter(AbstractArtifactDebugger):
             nodedata["tooltip"] = text
 
         for _, linkdata in digraph.edges.items():
-            linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
-            width = 1.0 + linkdata.pop("weight", 1.0)  # dropping weight from edge data
-            linkdata["penwidth"] = f"{width:.2f}"
+            if "weight" in linkdata:
+                cmap = sns.color_palette("blend:darkgrey,red", as_cmap=True) if linkdata["valence"] == am.ATTACK else sns.color_palette("blend:darkgrey,darkgreen", as_cmap=True)
+                color = cmap(1.2*linkdata.pop("weight"))  # dropping weight from edge data
+                linkdata["color"] = matplotlib.colors.to_hex(color)
+            else: 
+                linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
+
+            linkdata["penwidth"] = "1.5"
 
         return digraph
 
