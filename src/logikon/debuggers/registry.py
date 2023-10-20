@@ -3,13 +3,14 @@ from __future__ import annotations
 from typing import Mapping, List
 
 from logikon.debuggers.base import Debugger, AbstractScoreDebugger, AbstractArtifactDebugger
-from logikon.debuggers.exporters.networkx_exporter import NetworkXExporter, FuzzyNetworkXExporter
+from logikon.debuggers.exporters.networkx_exporter import NetworkXExporter, RelevanceNetworkNXExporter
 from logikon.debuggers.exporters.svgmap_exporter import SVGMapExporter
 from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
 from logikon.debuggers.reconstruction.informal_argmap_builder import InformalArgMapBuilder
 from logikon.debuggers.reconstruction.issue_builder_lmql import IssueBuilderLMQL
 from logikon.debuggers.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
-from logikon.debuggers.reconstruction.fuzzy_argmap_builder_lmql import FuzzyArgMapBuilderLMQL
+from logikon.debuggers.reconstruction.relevance_network_builder_lmql import RelevanceNetworkBuilderLMQL
+from logikon.debuggers.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
 from logikon.debuggers.scorers.argmap_graph_scores import (
     ArgMapGraphAttackRatioScorer,
     ArgMapGraphAvgKatzCScorer,
@@ -18,13 +19,14 @@ from logikon.debuggers.scorers.argmap_graph_scores import (
 
 # First class is treated as default debugger
 _DEBUGGER_REGISTRY: Mapping[str, List[type[Debugger]]] = {
-    "informal_argmap": [InformalArgMapBuilder],
-    "claims": [ClaimExtractor],
+    "informal_argmap": [InformalArgMapBuilder],  # deprecated
+    "claims": [ClaimExtractor],  # deprecated
+    "networkx_graph": [NetworkXExporter],  # deprecated
     "issue": [IssueBuilderLMQL],
     "proscons": [ProsConsBuilderLMQL],
-    "fuzzy_argmap": [FuzzyArgMapBuilderLMQL],
-    "networkx_graph": [NetworkXExporter],
-    "fuzzy_nx_graph": [FuzzyNetworkXExporter],
+    "relevance_network": [RelevanceNetworkBuilderLMQL],
+    "relevance_network_nx": [RelevanceNetworkNXExporter],
+    "fuzzy_argmap_nx": [FuzzyArgMapBuilder],
     "svg_argmap": [SVGMapExporter],
     "argmap_size": [ArgMapGraphSizeScorer],
     "argmap_avg_katz_centrality": [ArgMapGraphAvgKatzCScorer],

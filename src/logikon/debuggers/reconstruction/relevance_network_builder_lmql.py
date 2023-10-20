@@ -34,7 +34,7 @@ flowchart TD
 """
 
 from __future__ import annotations
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 
 import copy
 import functools as ft
@@ -241,18 +241,22 @@ def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
     '''
 
 
-class FuzzyArgMapBuilderLMQL(LMQLDebugger):
-    """ProsConsBuilderLMQL
+class RelevanceNetworkBuilderLMQL(LMQLDebugger):
+    """RelevanceNetworkBuilderLMQL
 
-    This LMQLDebugger is responsible for creating a fuzzy argument map from a pros and cons list and a given issue.
+    This LMQLDebugger is responsible for creating a relevance network, i.e. a (quasi-) complete fuzzy argmap, from a pros and cons list and a given issue.
 
     """
 
-    __product__ = "fuzzy_argmap"
+    __product__ = "relevance_network"
     __requirements__ = ["issue", "proscons"]
-    __pdescription__ = "Fuzzy argument map with weighted support and attack relations"
+    __pdescription__ = (
+        "Relevance network describing comprehensively the strengths of pairwise support and attack relations"
+    )
 
-    def _unpack_reasons(self, pros_and_cons: ProsConsList, issue: str) -> ProsConsList:
+    def _unpack_reasons(
+        self, pros_and_cons: ProsConsList, issue: str
+    ) -> Tuple[ProsConsList, List[Tuple[dict, List[dict]]]]:
         """Unpacks each individual reason in a pros and cons list
 
         Args:
@@ -260,9 +264,12 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
             issue (str): overarching issue addressed by pros and cons
 
         Returns:
-            ProsConsList: pros and cons list with unpacked reasons
+            ProsConsList, unpacking: pros and cons list with unpacked reasons; list of tuples with original and unpacked claims
         """
+
         pros_and_cons = copy.deepcopy(pros_and_cons)
+        unpacking = []
+
         for root in pros_and_cons.roots:
             to_be_added = []
             to_be_removed = []
@@ -271,6 +278,7 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
                     reason_data=pro.dict(), issue=issue, model=self._model, **self._generation_kwargs
                 )
                 if len(unpacked_pros) > 1:
+                    unpacking.append((pro.dict(), [claim.dict() for claim in unpacked_pros]))
                     to_be_removed.append(pro)
                     to_be_added.extend(unpacked_pros)
             for pro in to_be_removed:
@@ -283,13 +291,14 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
                     reason_data=con.dict(), issue=issue, model=self._model, **self._generation_kwargs
                 )
                 if len(unpacked_cons) > 1:
+                    unpacking.append((con.dict(), [claim.dict() for claim in unpacked_cons]))
                     to_be_removed.append(con)
                     to_be_added.extend(unpacked_cons)
             for con in to_be_removed:
                 root.cons.remove(con)
             root.cons.extend(to_be_added)
 
-        return pros_and_cons
+        return pros_and_cons, unpacking
 
     # the following function calculates the strength of the argumentative relation between tow claims
     def _relation_strength(
@@ -406,41 +415,46 @@ class FuzzyArgMapBuilderLMQL(LMQLDebugger):
             raise ValueError(f"Failed to parse pros and cons list: {pros_and_cons_data}")
 
         # unpack individual reasons
-        pros_and_cons = self._unpack_reasons(pros_and_cons, issue)
+        pros_and_cons, unpacking = self._unpack_reasons(pros_and_cons, issue)
         self.logger.info(f"Unpacked pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         # create fuzzy argmap from fuzzy pros and cons list (reason-root edges)
-        fuzzy_argmap = FuzzyArgMap()
+        relevance_network = FuzzyArgMap()
         for root in tqdm.tqdm(pros_and_cons.roots):
-            target_node = self._add_node(fuzzy_argmap, root, type=am.CENTRAL_CLAIM)
+            target_node = self._add_node(relevance_network, root, type=am.CENTRAL_CLAIM)
             for pro in root.pros:
-                source_node = self._add_node(fuzzy_argmap, pro, type=am.REASON)
-                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node, valence=am.SUPPORT)
+                source_node = self._add_node(relevance_network, pro, type=am.REASON)
+                self._add_fuzzy_edge(
+                    relevance_network, source_node=source_node, target_node=target_node, valence=am.SUPPORT
+                )
             for con in root.cons:
-                source_node = self._add_node(fuzzy_argmap, con, type=am.REASON)
-                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node, valence=am.ATTACK)
+                source_node = self._add_node(relevance_network, con, type=am.REASON)
+                self._add_fuzzy_edge(
+                    relevance_network, source_node=source_node, target_node=target_node, valence=am.ATTACK
+                )
 
         # add fuzzy reason-reason edges
-        for target_node in tqdm.tqdm(fuzzy_argmap.nodelist):
-            for source_node in fuzzy_argmap.nodelist:
+        for target_node in tqdm.tqdm(relevance_network.nodelist):
+            for source_node in relevance_network.nodelist:
                 if source_node.id == target_node.id:
                     continue
                 if source_node.nodeType == am.CENTRAL_CLAIM or target_node.nodeType == am.CENTRAL_CLAIM:
                     continue
-                self._add_fuzzy_edge(fuzzy_argmap, source_node=source_node, target_node=target_node)
+                self._add_fuzzy_edge(relevance_network, source_node=source_node, target_node=target_node)
 
-        if fuzzy_argmap is None:
-            self.logger.warning("Failed to build fuzzy argument map (fuzzy_argmap is None).")
+        if relevance_network is None:
+            self.logger.warning("Failed to build relevance network (relevance_network is None).")
 
         try:
-            fuzzy_argmap_data = fuzzy_argmap.model_dump()  # type: ignore
+            relevance_network_data = relevance_network.model_dump()  # type: ignore
         except AttributeError:
-            fuzzy_argmap_data = fuzzy_argmap.dict()
+            relevance_network_data = relevance_network.dict()
 
         artifact = Artifact(
             id=self.get_product(),
             description=self.get_description(),
-            data=fuzzy_argmap_data,
+            data=relevance_network_data,
+            metadata=dict(unpacking=unpacking),
         )
 
         debug_state.artifacts.append(artifact)

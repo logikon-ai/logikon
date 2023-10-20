@@ -91,18 +91,18 @@ class NetworkXExporter(AbstractNetworkXExporter):
         return InformalArgMap
 
 
-class FuzzyNetworkXExporter(AbstractNetworkXExporter):
-    """FuzzyNetworkXExporter Debugger
+class RelevanceNetworkNXExporter(AbstractNetworkXExporter):
+    """RelevanceNetworkNXExporter Debugger
 
-    This debugger exports a fuzzy argmap as a networkx graph.
+    This debugger exports a relevance nets as a networkx graph.
 
     It requires the following artifacts:
-    - fuzzy_argmap
+    - relevance_network
     """
 
-    __pdescription__ = "Fuzzy argmap rendered as a networkx graph"
-    __product__ = "fuzzy_nx_graph"
-    __requirements__ = ["fuzzy_argmap"]
+    __pdescription__ = "Relevance network rendered as a networkx graph"
+    __product__ = "relevance_network_nx"
+    __requirements__ = ["relevance_network"]
 
     @property
     def __input_class__(self) -> type:
