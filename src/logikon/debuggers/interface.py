@@ -1,7 +1,7 @@
 # interface.py
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Union
 
 
 class Debugger(ABC):
@@ -28,7 +28,7 @@ class Debugger(ABC):
 
     @classmethod
     @abstractmethod
-    def get_requirements(cls) -> List[str]:
+    def get_requirements(cls) -> List[Union[str,set]]:
         """Get config keywords of metrics / artifacts that are required for the debugger."""
         pass
 

@@ -40,7 +40,7 @@ def score(
         config.inputs.append(Artifact(id=INPUT_KWS.completion, description="Completion", data=completion, dtype="str"))
 
     # Dynamically construct debugger pipeline based on config
-    debugger_pipeline = DebuggerFactory().create(config)
+    debugger_pipeline, _ = DebuggerFactory().create(config)
     if not debugger_pipeline:
         return DebugState()
 

@@ -26,7 +26,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
     __pdescription__ = "Exports an informal argmap as a networkx graph"
     __product__ = "svg_argmap"
-    __requirements__ = ["networkx_graph"]
+    __requirements__ = [{"fuzzy_argmap_nx"},{"networkx_graph"}]  # alternative requirements sets, first set takes precedence when automatically building pipeline
 
     _NODE_TEMPLATE = """<
     <TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
@@ -124,12 +124,18 @@ class SVGMapExporter(AbstractArtifactDebugger):
     def _debug(self, debug_state: DebugState):
         """Reconstruct reasoning as argmap."""
 
-        try:
-            networkx_graph: nx.DiGraph = next(
-                artifact.data for artifact in debug_state.artifacts if artifact.id == "networkx_graph"
+        networkx_graph: Optional[nx.DiGraph] = next(
+            (artifact.data for artifact in debug_state.artifacts if artifact.id == "fuzzy_argmap_nx"),
+            None
+        )
+        if networkx_graph is None:
+            networkx_graph = next(
+                (artifact.data for artifact in debug_state.artifacts if artifact.id == "networkx_graph"),
+                None
             )
-        except StopIteration:
-            msg = "Missing required artifact: networkx_graph"
+
+        if networkx_graph is None:
+            msg = f"Missing any of the required artifacts: {self.get_requirements()}"
             raise ValueError(msg)
 
         svg_argmap = self._to_svg(networkx_graph)

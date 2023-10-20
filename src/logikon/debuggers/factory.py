@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Tuple
 
 import copy
 import functools as ft
@@ -46,7 +46,8 @@ class DebuggerFactory:
 
         return state
 
-    def create(self, config: DebugConfig) -> Optional[Callable]:
+
+    def create(self, config: DebugConfig) -> Tuple[Optional[Callable], Optional[List[Debugger]]]:
         """Create a debugger pipeline based on a config."""
 
         registry = get_debugger_registry()
@@ -89,33 +90,54 @@ class DebuggerFactory:
             debuggers.append(new_debugger)
 
         # Check if all requirements are met and add further debuggers as necessary
-        requirements = set()
         requirements_satisfied = False
 
         while not requirements_satisfied:
             products = {debugger.get_product() for debugger in debuggers}
+            missing_products = set()
             for debugger in debuggers:
-                requirements.update(debugger.get_requirements())
+                requirements = debugger.get_requirements()
+                if requirements and isinstance(requirements[0],set):
+                    if not any(
+                        set(rs).issubset(products | set(input_ids))
+                        for rs in requirements
+                    ):
+                        requirements_satisfied = False
+                        # use first requirement set to add additional debuggers
+                        missing_products = requirements[0] - products
+                        break
+                    if len([rs for rs in requirements if set(rs).issubset(products | set(input_ids))]) > 1:
+                        self.logger.warning(
+                            f"Debugger {debugger} has multiple requirement sets that are satisfied; this may lead to unexpected "
+                            "debugger chaining and final results. Please consider defining a more comprehensive and unambiguous debug config."
+                        )
+                else:
+                    if not set(requirements).issubset(products):
+                        requirements_satisfied = False
+                        missing_products = set(requirements) - products
+                        break
 
-            if requirements.issubset(products | set(input_ids)):
-                requirements_satisfied = True
+            requirements_satisfied = not missing_products
 
-            for requirement_kw in requirements:
-                if requirement_kw not in products:
-                    if requirement_kw not in registry:
-                        msg = f"Debugger requirement '{requirement_kw}' does not correspond to a registered debugger."
-                        raise ValueError(msg)
-                    new_debugger = registry[requirement_kw][0](config)
-                    debuggers.append(new_debugger)
+            for missing_product_kw in missing_products:
+                if missing_product_kw not in registry:
+                    msg = f"Debugger requirement '{missing_product_kw}' does not correspond to a registered debugger."
+                    raise ValueError(msg)
+                new_debugger = registry[missing_product_kw][0](config)
+                debuggers.append(new_debugger)
 
-        # Create debugger pipeline respecting the dependencies (iteratively add and remove debuggers)
+
+        # Create debugger pipeline respecting the dependencies (iteratively add debuggers)
         pipeline: list[Debugger] = []
         while debuggers:
             added_any = False
             products_available = {debugger.get_product() for debugger in pipeline} | set(input_ids)
             for debugger in debuggers:
-                requirements = set(debugger.get_requirements())
-                if requirements.issubset(products_available):
+                requirements = debugger.get_requirements()
+                if requirements:
+                    # use first requirement set to determine when to insert debugger
+                    requirements = list(requirements[0]) if isinstance(requirements[0],set) else requirements
+                if set(requirements).issubset(products_available):
                     pipeline.append(debugger)
                     debuggers.remove(debugger)
                     added_any = True
@@ -125,7 +147,7 @@ class DebuggerFactory:
                 raise ValueError(msg)
 
         if not pipeline:
-            return None
+            return None, None
 
         self.logger.info("Built debugger pipeline:" + " -> ".join([str(type(debugger)) for debugger in pipeline]))
 
@@ -135,7 +157,8 @@ class DebuggerFactory:
 
         pipeline_callable = ft.partial(self.run_pipeline, pipeline=pipeline)
 
-        return pipeline_callable
+        return pipeline_callable, pipeline
+
 
     @property
     def logger(self) -> logging.Logger:
