@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Callable, Tuple
+from typing import List, Optional, Callable, Tuple, Mapping
 
 import copy
 import functools as ft
@@ -46,12 +46,14 @@ class DebuggerFactory:
 
         return state
 
-    def create(self, config: DebugConfig) -> Tuple[Optional[Callable], Optional[List[Debugger]]]:
-        """Create a debugger pipeline based on a config."""
+    def _run_consistency_checks(self, config: DebugConfig, input_ids: List[str], registry: Mapping):
+        """consistency check for current configuration
 
-        registry = get_debugger_registry()
-        input_ids = [inpt.id for inpt in config.inputs]
-
+        Args:
+            config (DebugConfig): configuration
+            input_ids (List[str]): input ids provided in config
+            registry (Mapping): current debugger registry
+        """
         # Check if all metrics and artifacts keys in config are registered
         for key in config.metrics + config.artifacts:
             if not isinstance(key, str) and not issubclass(key, Debugger):
@@ -78,6 +80,17 @@ class DebuggerFactory:
                     raise ValueError(
                         f"Inconsistent configuration. {key.get_product()} provided as input but also as metric / artifact."
                     )
+
+    def _collect_debuggers(
+        self, config: DebugConfig, input_ids: List[str], registry: Mapping[str, List[type[Debugger]]]
+    ) -> List[Debugger]:
+        """collects all debuggers required for running current configuration
+
+        Args:
+            config (DebugConfig): configuration
+            input_ids (List[str]): inputs
+            registry (Mapping[str, List[type): available debuggers
+        """
 
         # Create list of debuggers from config and registry
         debuggers: List[Debugger] = []
@@ -122,7 +135,18 @@ class DebuggerFactory:
                 new_debugger = registry[missing_product_kw][0](config)
                 debuggers.append(new_debugger)
 
-        # Create debugger pipeline respecting the dependencies (iteratively add debuggers)
+        return debuggers
+
+    def _build_pipeline(self, debuggers: List[Debugger], input_ids: List[str]) -> List[Debugger]:
+        """builds debugger pipeline respecting requirements
+
+        Args:
+            debuggers (List[Debugger]): debuggers to be chained
+            input_ids (List[str]): available inputs
+
+        Returns:
+            List[Debugger]: chained debuggers (pipeline)
+        """
         pipeline: list[Debugger] = []
         while debuggers:
             added_any = False
@@ -141,14 +165,24 @@ class DebuggerFactory:
                 msg = f"Could not create debugger chain. Failed to satisfy any of the following debuggers' requirements: {debuggers_left}"
                 raise ValueError(msg)
 
+        return pipeline
+
+    def create(self, config: DebugConfig) -> Tuple[Optional[Callable], Optional[List[Debugger]]]:
+        """Create a debugger pipeline based on a config."""
+
+        registry = get_debugger_registry()
+        input_ids = [inpt.id for inpt in config.inputs]
+
+        self._run_consistency_checks(config, input_ids, registry)
+
+        debuggers = self._collect_debuggers(config, input_ids, registry)
+
+        pipeline = self._build_pipeline(debuggers, input_ids)
+
         if not pipeline:
             return None, None
 
         self.logger.info("Built debugger pipeline:" + " -> ".join([str(type(debugger)) for debugger in pipeline]))
-
-        # chain the debuggers via set_next()
-        # for i in range(len(pipeline) - 1):
-        #    pipeline[i].set_next(pipeline[i + 1])
 
         pipeline_callable = ft.partial(self.run_pipeline, pipeline=pipeline)
 
