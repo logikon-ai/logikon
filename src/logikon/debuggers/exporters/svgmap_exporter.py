@@ -82,10 +82,8 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
         for _, linkdata in digraph.edges.items():
             linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
-            width = 1.0 + linkdata.get("weight", 1.0)
+            width = 1.0 + linkdata.pop("weight", 1.0)  # dropping weight from edge data
             linkdata["penwidth"] = f"{width:.2f}"
-            if "weight" in linkdata:
-                linkdata["weight"] = str(linkdata["weight"])
 
         return digraph
 
@@ -102,7 +100,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
                 rankdir="TD",
                 ratio="compress",
                 orientation="portrait",
-                overlap="compress",
+                #overlap="compress",
             ),
         )
 
