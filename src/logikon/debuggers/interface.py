@@ -28,7 +28,7 @@ class Debugger(ABC):
 
     @classmethod
     @abstractmethod
-    def get_requirements(cls) -> List[Union[str,set]]:
+    def get_requirements(cls) -> List[Union[str, set]]:
         """Get config keywords of metrics / artifacts that are required for the debugger."""
         pass
 

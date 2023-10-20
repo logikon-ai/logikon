@@ -26,7 +26,10 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
     __pdescription__ = "Exports an informal argmap as a networkx graph"
     __product__ = "svg_argmap"
-    __requirements__ = [{"fuzzy_argmap_nx"},{"networkx_graph"}]  # alternative requirements sets, first set takes precedence when automatically building pipeline
+    __requirements__ = [
+        {"fuzzy_argmap_nx"},
+        {"networkx_graph"},
+    ]  # alternative requirements sets, first set takes precedence when automatically building pipeline
 
     _NODE_TEMPLATE = """<
     <TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
@@ -125,13 +128,11 @@ class SVGMapExporter(AbstractArtifactDebugger):
         """Reconstruct reasoning as argmap."""
 
         networkx_graph: Optional[nx.DiGraph] = next(
-            (artifact.data for artifact in debug_state.artifacts if artifact.id == "fuzzy_argmap_nx"),
-            None
+            (artifact.data for artifact in debug_state.artifacts if artifact.id == "fuzzy_argmap_nx"), None
         )
         if networkx_graph is None:
             networkx_graph = next(
-                (artifact.data for artifact in debug_state.artifacts if artifact.id == "networkx_graph"),
-                None
+                (artifact.data for artifact in debug_state.artifacts if artifact.id == "networkx_graph"), None
             )
 
         if networkx_graph is None:

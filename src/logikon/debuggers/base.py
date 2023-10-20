@@ -16,7 +16,7 @@ class AbstractDebugger(Debugger):
     """
 
     __product__: Optional[str] = None
-    __requirements__: list[Union[str,set]] = []
+    __requirements__: list[Union[str, set]] = []
     __pdescription__: Optional[str] = None
 
     def __init__(self, debug_config: DebugConfig):
@@ -41,7 +41,7 @@ class AbstractDebugger(Debugger):
         return cls.__product__
 
     @classmethod
-    def get_requirements(cls) -> list[Union[str,set]]:
+    def get_requirements(cls) -> list[Union[str, set]]:
         return cls.__requirements__
 
     @classmethod

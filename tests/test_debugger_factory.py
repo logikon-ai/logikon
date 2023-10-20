@@ -47,4 +47,4 @@ def test_altern_requirements():
 
     assert callable(debug_chain)
     assert pipeline
-    assert any(isinstance(debugger,FuzzyArgMapBuilder) for debugger in pipeline)
+    assert any(isinstance(debugger, FuzzyArgMapBuilder) for debugger in pipeline)

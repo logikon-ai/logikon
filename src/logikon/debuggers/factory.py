@@ -46,7 +46,6 @@ class DebuggerFactory:
 
         return state
 
-
     def create(self, config: DebugConfig) -> Tuple[Optional[Callable], Optional[List[Debugger]]]:
         """Create a debugger pipeline based on a config."""
 
@@ -97,11 +96,8 @@ class DebuggerFactory:
             missing_products = set()
             for debugger in debuggers:
                 requirements = debugger.get_requirements()
-                if requirements and isinstance(requirements[0],set):
-                    if not any(
-                        set(rs).issubset(products | set(input_ids))
-                        for rs in requirements
-                    ):
+                if requirements and isinstance(requirements[0], set):
+                    if not any(set(rs).issubset(products | set(input_ids)) for rs in requirements):
                         requirements_satisfied = False
                         # use first requirement set to add additional debuggers
                         missing_products = requirements[0] - products
@@ -126,7 +122,6 @@ class DebuggerFactory:
                 new_debugger = registry[missing_product_kw][0](config)
                 debuggers.append(new_debugger)
 
-
         # Create debugger pipeline respecting the dependencies (iteratively add debuggers)
         pipeline: list[Debugger] = []
         while debuggers:
@@ -136,7 +131,7 @@ class DebuggerFactory:
                 requirements = debugger.get_requirements()
                 if requirements:
                     # use first requirement set to determine when to insert debugger
-                    requirements = list(requirements[0]) if isinstance(requirements[0],set) else requirements
+                    requirements = list(requirements[0]) if isinstance(requirements[0], set) else requirements
                 if set(requirements).issubset(products_available):
                     pipeline.append(debugger)
                     debuggers.remove(debugger)
@@ -158,7 +153,6 @@ class DebuggerFactory:
         pipeline_callable = ft.partial(self.run_pipeline, pipeline=pipeline)
 
         return pipeline_callable, pipeline
-
 
     @property
     def logger(self) -> logging.Logger:
