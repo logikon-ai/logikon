@@ -14,6 +14,7 @@ from langchain.llms import (
     OpenAI,
 )
 
+import logikon.schemas.argument_mapping as am
 from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.debuggers.utils import init_llm_from_config
 from logikon.schemas.argument_mapping import AnnotationSpan, ArgMapEdge, ArgMapNode, InformalArgMap
@@ -428,7 +429,7 @@ class InformalArgMapChain(Chain):
                         ArgMapEdge(
                             source=claim_a.id,
                             target=claim_b.id,
-                            valence="con",
+                            valence=am.ATTACK,
                         )
                     )
         return argmap
@@ -608,7 +609,7 @@ class InformalArgMapChain(Chain):
             edge = ArgMapEdge(
                 source=node.id,
                 target=target_id,
-                valence="pro" if valence == "for" else "con",
+                valence=am.SUPPORT if valence == "for" else am.ATTACK,
             )
             argmap.edgelist.append(edge)
 
