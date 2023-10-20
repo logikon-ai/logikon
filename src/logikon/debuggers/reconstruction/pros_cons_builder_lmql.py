@@ -438,9 +438,9 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
 
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
         """
-        for reason in unused_reasons:
-            f_reason = format_reason(reason, 50)
-            "{f_reason}"
+        for ureason in unused_reasons:
+            f_ureason = format_reason(ureason, 50)
+            "{f_ureason}"
         """
         Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
 
