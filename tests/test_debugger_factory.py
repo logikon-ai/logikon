@@ -37,6 +37,14 @@ def test_debugger_factory2():
     assert callable(debug_chain)
 
 
+def test_debugger_factory3():
+    config = DebugConfig(
+        artifacts=["svg_argmap", "fuzzy_argmap_nx", "relevance_network_nx"],
+    )
+    debug_chain, _ = DebuggerFactory().create(config)
+    assert callable(debug_chain)
+
+
 def test_altern_requirements():
     config = DebugConfig(
         artifacts=["svg_argmap"],
