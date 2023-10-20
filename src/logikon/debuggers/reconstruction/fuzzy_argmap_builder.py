@@ -30,11 +30,13 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
     """
 
     __product__ = "fuzzy_argmap_nx"
-    __requirements__ = ["relevance_network"]
+    __requirements__ = ["relevance_network_nx"]
     __pdescription__ = "Informal argument map (nx graph) with weighted support and attack relations"
 
     def _sanity_checks(self, relevance_network: nx.DiGraph):
         """basic sanity checks"""
+        if not isinstance(relevance_network, nx.DiGraph):
+            raise ValueError(f"Invalid relevance graph data. Expected nx.DiGraph, got {type(relevance_network)}.")
         for u, v, data in relevance_network.edges(data=True):
             if 'weight' not in data:
                 self.logger.warning(f"Missing weight in edge {u} -> {v}. Using default value: {_DEFAULT_WEIGHT}.")
@@ -163,7 +165,7 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
 
         """
 
-        relevance_network = next((a.data for a in debug_state.artifacts if a.id == "relevance_network"), None)
+        relevance_network = next((a.data for a in debug_state.artifacts if a.id == "relevance_network_nx"), None)
         if relevance_network is None:
             raise ValueError(
                 "Missing required artifact: relevance_network. Available artifacts: " + str(debug_state.artifacts)
