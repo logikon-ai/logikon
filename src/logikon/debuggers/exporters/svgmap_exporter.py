@@ -82,7 +82,8 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
         for _, linkdata in digraph.edges.items():
             linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
-            linkdata["penwidth"] = "1.5"
+            width = 1. + linkdata.get("weight", 1.)
+            linkdata["penwidth"] = f"{width:.2f}"
 
         return digraph
 
