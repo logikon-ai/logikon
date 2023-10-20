@@ -20,6 +20,7 @@ import logikon.schemas.argument_mapping as am
 
 _FIX_WEIGHT_INTRA_ROOTS = 1.0  # weight of intra-root edges in relevance graphs
 _DEFAULT_WEIGHT = 0  # default weight for edges in relevance graphs
+_MAX_OUT_DEGREE = 3  # maximum out degree of nodes in fuzzy argmap
 
 
 class FuzzyArgMapBuilder(AbstractArtifactDebugger):
@@ -138,14 +139,25 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
         min_support_w = min(support_weights) if support_weights else None
         min_attack_w = min(attack_weights) if attack_weights else None
 
+        self.logger.info(f"Minimum support weight: {min_support_w}")
+        self.logger.info(f"Minimum attack weight: {min_attack_w}")
+
         if min_support_w is None and min_attack_w is None:
             return
 
+        n_edges = len(fuzzy_argmap.edges)
         for u, v, data in relevance_network.edges(data=True):
+            if fuzzy_argmap.has_edge(u, v) or fuzzy_argmap.has_edge(v, u):
+                continue
+            # check degree
+            if fuzzy_argmap.out_degree(u) >= _MAX_OUT_DEGREE:
+                continue
             if data['valence'] == am.SUPPORT and min_support_w is not None and data['weight'] > min_support_w:
                 fuzzy_argmap.add_edge(u, v, **data)
             elif data['valence'] == am.ATTACK and min_attack_w is not None and data['weight'] > min_attack_w:
                 fuzzy_argmap.add_edge(u, v, **data)
+
+        self.logger.info(f"Added {len(fuzzy_argmap.edges) - n_edges} edges to fuzzy argmap.")
 
     def _debug(self, debug_state: DebugState):
         """Build fuzzy argmap from pros and cons.
