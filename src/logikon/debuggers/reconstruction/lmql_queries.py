@@ -24,7 +24,7 @@ You are a helpful, honest and knowledgeable AI assistant with expertise in criti
 @lmql.query
 def supports_q(argument_data: dict, claim_data: dict):
     '''lmql
-    argmax(chunksize=4)
+    argmax(chunksize=1)
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
         """
@@ -62,7 +62,7 @@ def supports_q(argument_data: dict, claim_data: dict):
 @lmql.query
 def attacks_q(argument_data: dict, claim_data: dict):
     '''lmql
-    argmax(chunksize=4)
+    argmax(chunksize=1)
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
         """
@@ -100,7 +100,7 @@ def attacks_q(argument_data: dict, claim_data: dict):
 @lmql.query
 def most_confirmed(argument_data: dict, claims_data: list):
     '''lmql
-    argmax(chunksize=4)
+    argmax(chunksize=1)
         argument = Claim(**argument_data)
         claims = [Claim(**claim_data) for claim_data in claims_data]
         assert len(claims) <= 10
@@ -138,7 +138,7 @@ def most_confirmed(argument_data: dict, claims_data: list):
 @lmql.query
 def most_disconfirmed(argument_data: dict, claims_data: list):
     '''lmql
-    argmax(chunksize=4)
+    argmax(chunksize=1)
         argument = Claim(**argument_data)
         claims = [Claim(**claim_data) for claim_data in claims_data]
         assert len(claims) <= 10
@@ -180,7 +180,7 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
 @lmql.query
 def valence(argument_data: dict, claim_data: dict):
     '''lmql
-    argmax(chunksize=4)
+    argmax(chunksize=1)
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
         """
