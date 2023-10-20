@@ -29,7 +29,7 @@ def strip_issue_tag(text: str) -> str:
 @lmql.query
 def key_issue(prompt, completion):
     """
-    sample(n=3, temperature=.4)
+    sample(n=3, temperature=.4, chunksize=4)
         "### System\n\n"
         "You are a helpful argumentation analysis assistant.\n\n"
         "### User\n\n"
@@ -57,7 +57,7 @@ def key_issue(prompt, completion):
 @lmql.query
 def rate_issue_drafts(alternatives, questions, prompt, completion):
     '''lmql
-    argmax
+    argmax(chunksize=4)
         labels = [alternative.get('label') for alternative in alternatives]
         "### System\n\n"
         "You are a helpful argumentation analysis assistant.\n\n"
