@@ -5,6 +5,7 @@ import os
 
 from logikon.debuggers.exporters.svgmap_exporter import SVGMapExporter
 from logikon.schemas.configs import DebugConfig
+import logikon.schemas.argument_mapping as am
 
 
 @pytest.fixture(name="nx_map1")
@@ -49,6 +50,26 @@ def nx_map2() -> nx.DiGraph:
     return nx_graph
 
 
+@pytest.fixture(name="nx_map3")
+def nx_map3() -> nx.DiGraph:
+    data = {
+        "directed": True,
+        "multigraph": False,
+        "graph": {},
+        "nodes": [
+            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
+            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
+        ],
+        "links": [
+            {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.25},
+            {"valence": am.ATTACK, "source": "n2", "target": "n0", "weight": 0.95},
+        ],
+    }
+    nx_graph = nx.node_link_graph(data)
+    return nx_graph
+
+
 def test_preprocessor01(nx_map1):
     config = DebugConfig()
     svgmap_exporter = SVGMapExporter(config)
@@ -79,6 +100,18 @@ def test_svg_exporter_save(nx_map2):
     config = DebugConfig()
     svgmap_exporter = SVGMapExporter(config)
     svgmap = svgmap_exporter._to_svg(nx_map2)
+    assert isinstance(svgmap, str)
+
+    with open("test_graph.svg", 'w') as f:
+        f.write(svgmap)
+
+    assert os.path.isfile("test_graph.svg")
+
+
+def test_svg_exporter_weighted(nx_map3):
+    config = DebugConfig()
+    svgmap_exporter = SVGMapExporter(config)
+    svgmap = svgmap_exporter._to_svg(nx_map3)
     assert isinstance(svgmap, str)
 
     with open("test_graph.svg", 'w') as f:
