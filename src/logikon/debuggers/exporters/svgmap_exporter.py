@@ -9,6 +9,7 @@ import networkx as nx
 from unidecode import unidecode
 
 import logikon
+import logikon.schemas.argument_mapping as am
 from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.configs import DebugConfig
 from logikon.schemas.results import Artifact, DebugState
@@ -77,7 +78,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
             nodedata["tooltip"] = text
 
         for _, linkdata in digraph.edges.items():
-            linkdata["color"] = "red" if linkdata["valence"] == "con" else "darkgreen"
+            linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
             linkdata["penwidth"] = "1.5"
 
         return digraph
