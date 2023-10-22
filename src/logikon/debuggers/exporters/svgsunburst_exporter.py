@@ -87,7 +87,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
 
         return tree_data, color_map
 
-    def _to_svg(self, tree_data: list[dict], color_map: dict) -> str:
+    def _to_svg(self, tree_data: list[dict], color_map: dict, issue: str) -> str:
         """builds svg sunburst from tree data"""
 
         fig = px.sunburst(
@@ -98,6 +98,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             values='value',
             color='id',
             color_discrete_map=color_map,
+            title=issue,
             # branchvalues="total",
         )
 
@@ -124,7 +125,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
 
         tree_data, color_map = self._to_tree_data(networkx_graph, issue)
 
-        svg_sunburst = self._to_svg(tree_data, color_map)
+        svg_sunburst = self._to_svg(tree_data, color_map, issue)
 
         artifact = Artifact(
             id=self.get_product(),
