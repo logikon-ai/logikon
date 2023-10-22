@@ -50,6 +50,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
         # color_map[issue_id] = "white"
 
         for node, nodedata in digraph.nodes.items():
+            name = "</br></br>".join(nodedata.get("label","").strip().split(" "))
             if digraph.out_degree(node) == 0:
                 parent = ""  # issue_id
                 color = "goldenrod"
@@ -74,7 +75,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             tree_data.append(
                 dict(
                     id=node,
-                    name=nodedata["label"],
+                    name=name,
                     parent=parent,
                     value=value,
                 )

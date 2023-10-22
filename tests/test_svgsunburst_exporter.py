@@ -37,7 +37,7 @@ def nx_map2() -> nx.DiGraph:
         "nodes": [
             {
                 "text": 10 * (f"argument-{i} and "),
-                "label": f"arg{i}",
+                "label": f"arg #{i}",
                 "annotations": [],
                 "nodeType": "proposition",
                 "id": f"n{i}",
@@ -85,6 +85,8 @@ def test_svg_exporter_save(nx_map2):
         f.write(svgsunburst)
 
     assert os.path.isfile("test_svgsunburst1.svg")
+
+    assert 1==0
 
 
 def test_svg_exporter_weighted(nx_map3):
