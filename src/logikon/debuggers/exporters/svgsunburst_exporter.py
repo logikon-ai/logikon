@@ -58,7 +58,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             enum += 1
             name = f"#{enum}"
             label = nodedata.get("label", "No label")
-            legend_lines.append(f"{name}: <b>[{label}]</b>")
+            legend_lines.append(f"{name}: {label}")
 
             if digraph.out_degree(node) == 0:
                 parent = ""  # issue_id
@@ -109,7 +109,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             title=issue,
             # branchvalues="total",
         )
-
+        fig.update_traces(marker_line_width=2)
         fig.update_layout(
             annotations=[
                 go.layout.Annotation(
