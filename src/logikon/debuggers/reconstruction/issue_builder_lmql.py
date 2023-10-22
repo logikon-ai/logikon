@@ -92,6 +92,26 @@ class IssueBuilderLMQL(LMQLDebugger):
     __pdescription__ = "Issue or decision problem addressed in the deliberation"
     __product__ = "issue"
 
+    def _key_issue(self, prompt, completion):  # TODO: add type hints
+        """Internal (class-method) wrapper for lmql.query function."""
+        return key_issue(
+            prompt=prompt,
+            completion=completion,
+            model=self._model,
+            **self._generation_kwargs,
+        )
+
+    def _rate_issue_drafts(self, alternatives, questions, prompt, completion):  # TODO: add type hints
+        """Internal (class-method) wrapper for lmql.query function."""
+        return rate_issue_drafts(
+            alternatives=alternatives,
+            questions=questions,
+            prompt=prompt,
+            completion=completion,
+            model=self._model,
+            **self._generation_kwargs,
+        )
+
     def _debug(self, debug_state: DebugState):
         """Extract central issue of text (prompt/completion)."""
 
@@ -102,12 +122,11 @@ class IssueBuilderLMQL(LMQLDebugger):
             )
 
         # draft summarizations
-        results = key_issue(
+        results = self._key_issue(
             prompt=prompt,
             completion=completion,
-            model=self._model,
-            **self._generation_kwargs,
         )
+        # TODO: move LMQL logic in query function / wrapper
         if not all(isinstance(result, lmql.LMQLResult) for result in results):
             raise ValueError(f"Results are not of type lmql.LMQLResult. Got {results}.")
         issue_drafts = [
@@ -120,13 +139,11 @@ class IssueBuilderLMQL(LMQLDebugger):
         self.logger.info(f"Drafts: {issue_drafts}")
 
         # rate summarizations and choose best
-        result = rate_issue_drafts(
+        result = self._rate_issue_drafts(
             alternatives=issue_drafts,
             questions=QUESTIONS_EVAL,
             prompt=prompt,
             completion=completion,
-            model=self._model,
-            **self._generation_kwargs,
         )
         label = result.variables.get("FINAL_ANSWER")
         issue = next((draft["text"] for draft in issue_drafts if draft["label"] == label), None)

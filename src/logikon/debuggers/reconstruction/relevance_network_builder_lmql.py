@@ -254,6 +254,10 @@ class RelevanceNetworkBuilderLMQL(LMQLDebugger):
         "Relevance network describing comprehensively the strengths of pairwise support and attack relations"
     )
 
+    def _unpack_reason(self, reason_data: dict, issue: str) -> List[Claim]:
+        """Internal (class method) wrapper for lmql query function."""
+        return unpack_reason(reason_data=reason_data, issue=issue, model=self._model, **self._generation_kwargs)
+
     def _unpack_reasons(
         self, pros_and_cons: ProsConsList, issue: str
     ) -> Tuple[ProsConsList, List[Tuple[dict, List[dict]]]]:
@@ -274,9 +278,7 @@ class RelevanceNetworkBuilderLMQL(LMQLDebugger):
             to_be_added = []
             to_be_removed = []
             for pro in root.pros:
-                unpacked_pros = unpack_reason(
-                    reason_data=pro.dict(), issue=issue, model=self._model, **self._generation_kwargs
-                )
+                unpacked_pros = self._unpack_reason(reason_data=pro.dict(), issue=issue)
                 if len(unpacked_pros) > 1:
                     unpacking.append((pro.dict(), [claim.dict() for claim in unpacked_pros]))
                     to_be_removed.append(pro)
@@ -287,9 +289,7 @@ class RelevanceNetworkBuilderLMQL(LMQLDebugger):
             to_be_added = []
             to_be_removed = []
             for con in root.cons:
-                unpacked_cons = unpack_reason(
-                    reason_data=con.dict(), issue=issue, model=self._model, **self._generation_kwargs
-                )
+                unpacked_cons = self._unpack_reason(reason_data=con.dict(), issue=issue)
                 if len(unpacked_cons) > 1:
                     unpacking.append((con.dict(), [claim.dict() for claim in unpacked_cons]))
                     to_be_removed.append(con)

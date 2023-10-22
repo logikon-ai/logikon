@@ -34,7 +34,7 @@ flowchart TD
 """
 
 from __future__ import annotations
-from typing import List, TypedDict
+from typing import List, TypedDict, Tuple
 
 import copy
 import functools as ft
@@ -500,16 +500,33 @@ class ProsConsBuilderLMQL(LMQLDebugger):
 
     This LMQLDebugger is responsible for reconstructing a pros and cons list for a given issue.
 
-
-
-
     """
 
     __pdescription__ = "Pros and cons list with multiple root claims"
     __product__ = "proscons"
     __requirements__ = ["issue"]
 
-    def ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
+    def _mine_reasons(self, prompt, completion, issue) -> List[Claim]:
+        """Internal wrapper (class-method) for lmql.query function."""
+        return mine_reasons(prompt, completion, issue, model=self._model, **self._generation_kwargs)
+
+    def _build_pros_and_cons(self, reasons_data: list[dict], issue: str) -> Tuple[ProsConsList, List[Claim]]:
+        """Internal wrapper (class-method) for lmql.query function."""
+        return build_pros_and_cons(reasons_data, issue, model=self._model, **self._generation_kwargs)
+
+    def _add_unused_reasons(
+        self,
+        reasons_data: list[dict],
+        issue: str,
+        pros_and_cons_data: dict,
+        unused_reasons_data: list,
+    ) -> Tuple[ProsConsList, List[Claim]]:
+        """Internal wrapper (class-method) for lmql.query function."""
+        return add_unused_reasons(
+            reasons_data, issue, pros_and_cons_data, unused_reasons_data, model=self._model, **self._generation_kwargs
+        )
+
+    def _ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
         """Revises labels of reasons to ensure uniqueness
 
         Args:
@@ -539,7 +556,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
 
         return unique_reasons
 
-    def check_and_revise(self, pros_and_cons: ProsConsList, reasons: List[Claim], issue: str) -> ProsConsList:
+    def _check_and_revise(self, pros_and_cons: ProsConsList, reasons: List[Claim], issue: str) -> ProsConsList:
         """Checks and revises a pros & cons list
 
         Args:
@@ -720,7 +737,6 @@ class ProsConsBuilderLMQL(LMQLDebugger):
 
         prompt, completion = debug_state.get_prompt_completion()
         issue = next(a.data for a in debug_state.artifacts if a.id == "issue")
-        self.logger.info(f"Identified issue: {issue}")
 
         if prompt is None or completion is None:
             raise ValueError(
@@ -728,30 +744,24 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             )
 
         # mine reasons
-        reasons = mine_reasons(
-            prompt=prompt, completion=completion, issue=issue, model=self._model, **self._generation_kwargs
-        )
+        reasons = self._mine_reasons(prompt=prompt, completion=completion, issue=issue)
         if not all(isinstance(reason, Claim) for reason in reasons):
             raise ValueError(f"Reasons are not of type Claim. Got {reasons}.")
-        reasons = self.ensure_unique_labels(reasons)
+        reasons = self._ensure_unique_labels(reasons)
         self.logger.info(f"Mined reasons: {pprint.pformat(reasons)}")
 
         # build pros and cons list
-        pros_and_cons, unused_reasons = build_pros_and_cons(
-            reasons_data=[r.dict() for r in reasons], issue=issue, model=self._model, **self._generation_kwargs
-        )
+        pros_and_cons, unused_reasons = self._build_pros_and_cons(reasons_data=[r.dict() for r in reasons], issue=issue)
         if not isinstance(pros_and_cons, ProsConsList):
             raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
         # add unused reasons
         if unused_reasons:
             self.logger.info(f"Unused reasons: {pprint.pformat(unused_reasons)}")
-            pros_and_cons, unused_reasons = add_unused_reasons(
+            pros_and_cons, unused_reasons = self._add_unused_reasons(
                 reasons_data=[r.dict() for r in reasons],
                 issue=issue,
                 pros_and_cons_data=pros_and_cons.dict(),
                 unused_reasons_data=[r.dict() for r in unused_reasons],
-                model=self._model,
-                **self._generation_kwargs,
             )
             if unused_reasons:
                 self.logger.info(f"Failed to integrate the following reasons: {pprint.pformat(unused_reasons)}")
@@ -759,7 +769,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         self.logger.info(f"Built pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         # double-check and revise
-        pros_and_cons = self.check_and_revise(pros_and_cons, reasons, issue)
+        pros_and_cons = self._check_and_revise(pros_and_cons, reasons, issue)
         self.logger.info(f"Revised pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         if pros_and_cons is None:
