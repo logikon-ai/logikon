@@ -79,9 +79,9 @@ def nx_map3() -> nx.DiGraph:
 def test_svg_exporter_save(nx_map2):
     config = DebugConfig()
     svgsunburst_exporter = SVGSunburstExporter(config)
-    tree_data, color_map = svgsunburst_exporter._to_tree_data(nx_map2, "Issue 1")
+    tree_data, color_map, legend = svgsunburst_exporter._to_tree_data(nx_map2, "Issue 1")
     print(tree_data)
-    svgsunburst = svgsunburst_exporter._to_svg(tree_data, color_map, "Issue 2")
+    svgsunburst = svgsunburst_exporter._to_svg(tree_data, color_map, "Issue 2", legend)
 
     assert isinstance(svgsunburst, str)
 
@@ -96,8 +96,8 @@ def test_svg_exporter_save(nx_map2):
 def test_svg_exporter_weighted(nx_map3):
     config = DebugConfig()
     svgsunburst_exporter = SVGSunburstExporter(config)
-    tree_data, color_map = svgsunburst_exporter._to_tree_data(nx_map3, "Issue 3")
-    svgsunburst = svgsunburst_exporter._to_svg(tree_data, color_map, "Issue 3")
+    tree_data, color_map, legend = svgsunburst_exporter._to_tree_data(nx_map3, "Issue 3")
+    svgsunburst = svgsunburst_exporter._to_svg(tree_data, color_map, "Issue 3", legend)
 
     assert isinstance(svgsunburst, str)
 

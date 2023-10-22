@@ -6,6 +6,7 @@ import copy
 import uuid
 
 import plotly.express as px
+import plotly.graph_objects as go
 import networkx as nx
 import matplotlib.colors
 import seaborn as sns
@@ -41,6 +42,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
 
         tree_data = []
         color_map = {}
+        legend_lines: List[str] = []
 
         # issue_id = str(uuid.uuid4())
         # tree_data.append(dict(
@@ -51,9 +53,13 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
         # ))
         # color_map[issue_id] = "white"
 
+        enum = 0
         for node, nodedata in digraph.nodes.items():
-            name = nodedata.get("label", "")
-            name = name if len(name) <= MAX_LABEL_LEN else name[: (MAX_LABEL_LEN - 3)] + "..."
+            enum += 1
+            name = f"#{enum}"
+            label = nodedata.get("label", "No label")
+            legend_lines.append(f"{name}: <b>[{label}]</b>")
+
             if digraph.out_degree(node) == 0:
                 parent = ""  # issue_id
                 color = "goldenrod"
@@ -85,9 +91,11 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             )
             color_map[node] = color
 
-        return tree_data, color_map
+        legend = "<br>".join(legend_lines)
 
-    def _to_svg(self, tree_data: list[dict], color_map: dict, issue: str) -> str:
+        return tree_data, color_map, legend
+
+    def _to_svg(self, tree_data: list[dict], color_map: dict, issue: str, legend: str) -> str:
         """builds svg sunburst from tree data"""
 
         fig = px.sunburst(
@@ -100,6 +108,23 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             color_discrete_map=color_map,
             title=issue,
             # branchvalues="total",
+        )
+
+        fig.update_layout(
+            annotations=[
+                go.layout.Annotation(
+                    text=legend,
+                    align='left',
+                    showarrow=False,
+                    xref='paper',
+                    yref='paper',
+                    x=1.1,
+                    y=0.2,
+                    bgcolor='white',
+                    bordercolor='black',
+                    borderwidth=0
+                )
+            ]
         )
 
         svg = fig.to_image(format="svg").decode("utf-8")
@@ -123,9 +148,9 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             msg = f"Missing any of the required artifacts: {self.get_requirements()}"
             raise ValueError(msg)
 
-        tree_data, color_map = self._to_tree_data(networkx_graph, issue)
+        tree_data, color_map, legend = self._to_tree_data(networkx_graph, issue)
 
-        svg_sunburst = self._to_svg(tree_data, color_map, issue)
+        svg_sunburst = self._to_svg(tree_data, color_map, issue, legend)
 
         artifact = Artifact(
             id=self.get_product(),
