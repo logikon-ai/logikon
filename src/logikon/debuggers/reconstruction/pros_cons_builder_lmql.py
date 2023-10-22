@@ -540,11 +540,7 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         labels = [reason.label for reason in reasons]
 
         # replace empty labels with defaults
-        labels = [
-            label if label else f"Reason-{enum}"
-            for enum, label
-            in enumerate(labels)
-        ]
+        labels = [label if label else f"Reason-{enum}" for enum, label in enumerate(labels)]
 
         duplicate_labels = [label for label in labels if labels.count(label) > 1]
         if not duplicate_labels:
