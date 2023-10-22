@@ -59,7 +59,13 @@ def nx_map3() -> nx.DiGraph:
         "nodes": [
             {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
             {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
+            {
+                "text": "con 3",
+                "label": "con reason 3 explained",
+                "annotations": [],
+                "nodeType": "proposition",
+                "id": "n2",
+            },
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.25},
@@ -85,8 +91,6 @@ def test_svg_exporter_save(nx_map2):
         f.write(svgsunburst)
 
     assert os.path.isfile("test_svgsunburst1.svg")
-
-    assert 1==0
 
 
 def test_svg_exporter_weighted(nx_map3):

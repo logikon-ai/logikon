@@ -16,6 +16,8 @@ import logikon.schemas.argument_mapping as am
 from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.results import Artifact, DebugState
 
+MAX_LABEL_LEN = 12
+
 
 class SVGSunburstExporter(AbstractArtifactDebugger):
     """SVGSunburstExporter Debugger
@@ -50,7 +52,8 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
         # color_map[issue_id] = "white"
 
         for node, nodedata in digraph.nodes.items():
-            name = "</br></br>".join(nodedata.get("label","").strip().split(" "))
+            name = nodedata.get("label", "")
+            name = name if len(name) <= MAX_LABEL_LEN else name[: (MAX_LABEL_LEN - 3)] + "..."
             if digraph.out_degree(node) == 0:
                 parent = ""  # issue_id
                 color = "goldenrod"
