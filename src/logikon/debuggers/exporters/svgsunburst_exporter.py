@@ -37,7 +37,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
         {"networkx_graph", "issue"},
     ]  # alternative requirements sets, first set takes precedence when automatically building pipeline
 
-    def _to_tree_data(self, digraph: nx.DiGraph, issue: str) -> tuple[list[dict], dict]:
+    def _to_tree_data(self, digraph: nx.DiGraph, issue: str) -> tuple[list[dict], dict, str]:
         """builds svg sunburst from nx graph"""
 
         tree_data = []
@@ -107,6 +107,8 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             color='id',
             color_discrete_map=color_map,
             title=issue,
+            width=800,
+            height=640,
             # branchvalues="total",
         )
         fig.update_traces(marker_line_width=2)
@@ -115,14 +117,17 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
                 go.layout.Annotation(
                     text=legend,
                     align='left',
-                    showarrow=False,
+                    valign='middle',
+                    width=100,
+                    height=640,
                     xref='paper',
                     yref='paper',
                     x=1.1,
-                    y=0.2,
+                    y=0.5,
                     bgcolor='white',
                     bordercolor='black',
                     borderwidth=0,
+                    showarrow=False,
                 )
             ]
         )

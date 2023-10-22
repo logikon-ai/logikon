@@ -37,14 +37,14 @@ def nx_map2() -> nx.DiGraph:
         "nodes": [
             {
                 "text": 10 * (f"argument-{i} and "),
-                "label": f"arg #{i}",
+                "label": f"arg #{i} reason",
                 "annotations": [],
                 "nodeType": "proposition",
                 "id": f"n{i}",
             }
-            for i in range(16)
+            for i in range(20)
         ],
-        "links": [{"valence": am.SUPPORT, "source": f"n{i+1}", "target": f"n{i // 2}"} for i in range(15)],
+        "links": [{"valence": am.SUPPORT, "source": f"n{i+1}", "target": f"n{i // 2}"} for i in range(19)],
     }
     nx_graph = nx.node_link_graph(data)
     return nx_graph
