@@ -53,6 +53,7 @@ import logikon.schemas.argument_mapping as am
 MAX_N_REASONS = 50
 MAX_N_ROOTS = 10
 MAX_LEN_TITLE = 32
+MAX_LEN_ROOTCLAIM = 120
 MAX_LEN_GIST = 180
 N_DRAFTS = 3
 LABELS = "ABCDEFG"
@@ -214,7 +215,7 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
         n = 0
         while n<MAX_N_REASONS:
             n += 1
-            "[MARKER]" where MARKER in set(["\n```", "\n- "])
+            "[MARKER]" where MARKER in ["\n```", "\n- "]
             marker = MARKER
             if marker == "\n```":
                 break
@@ -309,12 +310,12 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         options = []
         marker = ""
         while len(options)<MAX_N_ROOTS:
-            "[MARKER]" where MARKER in set(["</options>", "- "])
+            "[MARKER]" where MARKER in ["</options>", "- "]
             marker = MARKER
             if marker == "</options>":
                 break
             else:
-                "[OPTION]" where STOPS_AT(OPTION, "\n") and len(OPTION) < 32
+                "[OPTION]" where STOPS_AT(OPTION, "\n") and len(OPTION) < MAX_LEN_TITLE
                 options.append(OPTION.strip("\n "))
         """
 
@@ -376,21 +377,21 @@ def build_pros_and_cons(reasons_data: list, issue: str):
         "pros_and_cons:\n"
         unused_reasons = copy.deepcopy(reasons)
         roots = []
-        "[MARKER]" where MARKER in set(["```", "- "])
+        "[MARKER]" where MARKER in ["```", "- "]
         marker = MARKER
         while len(roots)<MAX_N_ROOTS and unused_reasons:
             if marker == "```":
                 break
             elif marker == "- ":  # new root
-                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
-                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
+                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<MAX_LEN_TITLE
+                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
                 root = RootClaim(label=TITLE.strip(')'), text=CLAIM.strip('\"'))
                 "  pros:\n"
                 while unused_reasons:
-                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
+                    "[MARKER]" where MARKER in ["  cons:\n", "  - "]
                     marker = MARKER
                     if marker == "  - ":  # new pro
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in [reason.label for reason in unused_reasons]
                         selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
                         root.pros.append(selected_reason)
                         unused_reasons.remove(selected_reason)
@@ -398,10 +399,10 @@ def build_pros_and_cons(reasons_data: list, issue: str):
                         break
                 # cons
                 while unused_reasons:
-                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
+                    "[MARKER]" where MARKER in ["```", "- ", "  - "]
                     marker = MARKER
                     if marker == "  - ":  # new con
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in [reason.label for reason in unused_reasons]
                         selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
                         root.cons.append(selected_reason)
                         unused_reasons.remove(selected_reason)
@@ -456,7 +457,7 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
         "pros_and_cons:\n"
         unused_reasons = copy.deepcopy(reasons)
         roots = []
-        "[MARKER]" where MARKER in set(["```", "- "])
+        "[MARKER]" where MARKER in ["```", "- "]
         marker = MARKER
         while len(roots)<MAX_N_ROOTS and unused_reasons:
             if marker == "```":
@@ -467,10 +468,10 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
                 root = RootClaim(label=TITLE.strip(')'), text=CLAIM.strip('\"'))
                 "  pros:\n"
                 while unused_reasons:
-                    "[MARKER]" where MARKER in set(["  cons:\n", "  - "])
+                    "[MARKER]" where MARKER in ["  cons:\n", "  - "]
                     marker = MARKER
                     if marker == "  - ":  # new pro
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in [reason.label for reason in unused_reasons]
                         selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
                         root.pros.append(selected_reason)
                         unused_reasons.remove(selected_reason)
@@ -478,10 +479,10 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
                         break
                 # cons
                 while unused_reasons:
-                    "[MARKER]" where MARKER in set(["```", "- ", "  - "])
+                    "[MARKER]" where MARKER in ["```", "- ", "  - "]
                     marker = MARKER
                     if marker == "  - ":  # new con
-                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in set([reason.label for reason in unused_reasons])
+                        "\"[[[REASON_TITLE]]]\"\n" where REASON_TITLE in [reason.label for reason in unused_reasons]
                         selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
                         root.cons.append(selected_reason)
                         unused_reasons.remove(selected_reason)
@@ -537,6 +538,14 @@ class ProsConsBuilderLMQL(LMQLDebugger):
         """
 
         labels = [reason.label for reason in reasons]
+
+        # replace empty labels with defaults
+        labels = [
+            label if label else f"Reason-{enum}"
+            for enum, label
+            in enumerate(labels)
+        ]
+
         duplicate_labels = [label for label in labels if labels.count(label) > 1]
         if not duplicate_labels:
             return reasons
