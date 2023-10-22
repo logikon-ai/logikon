@@ -5,6 +5,7 @@ from typing import Mapping, List
 from logikon.debuggers.base import Debugger, AbstractScoreDebugger, AbstractArtifactDebugger
 from logikon.debuggers.exporters.networkx_exporter import NetworkXExporter, RelevanceNetworkNXExporter
 from logikon.debuggers.exporters.svgmap_exporter import SVGMapExporter
+from logikon.debuggers.exporters.svgsunburst_exporter import SVGSunburstExporter
 from logikon.debuggers.reconstruction.claim_extractor import ClaimExtractor
 from logikon.debuggers.reconstruction.informal_argmap_builder import InformalArgMapBuilder
 from logikon.debuggers.reconstruction.issue_builder_lmql import IssueBuilderLMQL
@@ -28,6 +29,7 @@ _DEBUGGER_REGISTRY: Mapping[str, List[type[Debugger]]] = {
     "relevance_network_nx": [RelevanceNetworkNXExporter],
     "fuzzy_argmap_nx": [FuzzyArgMapBuilder],
     "svg_argmap": [SVGMapExporter],
+    "svg_sunburst": [SVGSunburstExporter],
     "argmap_size": [ArgMapGraphSizeScorer],
     "argmap_avg_katz_centrality": [ArgMapGraphAvgKatzCScorer],
     "argmap_attack_ratio": [ArgMapGraphAttackRatioScorer],

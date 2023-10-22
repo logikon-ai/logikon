@@ -1,5 +1,5 @@
 # Test artifacts
-test_graph.svg
+test_*.svg
 
 # VS Code
 .vscode

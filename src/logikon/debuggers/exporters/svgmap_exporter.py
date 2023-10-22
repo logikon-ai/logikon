@@ -23,10 +23,11 @@ class SVGMapExporter(AbstractArtifactDebugger):
     This debugger exports an a networkx graph as svg via graphviz.
 
     It requires the following artifacts:
+    - fuzzy_argmap_nx, OR
     - networkx_graph
     """
 
-    __pdescription__ = "Exports an informal argmap as a networkx graph"
+    __pdescription__ = "Exports a networkx graph as a graphviz argument map (svg)"
     __product__ = "svg_argmap"
     __requirements__ = [
         {"fuzzy_argmap_nx"},
@@ -89,7 +90,7 @@ class SVGMapExporter(AbstractArtifactDebugger):
                     if linkdata["valence"] == am.ATTACK
                     else sns.color_palette("blend:darkgrey,darkgreen", as_cmap=True)
                 )
-                color = cmap(.2 + linkdata.pop("weight"))  # dropping weight from edge data
+                color = cmap(0.2 + linkdata.pop("weight"))  # dropping weight from edge data
                 linkdata["color"] = matplotlib.colors.to_hex(color)
             else:
                 linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
