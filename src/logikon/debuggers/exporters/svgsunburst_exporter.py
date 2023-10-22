@@ -122,7 +122,7 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
                     y=0.2,
                     bgcolor='white',
                     bordercolor='black',
-                    borderwidth=0
+                    borderwidth=0,
                 )
             ]
         )

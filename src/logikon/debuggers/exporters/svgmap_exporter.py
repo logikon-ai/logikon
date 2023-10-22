@@ -34,9 +34,9 @@ class SVGMapExporter(AbstractArtifactDebugger):
         {"networkx_graph"},
     ]  # alternative requirements sets, first set takes precedence when automatically building pipeline
 
-    #_NODE_TEMPLATE = """<
-    #<TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
-    #>"""
+    # _NODE_TEMPLATE = """<
+    # <TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
+    # >"""
 
     _NODE_TEMPLATE = """<
     <TABLE BORDER="4" COLOR="{bgcolor}" CELLPADDING="2" CELLSPACING="2"  BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>{label}</B></FONT></TD></TR><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0">{text}</FONT></TD></TR></TABLE>
