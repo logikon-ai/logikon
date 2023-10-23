@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Tuple
 
 import copy
+import textwrap
 import uuid
 
 import plotly.express as px
@@ -18,27 +19,28 @@ from logikon.debuggers.base import AbstractArtifactDebugger
 from logikon.schemas.results import Artifact, DebugState
 
 MAX_LABEL_LEN = 12
+WITH_LEGEND = False
 
 
-class SVGSunburstExporter(AbstractArtifactDebugger):
-    """SVGSunburstExporter Debugger
+class HTMLSunburstExporter(AbstractArtifactDebugger):
+    """HTMLSunburstExporter Debugger
 
-    This debugger exports an a networkx graph as svg sunburst vial plotly express.
+    This debugger exports an a networkx graph as html sunburst vial plotly express.
 
     It requires the following artifacts:
     - fuzzy_argmap_nx, OR
     - networkx_graph
     """
 
-    __pdescription__ = "Exports a networkx graph as a SVG sunburst"
-    __product__ = "svg_sunburst"
+    __pdescription__ = "Exports a networkx graph as a HTML sunburst"
+    __product__ = "html_sunburst"
     __requirements__ = [
         {"fuzzy_argmap_nx", "issue"},
         {"networkx_graph", "issue"},
     ]  # alternative requirements sets, first set takes precedence when automatically building pipeline
 
     def _to_tree_data(self, digraph: nx.DiGraph, issue: str) -> tuple[list[dict], dict, str]:
-        """builds svg sunburst from nx graph"""
+        """builds html sunburst from nx graph"""
 
         tree_data = []
         color_map = {}
@@ -54,15 +56,19 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
         # color_map[issue_id] = "white"
 
         enum = 0
+        n_roots = 0
         for node, nodedata in digraph.nodes.items():
             enum += 1
-            name = f"#{enum}"
+            number = f"#{enum}" if WITH_LEGEND else ""
             label = nodedata.get("label", "No label")
-            legend_lines.append(f"{name}: {label}")
+            text = nodedata.get("text", "No text")
+            text = "<BR>".join(textwrap.wrap(text, width=30))
+            legend_lines.append(f"{number}: {label}")
 
             if digraph.out_degree(node) == 0:
                 parent = ""  # issue_id
-                color = "goldenrod"
+                color = px.colors.qualitative.Pastel[n_roots % len(px.colors.qualitative.Pastel2)]
+                n_roots += 1
             else:
                 # get parent with highest link weight
                 neighbors = [(n, digraph[node][n].get("weight", 1)) for n in digraph[node]]
@@ -84,7 +90,9 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             tree_data.append(
                 dict(
                     id=node,
-                    name=name,
+                    number=number,
+                    label=label,
+                    text=text,
                     parent=parent,
                     value=value,
                 )
@@ -95,13 +103,15 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
 
         return tree_data, color_map, legend
 
-    def _to_svg(self, tree_data: list[dict], color_map: dict, issue: str, legend: str) -> str:
-        """builds svg sunburst from tree data"""
+    def _to_html(self, tree_data: list[dict], color_map: dict, issue: str, legend: str) -> str:
+        """builds html sunburst from tree data"""
 
         fig = px.sunburst(
             tree_data,
             ids='id',
-            names='name',
+            names='number',
+            hover_name='label',
+            hover_data={'text': True, 'value': False, 'parent': False, 'id': False, 'label': False, 'number': False},
             parents='parent',
             values='value',
             color='id',
@@ -112,29 +122,31 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
             # branchvalues="total",
         )
         fig.update_traces(marker_line_width=2)
-        fig.update_layout(
-            annotations=[
-                go.layout.Annotation(
-                    text=legend,
-                    align='left',
-                    valign='middle',
-                    width=100,
-                    height=640,
-                    xref='paper',
-                    yref='paper',
-                    x=1.1,
-                    y=0.5,
-                    bgcolor='white',
-                    bordercolor='black',
-                    borderwidth=0,
-                    showarrow=False,
-                )
-            ]
-        )
 
-        svg = fig.to_image(format="svg").decode("utf-8")
+        if WITH_LEGEND:
+            fig.update_layout(
+                annotations=[
+                    go.layout.Annotation(
+                        text=legend,
+                        align='left',
+                        valign='middle',
+                        width=100,
+                        height=640,
+                        xref='paper',
+                        yref='paper',
+                        x=1.1,
+                        y=0.5,
+                        bgcolor='white',
+                        bordercolor='black',
+                        borderwidth=0,
+                        showarrow=False,
+                    )
+                ]
+            )
 
-        return svg
+        html = fig.to_html(full_html=True, include_plotlyjs="cdn")
+
+        return html
 
     def _debug(self, debug_state: DebugState):
         """Reconstruct reasoning as argmap."""
@@ -155,12 +167,12 @@ class SVGSunburstExporter(AbstractArtifactDebugger):
 
         tree_data, color_map, legend = self._to_tree_data(networkx_graph, issue)
 
-        svg_sunburst = self._to_svg(tree_data, color_map, issue, legend)
+        html_sunburst = self._to_html(tree_data, color_map, issue, legend)
 
         artifact = Artifact(
             id=self.get_product(),
             description=self.get_description(),
-            data=svg_sunburst,
+            data=html_sunburst,
         )
 
         debug_state.artifacts.append(artifact)

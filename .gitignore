@@ -1,5 +1,6 @@
 # Test artifacts
 test_*.svg
+test_*.html
 
 # VS Code
 .vscode

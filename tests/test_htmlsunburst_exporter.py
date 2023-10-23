@@ -3,7 +3,7 @@ import pytest
 
 import os
 
-from logikon.debuggers.exporters.svgsunburst_exporter import SVGSunburstExporter
+from logikon.debuggers.exporters.htmlsunburst_exporter import HTMLSunburstExporter
 from logikon.schemas.configs import DebugConfig
 import logikon.schemas.argument_mapping as am
 
@@ -58,6 +58,7 @@ def nx_map3() -> nx.DiGraph:
         "graph": {},
         "nodes": [
             {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
+            {"text": "claim 2", "label": "claim2", "annotations": [], "nodeType": "proposition", "id": "n00"},
             {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
             {
                 "text": "con 3",
@@ -76,32 +77,32 @@ def nx_map3() -> nx.DiGraph:
     return nx_graph
 
 
-def test_svg_exporter_save(nx_map2):
+def test_html_exporter_save(nx_map2):
     config = DebugConfig()
-    svgsunburst_exporter = SVGSunburstExporter(config)
-    tree_data, color_map, legend = svgsunburst_exporter._to_tree_data(nx_map2, "Issue 1")
+    htmlsunburst_exporter = HTMLSunburstExporter(config)
+    tree_data, color_map, legend = htmlsunburst_exporter._to_tree_data(nx_map2, "Issue 1")
     print(tree_data)
-    svgsunburst = svgsunburst_exporter._to_svg(tree_data, color_map, "Issue 2", legend)
+    htmlsunburst = htmlsunburst_exporter._to_html(tree_data, color_map, "Issue 2", legend)
 
-    assert isinstance(svgsunburst, str)
+    assert isinstance(htmlsunburst, str)
 
-    assert svgsunburst.startswith('<svg')
+    assert htmlsunburst.startswith('<html')
 
-    with open("test_svgsunburst1.svg", 'w') as f:
-        f.write(svgsunburst)
+    with open("test_sunburst1.html", 'w') as f:
+        f.write(htmlsunburst)
 
-    assert os.path.isfile("test_svgsunburst1.svg")
+    assert os.path.isfile("test_sunburst1.html")
 
 
-def test_svg_exporter_weighted(nx_map3):
+def test_html_exporter_weighted(nx_map3):
     config = DebugConfig()
-    svgsunburst_exporter = SVGSunburstExporter(config)
-    tree_data, color_map, legend = svgsunburst_exporter._to_tree_data(nx_map3, "Issue 3")
-    svgsunburst = svgsunburst_exporter._to_svg(tree_data, color_map, "Issue 3", legend)
+    htmlsunburst_exporter = HTMLSunburstExporter(config)
+    tree_data, color_map, legend = htmlsunburst_exporter._to_tree_data(nx_map3, "Issue 3")
+    htmlsunburst = htmlsunburst_exporter._to_html(tree_data, color_map, "Issue 3", legend)
 
-    assert isinstance(svgsunburst, str)
+    assert isinstance(htmlsunburst, str)
 
-    with open("test_svgsunburst2.svg", 'w') as f:
-        f.write(svgsunburst)
+    with open("test_sunburst2.html", 'w') as f:
+        f.write(htmlsunburst)
 
-    assert os.path.isfile("test_svgsunburst2.svg")
+    assert os.path.isfile("test_sunburst2.html")
