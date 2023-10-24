@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Optional, Union, Type, List, Mapping, Dict
 
 import copy
+import logging
 from pydantic import BaseModel
 import yaml
 
@@ -139,8 +140,11 @@ class ScoreConfig(BaseModel):
             Optional[DebuggerConfig]: config info for debugger type
         """
 
+        if any(isinstance(key, str) for key in self.debugger_configs):
+            self.logger.warning("Found string keys in debugger_configs. These will be ignored by get_debugger_config(). Consider calling cast() first.")
+
         config_data = copy.deepcopy(self.global_kwargs)
-        
+
         if debugger in self.debugger_configs:
             if isinstance(self.debugger_configs[debugger], dict):
                 config_data.update(self.debugger_configs[debugger])
@@ -156,3 +160,10 @@ class ScoreConfig(BaseModel):
 
         return debugger_config
 
+
+    @property
+    def logger(self) -> logging.Logger:
+        """
+        A :class:`logging.Logger` that can be used within the :meth:`run()` method.
+        """
+        return logging.getLogger(self.__class__.__name__)
