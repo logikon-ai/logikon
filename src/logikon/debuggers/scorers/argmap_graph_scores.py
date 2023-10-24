@@ -19,7 +19,11 @@ class AbstractGraphScorer(AbstractScoreDebugger):
     - networkx_graph
     """
 
-    __requirements__ = ["networkx_graph"]
+    __requirements__ = [
+        {"fuzzy_argmap_nx"},
+        {"networkx_graph"},
+    ]  # alternative requirements sets, first set takes precedence when automatically building pipeline
+
 
     @abstractmethod
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:

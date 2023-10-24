@@ -13,7 +13,6 @@ from unidecode import unidecode
 import logikon
 import logikon.schemas.argument_mapping as am
 from logikon.debuggers.base import AbstractArtifactDebugger
-from logikon.schemas.configs import DebugConfig
 from logikon.schemas.results import Artifact, DebugState
 
 
@@ -42,8 +41,8 @@ class SVGMapExporter(AbstractArtifactDebugger):
     <TABLE BORDER="4" COLOR="{bgcolor}" CELLPADDING="2" CELLSPACING="2"  BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>{label}</B></FONT></TD></TR><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0">{text}</FONT></TD></TR></TABLE>
     >"""
 
-    def __init__(self, debug_config: DebugConfig):
-        super().__init__(debug_config)
+    def __init__(self, config):
+        super().__init__(config)
         # check if graphviz is available
         try:
             import subprocess

@@ -4,7 +4,7 @@ import pytest
 import os
 
 from logikon.debuggers.exporters.svgmap_exporter import SVGMapExporter
-from logikon.schemas.configs import DebugConfig
+from logikon.debuggers.base import ArtifcatDebuggerConfig
 import logikon.schemas.argument_mapping as am
 
 
@@ -71,7 +71,7 @@ def nx_map3() -> nx.DiGraph:
 
 
 def test_preprocessor01(nx_map1):
-    config = DebugConfig()
+    config = ArtifcatDebuggerConfig()
     svgmap_exporter = SVGMapExporter(config)
     nx_map_pp = svgmap_exporter._preprocess_graph(nx_map1)
 
@@ -84,7 +84,7 @@ def test_preprocessor01(nx_map1):
 
 
 def test_svg_exporter(nx_map1):
-    config = DebugConfig()
+    config = ArtifcatDebuggerConfig()
     svgmap_exporter = SVGMapExporter(config)
     svgmap = svgmap_exporter._to_svg(nx_map1)
     assert isinstance(svgmap, str)
@@ -97,7 +97,7 @@ def test_svg_exporter(nx_map1):
 
 
 def test_svg_exporter_save(nx_map2):
-    config = DebugConfig()
+    config = ArtifcatDebuggerConfig()
     svgmap_exporter = SVGMapExporter(config)
     svgmap = svgmap_exporter._to_svg(nx_map2)
     assert isinstance(svgmap, str)
@@ -109,7 +109,7 @@ def test_svg_exporter_save(nx_map2):
 
 
 def test_svg_exporter_weighted(nx_map3):
-    config = DebugConfig()
+    config = ArtifcatDebuggerConfig()
     svgmap_exporter = SVGMapExporter(config)
     svgmap = svgmap_exporter._to_svg(nx_map3)
     assert isinstance(svgmap, str)

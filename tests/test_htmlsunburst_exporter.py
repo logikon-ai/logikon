@@ -4,7 +4,7 @@ import pytest
 import os
 
 from logikon.debuggers.exporters.htmlsunburst_exporter import HTMLSunburstExporter
-from logikon.schemas.configs import DebugConfig
+from logikon.debuggers.base import ArtifcatDebuggerConfig
 import logikon.schemas.argument_mapping as am
 
 
@@ -78,7 +78,7 @@ def nx_map3() -> nx.DiGraph:
 
 
 def test_html_exporter_save(nx_map2):
-    config = DebugConfig()
+    config = ArtifcatDebuggerConfig()
     htmlsunburst_exporter = HTMLSunburstExporter(config)
     tree_data, color_map, legend = htmlsunburst_exporter._to_tree_data(nx_map2, "Issue 1")
     print(tree_data)
@@ -95,7 +95,7 @@ def test_html_exporter_save(nx_map2):
 
 
 def test_html_exporter_weighted(nx_map3):
-    config = DebugConfig()
+    config = ArtifcatDebuggerConfig()
     htmlsunburst_exporter = HTMLSunburstExporter(config)
     tree_data, color_map, legend = htmlsunburst_exporter._to_tree_data(nx_map3, "Issue 3")
     htmlsunburst = htmlsunburst_exporter._to_html(tree_data, color_map, "Issue 3", legend)

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Callable, Tuple, Mapping
+from typing import List, Optional, Callable, Tuple, Mapping, Type
 
 import copy
 import functools as ft
 
 from logikon.debuggers.interface import Debugger
 from logikon.debuggers.registry import get_debugger_registry
-from logikon.schemas.configs import DebugConfig
+from logikon.schemas.configs import ScoreConfig
 from logikon.schemas.results import DebugState, Artifact
 
 
@@ -46,11 +46,11 @@ class DebuggerFactory:
 
         return state
 
-    def _run_consistency_checks(self, config: DebugConfig, input_ids: List[str], registry: Mapping):
+    def _run_consistency_checks(self, config: ScoreConfig, input_ids: List[str], registry: Mapping):
         """consistency check for current configuration
 
         Args:
-            config (DebugConfig): configuration
+            config (ScoreConfig): configuration
             input_ids (List[str]): input ids provided in config
             registry (Mapping): current debugger registry
         """
@@ -81,24 +81,24 @@ class DebuggerFactory:
                         f"Inconsistent configuration. {key.get_product()} provided as input but also as metric / artifact."
                     )
 
-    def _collect_debuggers(
-        self, config: DebugConfig, input_ids: List[str], registry: Mapping[str, List[type[Debugger]]]
+    def _initialize_debuggers(
+        self, config: ScoreConfig, input_ids: List[str], registry: Mapping[str, List[type[Debugger]]]
     ) -> List[Debugger]:
-        """collects all debuggers required for running current configuration
+        """collect and initialize all debuggers required for running current configuration
 
         Args:
-            config (DebugConfig): configuration
+            config (ScoreConfig): configuration
             input_ids (List[str]): inputs
             registry (Mapping[str, List[type): available debuggers
         """
 
-        # Create list of debuggers from config and registry
-        debuggers: List[Debugger] = []
+        # Create list of debuggers classes from config and registry
+        debuggers: List[Type[Debugger]] = []
         for key in config.metrics + config.artifacts:
             if isinstance(key, str):
-                new_debugger = registry[key][0](config)  # first debugger class in registry list is default
+                new_debugger = registry[key][0]  # first debugger class in registry list is default
             else:
-                new_debugger = key(config)
+                new_debugger = key
             debuggers.append(new_debugger)
 
         # Check if all requirements are met and add further debuggers as necessary
@@ -132,10 +132,16 @@ class DebuggerFactory:
                 if missing_product_kw not in registry:
                     msg = f"Debugger requirement '{missing_product_kw}' does not correspond to a registered debugger."
                     raise ValueError(msg)
-                new_debugger = registry[missing_product_kw][0](config)
+                new_debugger = registry[missing_product_kw][0]
                 debuggers.append(new_debugger)
 
-        return debuggers
+        # Initialize debuggers
+        debuggers_ini = []
+        for debugger in debuggers:
+            debugger_config = config.get_debugger_config(debugger)
+            debuggers_ini.append(debugger(config=debugger_config))
+
+        return debuggers_ini
 
     def _build_pipeline(self, debuggers: List[Debugger], input_ids: List[str]) -> List[Debugger]:
         """builds debugger pipeline respecting requirements
@@ -167,15 +173,17 @@ class DebuggerFactory:
 
         return pipeline
 
-    def create(self, config: DebugConfig) -> Tuple[Optional[Callable], Optional[List[Debugger]]]:
+    def create(self, config: ScoreConfig) -> Tuple[Optional[Callable], Optional[List[Debugger]]]:
         """Create a debugger pipeline based on a config."""
 
         registry = get_debugger_registry()
         input_ids = [inpt.id for inpt in config.inputs]
 
+        config = config.cast(registry)
+
         self._run_consistency_checks(config, input_ids, registry)
 
-        debuggers = self._collect_debuggers(config, input_ids, registry)
+        debuggers = self._initialize_debuggers(config, input_ids, registry)
 
         pipeline = self._build_pipeline(debuggers, input_ids)
 

@@ -1,14 +1,16 @@
 # test score function
 
-from logikon.schemas.configs import DebugConfig
+from logikon.schemas.configs import ScoreConfig
 
 
 def test_configs():
-    config = DebugConfig()
-    assert config.expert_model == "gpt-3.5-turbo-instruct"
+    config = ScoreConfig()
+    assert "proscons" in config.artifacts
 
-    config = DebugConfig(
-        expert_model="text-ada-002",
-        llm_framework="VLLM",
+    config = ScoreConfig(
+        global_kwargs=dict(
+            expert_model="text-ada-002",
+            llm_framework="VLLM",
+        )
     )
-    assert config.expert_model == "text-ada-002"
+    assert config.global_kwargs["expert_model"] == "text-ada-002"

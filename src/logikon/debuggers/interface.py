@@ -1,14 +1,15 @@
 # interface.py
 
 from abc import ABC, abstractmethod
-from typing import List, Union
+from typing import List, Union, Type
 
+from pydantic import BaseModel
 
 class Debugger(ABC):
     """Abstract base class for all debuggers."""
 
     @abstractmethod
-    def __init__(self, debug_config):
+    def __init__(self, config):
         pass
 
     @abstractmethod
@@ -32,7 +33,16 @@ class Debugger(ABC):
         """Get config keywords of metrics / artifacts that are required for the debugger."""
         pass
 
+    @classmethod
+    @abstractmethod
+    def get_config_class(cls) -> Type:
+        """Get type of config class (subclass of DebuggerConfig)."""
+        pass
+
     @property
     @abstractmethod
     def product_type(self) -> str:
         pass
+
+class DebuggerConfig(BaseModel):
+    pass

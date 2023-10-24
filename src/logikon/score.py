@@ -5,27 +5,27 @@ from typing import Any, Dict, List, Optional, Union
 import copy
 
 from logikon.debuggers.factory import DebuggerFactory
-from logikon.schemas.configs import DebugConfig
+from logikon.schemas.configs import ScoreConfig
 from logikon.schemas.results import DebugState, Artifact, INPUT_KWS
 
 
 def score(
     prompt: Optional[str] = None,
     completion: Optional[str] = None,
-    config: Optional[DebugConfig] = None,
+    config: Optional[Union[ScoreConfig,str]] = None,
 ) -> Optional[DebugState]:
     """Score the completion."""
 
     if config is None:
         if prompt is None and completion is None:
             return None
-        config = DebugConfig()
+        config = ScoreConfig()
+    elif isinstance(config, str):
+        config = ScoreConfig.parse_file(config)
     else:
         config = copy.deepcopy(config)
 
-    # TODO: optionally load configuration from yaml config file
-
-    # add prompt and completion to config
+    # add prompt and completion as input artifacts to config
     if prompt is not None:
         if any(inpt.id == INPUT_KWS.prompt for inpt in config.inputs):
             raise ValueError(

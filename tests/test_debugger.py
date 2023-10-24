@@ -1,18 +1,23 @@
 # test score function
-from typing import List, Optional
+from typing import List, Type
 
 import pytest
 
-from logikon.debuggers.base import AbstractArtifactDebugger, AbstractScoreDebugger
-from logikon.schemas.configs import DebugConfig
+from logikon.debuggers.base import AbstractArtifactDebugger, AbstractScoreDebugger, ScoreDebuggerConfig, ArtifcatDebuggerConfig
 from logikon.schemas.results import Artifact, DebugState, Score, INPUT_KWS
 
+class DummyDebuggerConfig(ArtifcatDebuggerConfig):
+    pass
+
+class DummyDebuggerConfig2(ScoreDebuggerConfig):
+    pass
 
 class DummyDebugger1(AbstractArtifactDebugger):
     """Dummy Debugger"""
 
     __pdescription__ = "dummy_debugger1"
     __product__ = "dummy_artifact1"
+    __configclass__: Type[ArtifcatDebuggerConfig] = DummyDebuggerConfig
 
     def _debug(self, debug_state: DebugState):
         prompt, completion = debug_state.get_prompt_completion()
@@ -32,6 +37,7 @@ class DummyDebugger2(AbstractScoreDebugger):
     __pdescription__ = "dummy_debugger2"
     __product__ = "dummy_metric2"
     __requirements__ = ["dummy_artifact1"]
+    __configclass__: Type[ScoreDebuggerConfig] = DummyDebuggerConfig2
 
     def _debug(self, debug_state: DebugState):
         """Length of prompt."""
@@ -46,19 +52,21 @@ class DummyDebugger2(AbstractScoreDebugger):
 
 
 def test_debugger_pipeline():
-    config = DebugConfig()
+    config = DummyDebuggerConfig()
+    config2 = DummyDebuggerConfig2()
 
     debugger1 = DummyDebugger1(config)
-    debugger2 = DummyDebugger2(config)
+    debugger2 = DummyDebugger2(config2)
 
     prompt = "01234"
     completion = "56789"
 
-    config.inputs.append(Artifact(id=INPUT_KWS.prompt, description="Prompt", data=prompt, dtype="str"))
-    config.inputs.append(Artifact(id=INPUT_KWS.completion, description="Completion", data=completion, dtype="str"))
+    inputs = []
+    inputs.append(Artifact(id=INPUT_KWS.prompt, description="Prompt", data=prompt, dtype="str"))
+    inputs.append(Artifact(id=INPUT_KWS.completion, description="Completion", data=completion, dtype="str"))
 
     # manual pipeline
-    results = DebugState(inputs=config.inputs)
+    results = DebugState(inputs=inputs)
     results = debugger1(debug_state=results)
     results = debugger2(debug_state=results)
 

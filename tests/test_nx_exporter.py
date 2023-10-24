@@ -1,7 +1,7 @@
 import networkx as nx
 import pytest
 
-from logikon.debuggers.exporters.networkx_exporter import NetworkXExporter, RelevanceNetworkNXExporter
+from logikon.debuggers.exporters.networkx_exporter import RelevanceNetworkNXExporter
 from logikon.schemas.argument_mapping import (
     AnnotationSpan,
     ArgMapEdge,
@@ -10,7 +10,7 @@ from logikon.schemas.argument_mapping import (
     FuzzyArgMapEdge,
     FuzzyArgMap,
 )
-from logikon.schemas.configs import DebugConfig
+from logikon.debuggers.base import ArtifcatDebuggerConfig
 import logikon.schemas.argument_mapping as am
 
 
@@ -42,25 +42,10 @@ def reln1() -> FuzzyArgMap:
     return FuzzyArgMap(nodelist=nodelist, edgelist=edgelist)
 
 
-def test_nx_exporter(argmap1: InformalArgMap):
-    nx_exporter = NetworkXExporter(DebugConfig())
-    nx_map = nx_exporter._to_nx(argmap1.dict())
-
-    print(nx.node_link_data(nx_map))
-
-    assert isinstance(nx_map, nx.DiGraph)
-
-    assert len(nx_map.nodes) == len(argmap1.nodelist)
-    assert len(nx_map.edges) == len(argmap1.edgelist)
-
-    for node, nodedata in nx_map.nodes.items():
-        original_node = next(n for n in argmap1.nodelist if n.id == node)
-        assert nodedata["label"] == original_node.label
-        assert nodedata["text"] == original_node.text
 
 
 def test_nx_exporter2(reln1: FuzzyArgMap):
-    nx_exporter = RelevanceNetworkNXExporter(DebugConfig())
+    nx_exporter = RelevanceNetworkNXExporter(ArtifcatDebuggerConfig())
     nx_map = nx_exporter._to_nx(reln1.dict())
 
     print(nx.node_link_data(nx_map))

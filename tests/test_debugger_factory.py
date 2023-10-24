@@ -3,7 +3,7 @@
 from logikon.debuggers.base import AbstractArtifactDebugger, AbstractDebugger, AbstractScoreDebugger
 from logikon.debuggers.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
 from logikon.debuggers.factory import DebuggerFactory, get_debugger_registry
-from logikon.schemas.configs import DebugConfig
+from logikon.schemas.configs import ScoreConfig
 
 
 def test_debugger_factory():
@@ -22,32 +22,49 @@ def test_debugger_factory():
                 print("Unknown debugger class type")
                 raise AssertionError()
 
-            config = DebugConfig(metrics=metrics, artifacts=artifacts)
+            config = ScoreConfig(
+                metrics=metrics,
+                artifacts=artifacts,
+                global_kwargs=dict(
+                    expert_model="text-ada-002",
+                    llm_framework="OpenAI",
+                )
+            )
 
             debug_chain, _ = DebuggerFactory().create(config)
             assert callable(debug_chain)
 
 
 def test_debugger_factory2():
-    config = DebugConfig(
-        expert_model="text-ada-002",
-        llm_framework="VLLM",
+    config = ScoreConfig(
+        global_kwargs=dict(
+            expert_model="text-ada-002",
+            llm_framework="OpenAI",
+        )
     )
     debug_chain, _ = DebuggerFactory().create(config)
     assert callable(debug_chain)
 
 
 def test_debugger_factory3():
-    config = DebugConfig(
+    config = ScoreConfig(
         artifacts=["svg_argmap", "fuzzy_argmap_nx", "relevance_network_nx"],
+        global_kwargs=dict(
+            expert_model="text-ada-002",
+            llm_framework="OpenAI",
+        )
     )
     debug_chain, _ = DebuggerFactory().create(config)
     assert callable(debug_chain)
 
 
 def test_altern_requirements():
-    config = DebugConfig(
+    config = ScoreConfig(
         artifacts=["svg_argmap"],
+        global_kwargs=dict(
+            expert_model="text-ada-002",
+            llm_framework="OpenAI",
+        )
     )
     debug_chain, pipeline = DebuggerFactory().create(config)
 

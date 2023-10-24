@@ -5,7 +5,7 @@ import os
 
 import logikon.schemas.argument_mapping as am
 from logikon.debuggers.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
-from logikon.schemas.configs import DebugConfig
+from logikon.debuggers.base import ArtifcatDebuggerConfig
 
 
 @pytest.fixture(name="nx_map1")
@@ -56,7 +56,7 @@ def nx_map2() -> nx.DiGraph:
 
 
 def test_preprocessor01(nx_map1: nx.DiGraph):
-    config = DebugConfig()
+    config = ArtifcatDebuggerConfig()
     debugger = FuzzyArgMapBuilder(config)
 
     print(nx.node_link_data(nx_map1))
@@ -76,7 +76,7 @@ def test_preprocessor01(nx_map1: nx.DiGraph):
 
 
 def test_reduction_workflow(nx_map1: nx.DiGraph):
-    config = DebugConfig()
+    config = ArtifcatDebuggerConfig()
     debugger = FuzzyArgMapBuilder(config)
 
     print(f"Original rel network:\n{nx.node_link_data(nx_map1)}")

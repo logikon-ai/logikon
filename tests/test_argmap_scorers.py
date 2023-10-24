@@ -6,7 +6,7 @@ from logikon.debuggers.scorers.argmap_graph_scores import (
     ArgMapGraphAvgKatzCScorer,
     ArgMapGraphSizeScorer,
 )
-from logikon.schemas.configs import DebugConfig
+from logikon.debuggers.base import ScoreDebuggerConfig
 
 
 @pytest.fixture(name="nx_map1")
@@ -51,7 +51,7 @@ def nx_map2() -> nx.DiGraph:
 
 
 def test_argmap_size_scorer01(nx_map1):
-    scorer = ArgMapGraphSizeScorer(DebugConfig())
+    scorer = ArgMapGraphSizeScorer(ScoreDebuggerConfig())
     score, comment, meta = scorer._calculate_score(nx_map1)
 
     assert score == len(nx_map1.nodes)
@@ -60,7 +60,7 @@ def test_argmap_size_scorer01(nx_map1):
 
 
 def test_argmap_katz_scorer01(nx_map1, nx_map2):
-    scorer = ArgMapGraphAvgKatzCScorer(DebugConfig())
+    scorer = ArgMapGraphAvgKatzCScorer(ScoreDebuggerConfig())
     score1, _, _ = scorer._calculate_score(nx_map1)
     score2, _, _ = scorer._calculate_score(nx_map2)
 
@@ -68,7 +68,7 @@ def test_argmap_katz_scorer01(nx_map1, nx_map2):
 
 
 def test_argmap_attackratio_scorer01(nx_map1, nx_map2):
-    scorer = ArgMapGraphAttackRatioScorer(DebugConfig())
+    scorer = ArgMapGraphAttackRatioScorer(ScoreDebuggerConfig())
     score1, _, _ = scorer._calculate_score(nx_map1)
     score2, _, _ = scorer._calculate_score(nx_map2)
 

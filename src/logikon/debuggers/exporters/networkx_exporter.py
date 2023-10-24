@@ -73,22 +73,22 @@ class AbstractNetworkXExporter(AbstractArtifactDebugger):
         debug_state.artifacts.append(artifact)
 
 
-class NetworkXExporter(AbstractNetworkXExporter):
-    """NetworkXExporter Debugger
-
-    This debugger exports an informal argmap as a networkx graph.
-
-    It requires the following artifacts:
-    - informal_argmap
-    """
-
-    __pdescription__ = "Informal argmap rendered as a networkx graph"
-    __product__ = "networkx_graph"
-    __requirements__ = ["informal_argmap"]
-
-    @property
-    def __input_class__(self) -> type:
-        return InformalArgMap
+# class NetworkXExporter(AbstractNetworkXExporter):
+#     """NetworkXExporter Debugger
+# 
+#     This debugger exports an informal argmap as a networkx graph.
+# 
+#     It requires the following artifacts:
+#     - informal_argmap
+#     """
+# 
+#     __pdescription__ = "Informal argmap rendered as a networkx graph"
+#     __product__ = "networkx_graph"
+#     __requirements__ = ["informal_argmap"]
+# 
+#     @property
+#     def __input_class__(self) -> type:
+#         return InformalArgMap
 
 
 class RelevanceNetworkNXExporter(AbstractNetworkXExporter):

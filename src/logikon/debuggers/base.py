@@ -1,10 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Type
 
-from logikon.schemas.configs import DebugConfig
 from logikon.schemas.results import DebugState
-from logikon.debuggers.interface import Debugger
+from logikon.debuggers.interface import Debugger, DebuggerConfig
 
 ARTIFACT = "ARTIFACT"
 SCORE = "SCORE"
@@ -18,9 +17,10 @@ class AbstractDebugger(Debugger):
     __product__: Optional[str] = None
     __requirements__: list[Union[str, set]] = []
     __pdescription__: Optional[str] = None
+    __configclass__: Optional[Type] = None
 
-    def __init__(self, debug_config: DebugConfig):
-        self._debug_config = debug_config
+    def __init__(self, config: DebuggerConfig):
+        self._config = config
 
     @abstractmethod
     def _debug(self, debug_state: DebugState):
@@ -50,6 +50,15 @@ class AbstractDebugger(Debugger):
             raise ValueError(f"Product description not defined for {cls.__name__}.")
         return cls.__pdescription__
 
+    @classmethod
+    def get_config_class(cls) -> Type:
+        if cls.__configclass__ is None:
+            raise ValueError(f"Config class not defined for {cls.__name__}.")
+        # check if configclass is subclass of DebuggerConfig
+        if not issubclass(cls.__configclass__, DebuggerConfig):
+            raise ValueError(f"Config class {cls.__name__} not derived from DebuggerConfig.")
+        return cls.__configclass__
+
     @property
     def logger(self) -> logging.Logger:
         """
@@ -58,20 +67,29 @@ class AbstractDebugger(Debugger):
         return logging.getLogger(self.__class__.__name__)
 
 
+class ArtifcatDebuggerConfig(DebuggerConfig):
+    pass
+
 class AbstractArtifactDebugger(AbstractDebugger):
     """
     Base debugger class for creating artifacts.
     """
 
+    __configclass__ = ArtifcatDebuggerConfig
+
     @property
     def product_type(self) -> str:
         return ARTIFACT
 
+class ScoreDebuggerConfig(DebuggerConfig):
+    pass
 
 class AbstractScoreDebugger(AbstractDebugger):
     """
-    Base debugger class for creating scroes.
+    Base debugger class for creating scores.
     """
+
+    __configclass__ = ScoreDebuggerConfig
 
     @property
     def product_type(self) -> str:
