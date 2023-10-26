@@ -53,12 +53,6 @@
 
             </li>
             <li>
-                    <a class="class" href="#NetworkXExporter">NetworkXExporter</a>
-                            <ul class="memberlist">
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#RelevanceNetworkNXExporter">RelevanceNetworkNXExporter</a>
                             <ul class="memberlist">
                 </ul>
@@ -160,22 +154,22 @@
 </span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>        <span class="n">debug_state</span><span class="o">.</span><span class="n">artifacts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">artifact</span><span class="p">)</span>
 </span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
 </span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="k">class</span> <span class="nc">NetworkXExporter</span><span class="p">(</span><span class="n">AbstractNetworkXExporter</span><span class="p">):</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NetworkXExporter Debugger</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">    This debugger exports an informal argmap as a networkx graph.</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">    It requires the following artifacts:</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">    - informal_argmap</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="n">__pdescription__</span> <span class="o">=</span> <span class="s2">&quot;Informal argmap rendered as a networkx graph&quot;</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>    <span class="n">__product__</span> <span class="o">=</span> <span class="s2">&quot;networkx_graph&quot;</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="n">__requirements__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;informal_argmap&quot;</span><span class="p">]</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>    <span class="nd">@property</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="k">def</span> <span class="nf">__input_class__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="k">return</span> <span class="n">InformalArgMap</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="c1"># class NetworkXExporter(AbstractNetworkXExporter):</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="c1">#     &quot;&quot;&quot;NetworkXExporter Debugger</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="c1"># </span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="c1">#     This debugger exports an informal argmap as a networkx graph.</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="c1"># </span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="c1">#     It requires the following artifacts:</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="c1">#     - informal_argmap</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="c1"># </span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="c1">#     __pdescription__ = &quot;Informal argmap rendered as a networkx graph&quot;</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="c1">#     __product__ = &quot;networkx_graph&quot;</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="c1">#     __requirements__ = [&quot;informal_argmap&quot;]</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="c1"># </span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="c1">#     @property</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="c1">#     def __input_class__(self) -&gt; type:</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="c1">#         return InformalArgMap</span>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="k">class</span> <span class="nc">RelevanceNetworkNXExporter</span><span class="p">(</span><span class="n">AbstractNetworkXExporter</span><span class="p">):</span>
@@ -289,67 +283,8 @@ and to export them as a networkx graph.</p>
                                 <dd id="AbstractNetworkXExporter.get_product" class="function"><a href="../base.html#AbstractDebugger.get_product">get_product</a></dd>
                 <dd id="AbstractNetworkXExporter.get_requirements" class="function"><a href="../base.html#AbstractDebugger.get_requirements">get_requirements</a></dd>
                 <dd id="AbstractNetworkXExporter.get_description" class="function"><a href="../base.html#AbstractDebugger.get_description">get_description</a></dd>
+                <dd id="AbstractNetworkXExporter.get_config_class" class="function"><a href="../base.html#AbstractDebugger.get_config_class">get_config_class</a></dd>
                 <dd id="AbstractNetworkXExporter.logger" class="variable"><a href="../base.html#AbstractDebugger.logger">logger</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="NetworkXExporter">
-                            <input id="NetworkXExporter-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">NetworkXExporter</span><wbr>(<span class="base"><a href="#AbstractNetworkXExporter">AbstractNetworkXExporter</a></span>):
-
-                <label class="view-source-button" for="NetworkXExporter-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#NetworkXExporter"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NetworkXExporter-77"><a href="#NetworkXExporter-77"><span class="linenos">77</span></a><span class="k">class</span> <span class="nc">NetworkXExporter</span><span class="p">(</span><span class="n">AbstractNetworkXExporter</span><span class="p">):</span>
-</span><span id="NetworkXExporter-78"><a href="#NetworkXExporter-78"><span class="linenos">78</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;NetworkXExporter Debugger</span>
-</span><span id="NetworkXExporter-79"><a href="#NetworkXExporter-79"><span class="linenos">79</span></a>
-</span><span id="NetworkXExporter-80"><a href="#NetworkXExporter-80"><span class="linenos">80</span></a><span class="sd">    This debugger exports an informal argmap as a networkx graph.</span>
-</span><span id="NetworkXExporter-81"><a href="#NetworkXExporter-81"><span class="linenos">81</span></a>
-</span><span id="NetworkXExporter-82"><a href="#NetworkXExporter-82"><span class="linenos">82</span></a><span class="sd">    It requires the following artifacts:</span>
-</span><span id="NetworkXExporter-83"><a href="#NetworkXExporter-83"><span class="linenos">83</span></a><span class="sd">    - informal_argmap</span>
-</span><span id="NetworkXExporter-84"><a href="#NetworkXExporter-84"><span class="linenos">84</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="NetworkXExporter-85"><a href="#NetworkXExporter-85"><span class="linenos">85</span></a>
-</span><span id="NetworkXExporter-86"><a href="#NetworkXExporter-86"><span class="linenos">86</span></a>    <span class="n">__pdescription__</span> <span class="o">=</span> <span class="s2">&quot;Informal argmap rendered as a networkx graph&quot;</span>
-</span><span id="NetworkXExporter-87"><a href="#NetworkXExporter-87"><span class="linenos">87</span></a>    <span class="n">__product__</span> <span class="o">=</span> <span class="s2">&quot;networkx_graph&quot;</span>
-</span><span id="NetworkXExporter-88"><a href="#NetworkXExporter-88"><span class="linenos">88</span></a>    <span class="n">__requirements__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;informal_argmap&quot;</span><span class="p">]</span>
-</span><span id="NetworkXExporter-89"><a href="#NetworkXExporter-89"><span class="linenos">89</span></a>
-</span><span id="NetworkXExporter-90"><a href="#NetworkXExporter-90"><span class="linenos">90</span></a>    <span class="nd">@property</span>
-</span><span id="NetworkXExporter-91"><a href="#NetworkXExporter-91"><span class="linenos">91</span></a>    <span class="k">def</span> <span class="nf">__input_class__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
-</span><span id="NetworkXExporter-92"><a href="#NetworkXExporter-92"><span class="linenos">92</span></a>        <span class="k">return</span> <span class="n">InformalArgMap</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>NetworkXExporter Debugger</p>
-
-<p>This debugger exports an informal argmap as a networkx graph.</p>
-
-<p>It requires the following artifacts:</p>
-
-<ul>
-<li>informal_argmap</li>
-</ul>
-</div>
-
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="../base.html#AbstractDebugger">logikon.debuggers.base.AbstractDebugger</a></dt>
-                                <dd id="NetworkXExporter.__init__" class="function"><a href="../base.html#AbstractDebugger.__init__">AbstractDebugger</a></dd>
-                <dd id="NetworkXExporter.get_product" class="function"><a href="../base.html#AbstractDebugger.get_product">get_product</a></dd>
-                <dd id="NetworkXExporter.get_requirements" class="function"><a href="../base.html#AbstractDebugger.get_requirements">get_requirements</a></dd>
-                <dd id="NetworkXExporter.get_description" class="function"><a href="../base.html#AbstractDebugger.get_description">get_description</a></dd>
-                <dd id="NetworkXExporter.logger" class="variable"><a href="../base.html#AbstractDebugger.logger">logger</a></dd>
-
-            </div>
-            <div><dt><a href="../base.html#AbstractArtifactDebugger">logikon.debuggers.base.AbstractArtifactDebugger</a></dt>
-                                <dd id="NetworkXExporter.product_type" class="variable"><a href="../base.html#AbstractArtifactDebugger.product_type">product_type</a></dd>
 
             </div>
                                 </dl>
@@ -405,6 +340,7 @@ and to export them as a networkx graph.</p>
                 <dd id="RelevanceNetworkNXExporter.get_product" class="function"><a href="../base.html#AbstractDebugger.get_product">get_product</a></dd>
                 <dd id="RelevanceNetworkNXExporter.get_requirements" class="function"><a href="../base.html#AbstractDebugger.get_requirements">get_requirements</a></dd>
                 <dd id="RelevanceNetworkNXExporter.get_description" class="function"><a href="../base.html#AbstractDebugger.get_description">get_description</a></dd>
+                <dd id="RelevanceNetworkNXExporter.get_config_class" class="function"><a href="../base.html#AbstractDebugger.get_config_class">get_config_class</a></dd>
                 <dd id="RelevanceNetworkNXExporter.logger" class="variable"><a href="../base.html#AbstractDebugger.logger">logger</a></dd>
 
             </div>

@@ -9,13 +9,13 @@ flowchart TD
     pcl["`pros cons list`"]
     ur["`reasons (unused)`"]
     rm("`reason mining
-    >_reasons_`")
+    :>_reasons_`")
     pco("`pros cons organizing
-    >_pros cons list_`")
+    :>_pros cons list_`")
     add("`add unused reasons
-    >_pros cons list_`")
+    :>_pros cons list_`")
     cr("`check and revise
-    >_pros cons list_`")
+    :>_pros cons list_`")
     subgraph artifact
     ad["`data`"]
     am["`metadata`"]

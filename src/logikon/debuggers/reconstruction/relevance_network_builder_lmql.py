@@ -2,33 +2,33 @@
 
 ```mermaid
 flowchart TD
-    p["`prompt`"]
-    c["`completion`"]
+    p["`pros cons list`"]
     i["`issue`"]
-    r["`reasons (unstructured)`"]
-    pcl["`pros cons list`"]
-    ur["`reasons (unused)`"]
-    rm("`reason mining
-    >_reasons_`")
-    pco("`pros cons organizing
-    >_pros cons list_`")
-    add("`add unused reasons
-    >_pros cons list_`")
-    cr("`check and revise
-    >_pros cons list_`")
+    ur("unpack reason
+    :>pros cons list`")
+    pu["`pros cons unpacked`"]
+    rore("`adjacent root-reason
+    :>_links_`")
+    rwre("`any reason-reason
+    :>:links_`")
+    links["`links (unweighted)`"]
+    mcqu1("`support or attack?
+    :>_prob1_`")
+    prune("`prune`")
+    mcqu2("`sup/att or neutral?
+    :>_prob2_`")
+    wlinks["`weighted links (p1*p2)`"]
     subgraph artifact
     ad["`data`"]
     am["`metadata`"]
     end
-    p --> rm
-    c --> rm
-    i --> rm
-    rm --> r --> am
-    i --> pco
-    r --> pco --> add --> pco
-    i --> cr
-    pco --> cr --> pcl --> ad
-    pco --> ur --> am
+    p --> ur
+    i --> ur
+    ur --> pu 
+    pu--> rore --> links
+    pu--> rwre --> links
+    links --> mcqu1 --> mcqu2 --> prune --> wlinks --> ad
+    ur --> am
 ```
 
 """

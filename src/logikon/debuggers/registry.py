@@ -18,6 +18,9 @@ from logikon.debuggers.scorers.argmap_graph_scores import (
     ArgMapGraphSizeScorer,
 )
 
+# TODO: set up a product registry for storing product_kw/product_cls mapping
+
+
 # First class is treated as default debugger
 _DEBUGGER_REGISTRY: Mapping[str, List[type[Debugger]]] = {
 #    "informal_argmap": [InformalArgMapBuilder],  # deprecated

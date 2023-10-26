@@ -56,8 +56,17 @@
                                 <a class="function" href="#Debugger.get_requirements">get_requirements</a>
                         </li>
                         <li>
+                                <a class="function" href="#Debugger.get_config_class">get_config_class</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#Debugger.product_type">product_type</a>
                         </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#DebuggerConfig">DebuggerConfig</a>
+                            <ul class="memberlist">
                 </ul>
 
             </li>
@@ -85,41 +94,51 @@
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># interface.py</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Type</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="k">class</span> <span class="nc">Debugger</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for all debuggers.&quot;&quot;&quot;</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_config</span><span class="p">):</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="k">pass</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="k">def</span> <span class="nf">_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">):</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Debug inputs in debug_state.&quot;&quot;&quot;</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>        <span class="k">pass</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">):</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="k">pass</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="nd">@classmethod</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="k">def</span> <span class="nf">get_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keyword of artifact / metric produced by debugger.&quot;&quot;&quot;</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>        <span class="k">pass</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="nd">@classmethod</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keywords of metrics / artifacts that are required for the debugger.&quot;&quot;&quot;</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="k">pass</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="nd">@property</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>        <span class="k">pass</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="k">class</span> <span class="nc">Debugger</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for all debuggers.&quot;&quot;&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="k">pass</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="k">def</span> <span class="nf">_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">):</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Debug inputs in debug_state.&quot;&quot;&quot;</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>        <span class="k">pass</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">):</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>        <span class="k">pass</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="nd">@classmethod</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="k">def</span> <span class="nf">get_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keyword of artifact / metric produced by debugger.&quot;&quot;&quot;</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>        <span class="k">pass</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="nd">@classmethod</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]:</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keywords of metrics / artifacts that are required for the debugger.&quot;&quot;&quot;</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>        <span class="k">pass</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="nd">@classmethod</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="k">def</span> <span class="nf">get_config_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get type of config class (subclass of DebuggerConfig).&quot;&quot;&quot;</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>        <span class="k">pass</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>    <span class="nd">@property</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>        <span class="k">pass</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="k">class</span> <span class="nc">DebuggerConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>    <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -135,38 +154,44 @@
 
     </div>
     <a class="headerlink" href="#Debugger"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Debugger-8"><a href="#Debugger-8"><span class="linenos"> 8</span></a><span class="k">class</span> <span class="nc">Debugger</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-</span><span id="Debugger-9"><a href="#Debugger-9"><span class="linenos"> 9</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for all debuggers.&quot;&quot;&quot;</span>
-</span><span id="Debugger-10"><a href="#Debugger-10"><span class="linenos">10</span></a>
-</span><span id="Debugger-11"><a href="#Debugger-11"><span class="linenos">11</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Debugger-12"><a href="#Debugger-12"><span class="linenos">12</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_config</span><span class="p">):</span>
-</span><span id="Debugger-13"><a href="#Debugger-13"><span class="linenos">13</span></a>        <span class="k">pass</span>
-</span><span id="Debugger-14"><a href="#Debugger-14"><span class="linenos">14</span></a>
-</span><span id="Debugger-15"><a href="#Debugger-15"><span class="linenos">15</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Debugger-16"><a href="#Debugger-16"><span class="linenos">16</span></a>    <span class="k">def</span> <span class="nf">_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">):</span>
-</span><span id="Debugger-17"><a href="#Debugger-17"><span class="linenos">17</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Debug inputs in debug_state.&quot;&quot;&quot;</span>
-</span><span id="Debugger-18"><a href="#Debugger-18"><span class="linenos">18</span></a>        <span class="k">pass</span>
-</span><span id="Debugger-19"><a href="#Debugger-19"><span class="linenos">19</span></a>
-</span><span id="Debugger-20"><a href="#Debugger-20"><span class="linenos">20</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Debugger-21"><a href="#Debugger-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">):</span>
-</span><span id="Debugger-22"><a href="#Debugger-22"><span class="linenos">22</span></a>        <span class="k">pass</span>
-</span><span id="Debugger-23"><a href="#Debugger-23"><span class="linenos">23</span></a>
-</span><span id="Debugger-24"><a href="#Debugger-24"><span class="linenos">24</span></a>    <span class="nd">@classmethod</span>
-</span><span id="Debugger-25"><a href="#Debugger-25"><span class="linenos">25</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Debugger-26"><a href="#Debugger-26"><span class="linenos">26</span></a>    <span class="k">def</span> <span class="nf">get_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="Debugger-27"><a href="#Debugger-27"><span class="linenos">27</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keyword of artifact / metric produced by debugger.&quot;&quot;&quot;</span>
-</span><span id="Debugger-28"><a href="#Debugger-28"><span class="linenos">28</span></a>        <span class="k">pass</span>
-</span><span id="Debugger-29"><a href="#Debugger-29"><span class="linenos">29</span></a>
-</span><span id="Debugger-30"><a href="#Debugger-30"><span class="linenos">30</span></a>    <span class="nd">@classmethod</span>
-</span><span id="Debugger-31"><a href="#Debugger-31"><span class="linenos">31</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Debugger-32"><a href="#Debugger-32"><span class="linenos">32</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="Debugger-33"><a href="#Debugger-33"><span class="linenos">33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keywords of metrics / artifacts that are required for the debugger.&quot;&quot;&quot;</span>
-</span><span id="Debugger-34"><a href="#Debugger-34"><span class="linenos">34</span></a>        <span class="k">pass</span>
-</span><span id="Debugger-35"><a href="#Debugger-35"><span class="linenos">35</span></a>
-</span><span id="Debugger-36"><a href="#Debugger-36"><span class="linenos">36</span></a>    <span class="nd">@property</span>
-</span><span id="Debugger-37"><a href="#Debugger-37"><span class="linenos">37</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Debugger-38"><a href="#Debugger-38"><span class="linenos">38</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="Debugger-39"><a href="#Debugger-39"><span class="linenos">39</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Debugger-9"><a href="#Debugger-9"><span class="linenos"> 9</span></a><span class="k">class</span> <span class="nc">Debugger</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="Debugger-10"><a href="#Debugger-10"><span class="linenos">10</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for all debuggers.&quot;&quot;&quot;</span>
+</span><span id="Debugger-11"><a href="#Debugger-11"><span class="linenos">11</span></a>
+</span><span id="Debugger-12"><a href="#Debugger-12"><span class="linenos">12</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger-13"><a href="#Debugger-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+</span><span id="Debugger-14"><a href="#Debugger-14"><span class="linenos">14</span></a>        <span class="k">pass</span>
+</span><span id="Debugger-15"><a href="#Debugger-15"><span class="linenos">15</span></a>
+</span><span id="Debugger-16"><a href="#Debugger-16"><span class="linenos">16</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger-17"><a href="#Debugger-17"><span class="linenos">17</span></a>    <span class="k">def</span> <span class="nf">_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">):</span>
+</span><span id="Debugger-18"><a href="#Debugger-18"><span class="linenos">18</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Debug inputs in debug_state.&quot;&quot;&quot;</span>
+</span><span id="Debugger-19"><a href="#Debugger-19"><span class="linenos">19</span></a>        <span class="k">pass</span>
+</span><span id="Debugger-20"><a href="#Debugger-20"><span class="linenos">20</span></a>
+</span><span id="Debugger-21"><a href="#Debugger-21"><span class="linenos">21</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger-22"><a href="#Debugger-22"><span class="linenos">22</span></a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">):</span>
+</span><span id="Debugger-23"><a href="#Debugger-23"><span class="linenos">23</span></a>        <span class="k">pass</span>
+</span><span id="Debugger-24"><a href="#Debugger-24"><span class="linenos">24</span></a>
+</span><span id="Debugger-25"><a href="#Debugger-25"><span class="linenos">25</span></a>    <span class="nd">@classmethod</span>
+</span><span id="Debugger-26"><a href="#Debugger-26"><span class="linenos">26</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger-27"><a href="#Debugger-27"><span class="linenos">27</span></a>    <span class="k">def</span> <span class="nf">get_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="Debugger-28"><a href="#Debugger-28"><span class="linenos">28</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keyword of artifact / metric produced by debugger.&quot;&quot;&quot;</span>
+</span><span id="Debugger-29"><a href="#Debugger-29"><span class="linenos">29</span></a>        <span class="k">pass</span>
+</span><span id="Debugger-30"><a href="#Debugger-30"><span class="linenos">30</span></a>
+</span><span id="Debugger-31"><a href="#Debugger-31"><span class="linenos">31</span></a>    <span class="nd">@classmethod</span>
+</span><span id="Debugger-32"><a href="#Debugger-32"><span class="linenos">32</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger-33"><a href="#Debugger-33"><span class="linenos">33</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]:</span>
+</span><span id="Debugger-34"><a href="#Debugger-34"><span class="linenos">34</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keywords of metrics / artifacts that are required for the debugger.&quot;&quot;&quot;</span>
+</span><span id="Debugger-35"><a href="#Debugger-35"><span class="linenos">35</span></a>        <span class="k">pass</span>
+</span><span id="Debugger-36"><a href="#Debugger-36"><span class="linenos">36</span></a>
+</span><span id="Debugger-37"><a href="#Debugger-37"><span class="linenos">37</span></a>    <span class="nd">@classmethod</span>
+</span><span id="Debugger-38"><a href="#Debugger-38"><span class="linenos">38</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger-39"><a href="#Debugger-39"><span class="linenos">39</span></a>    <span class="k">def</span> <span class="nf">get_config_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+</span><span id="Debugger-40"><a href="#Debugger-40"><span class="linenos">40</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get type of config class (subclass of DebuggerConfig).&quot;&quot;&quot;</span>
+</span><span id="Debugger-41"><a href="#Debugger-41"><span class="linenos">41</span></a>        <span class="k">pass</span>
+</span><span id="Debugger-42"><a href="#Debugger-42"><span class="linenos">42</span></a>
+</span><span id="Debugger-43"><a href="#Debugger-43"><span class="linenos">43</span></a>    <span class="nd">@property</span>
+</span><span id="Debugger-44"><a href="#Debugger-44"><span class="linenos">44</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger-45"><a href="#Debugger-45"><span class="linenos">45</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="Debugger-46"><a href="#Debugger-46"><span class="linenos">46</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -187,11 +212,11 @@
 
     </div>
     <a class="headerlink" href="#Debugger.get_product"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Debugger.get_product-24"><a href="#Debugger.get_product-24"><span class="linenos">24</span></a>    <span class="nd">@classmethod</span>
-</span><span id="Debugger.get_product-25"><a href="#Debugger.get_product-25"><span class="linenos">25</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Debugger.get_product-26"><a href="#Debugger.get_product-26"><span class="linenos">26</span></a>    <span class="k">def</span> <span class="nf">get_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="Debugger.get_product-27"><a href="#Debugger.get_product-27"><span class="linenos">27</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keyword of artifact / metric produced by debugger.&quot;&quot;&quot;</span>
-</span><span id="Debugger.get_product-28"><a href="#Debugger.get_product-28"><span class="linenos">28</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Debugger.get_product-25"><a href="#Debugger.get_product-25"><span class="linenos">25</span></a>    <span class="nd">@classmethod</span>
+</span><span id="Debugger.get_product-26"><a href="#Debugger.get_product-26"><span class="linenos">26</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger.get_product-27"><a href="#Debugger.get_product-27"><span class="linenos">27</span></a>    <span class="k">def</span> <span class="nf">get_product</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="Debugger.get_product-28"><a href="#Debugger.get_product-28"><span class="linenos">28</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keyword of artifact / metric produced by debugger.&quot;&quot;&quot;</span>
+</span><span id="Debugger.get_product-29"><a href="#Debugger.get_product-29"><span class="linenos">29</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -207,21 +232,47 @@
         <div class="decorator">@abstractmethod</div>
 
         <span class="def">def</span>
-        <span class="name">get_requirements</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">cls</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
+        <span class="name">get_requirements</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">cls</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]</span>:</span></span>
 
                 <label class="view-source-button" for="Debugger.get_requirements-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#Debugger.get_requirements"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Debugger.get_requirements-30"><a href="#Debugger.get_requirements-30"><span class="linenos">30</span></a>    <span class="nd">@classmethod</span>
-</span><span id="Debugger.get_requirements-31"><a href="#Debugger.get_requirements-31"><span class="linenos">31</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Debugger.get_requirements-32"><a href="#Debugger.get_requirements-32"><span class="linenos">32</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="Debugger.get_requirements-33"><a href="#Debugger.get_requirements-33"><span class="linenos">33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keywords of metrics / artifacts that are required for the debugger.&quot;&quot;&quot;</span>
-</span><span id="Debugger.get_requirements-34"><a href="#Debugger.get_requirements-34"><span class="linenos">34</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Debugger.get_requirements-31"><a href="#Debugger.get_requirements-31"><span class="linenos">31</span></a>    <span class="nd">@classmethod</span>
+</span><span id="Debugger.get_requirements-32"><a href="#Debugger.get_requirements-32"><span class="linenos">32</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger.get_requirements-33"><a href="#Debugger.get_requirements-33"><span class="linenos">33</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]:</span>
+</span><span id="Debugger.get_requirements-34"><a href="#Debugger.get_requirements-34"><span class="linenos">34</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config keywords of metrics / artifacts that are required for the debugger.&quot;&quot;&quot;</span>
+</span><span id="Debugger.get_requirements-35"><a href="#Debugger.get_requirements-35"><span class="linenos">35</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Get config keywords of metrics / artifacts that are required for the debugger.</p>
+</div>
+
+
+                            </div>
+                            <div id="Debugger.get_config_class" class="classattr">
+                                        <input id="Debugger.get_config_class-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator">@classmethod</div>
+        <div class="decorator">@abstractmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">get_config_class</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">cls</span></span><span class="return-annotation">) -> <span class="n">Type</span>:</span></span>
+
+                <label class="view-source-button" for="Debugger.get_config_class-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Debugger.get_config_class"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Debugger.get_config_class-37"><a href="#Debugger.get_config_class-37"><span class="linenos">37</span></a>    <span class="nd">@classmethod</span>
+</span><span id="Debugger.get_config_class-38"><a href="#Debugger.get_config_class-38"><span class="linenos">38</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Debugger.get_config_class-39"><a href="#Debugger.get_config_class-39"><span class="linenos">39</span></a>    <span class="k">def</span> <span class="nf">get_config_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+</span><span id="Debugger.get_config_class-40"><a href="#Debugger.get_config_class-40"><span class="linenos">40</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get type of config class (subclass of DebuggerConfig).&quot;&quot;&quot;</span>
+</span><span id="Debugger.get_config_class-41"><a href="#Debugger.get_config_class-41"><span class="linenos">41</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Get type of config class (subclass of DebuggerConfig).</p>
 </div>
 
 
@@ -236,6 +287,47 @@
     
     
 
+                            </div>
+                </section>
+                <section id="DebuggerConfig">
+                            <input id="DebuggerConfig-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">DebuggerConfig</span><wbr>(<span class="base">pydantic.main.BaseModel</span>):
+
+                <label class="view-source-button" for="DebuggerConfig-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#DebuggerConfig"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DebuggerConfig-48"><a href="#DebuggerConfig-48"><span class="linenos">48</span></a><span class="k">class</span> <span class="nc">DebuggerConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="DebuggerConfig-49"><a href="#DebuggerConfig-49"><span class="linenos">49</span></a>    <span class="k">pass</span>
+</span></pre></div>
+
+
+    
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>pydantic.main.BaseModel</dt>
+                                <dd id="DebuggerConfig.__init__" class="function">BaseModel</dd>
+                <dd id="DebuggerConfig.Config" class="variable">Config</dd>
+                <dd id="DebuggerConfig.dict" class="function">dict</dd>
+                <dd id="DebuggerConfig.json" class="function">json</dd>
+                <dd id="DebuggerConfig.parse_obj" class="function">parse_obj</dd>
+                <dd id="DebuggerConfig.parse_raw" class="function">parse_raw</dd>
+                <dd id="DebuggerConfig.parse_file" class="function">parse_file</dd>
+                <dd id="DebuggerConfig.from_orm" class="function">from_orm</dd>
+                <dd id="DebuggerConfig.construct" class="function">construct</dd>
+                <dd id="DebuggerConfig.copy" class="function">copy</dd>
+                <dd id="DebuggerConfig.schema" class="function">schema</dd>
+                <dd id="DebuggerConfig.schema_json" class="function">schema_json</dd>
+                <dd id="DebuggerConfig.validate" class="function">validate</dd>
+                <dd id="DebuggerConfig.update_forward_refs" class="function">update_forward_refs</dd>
+
+            </div>
+                                </dl>
                             </div>
                 </section>
     </main>

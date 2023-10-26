@@ -1,5 +1,32 @@
-# issue_builder_ol.py
+"""Module with debugger for identifying text's central issue with LMQL
 
+```mermaid
+flowchart TD
+    p["`prompt`"]
+    c["`completion`"]
+    di("`state issue
+    :>_issue draft_`")
+    i1["`issue draft-1`"]
+    i2["`issue draft-2`"]
+    in["`issue draft-n`"]
+    q["`eval criteria`"]
+    i["`issue`"]
+    rs("`rate and select
+    :>_reasons_`")
+    subgraph artifact
+    ad["`data`"]
+    am["`metadata`"]
+    end
+    p --> di
+    c --> di
+    di --> i1 --> rs
+    di --> i2 --> rs
+    di --> in --> rs
+    q --> rs
+    rs --> i --> ad
+```
+
+"""
 from __future__ import annotations
 
 import lmql

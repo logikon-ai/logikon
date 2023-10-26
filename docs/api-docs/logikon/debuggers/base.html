@@ -65,8 +65,17 @@
                                 <a class="function" href="#AbstractDebugger.get_description">get_description</a>
                         </li>
                         <li>
+                                <a class="function" href="#AbstractDebugger.get_config_class">get_config_class</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#AbstractDebugger.logger">logger</a>
                         </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ArtifcatDebuggerConfig">ArtifcatDebuggerConfig</a>
+                            <ul class="memberlist">
                 </ul>
 
             </li>
@@ -76,6 +85,12 @@
                         <li>
                                 <a class="variable" href="#AbstractArtifactDebugger.product_type">product_type</a>
                         </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ScoreDebuggerConfig">ScoreDebuggerConfig</a>
+                            <ul class="memberlist">
                 </ul>
 
             </li>
@@ -111,27 +126,27 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">logging</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Type</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span> <span class="nn">logikon.schemas.configs</span> <span class="kn">import</span> <span class="n">DebugConfig</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span> <span class="nn">logikon.schemas.results</span> <span class="kn">import</span> <span class="n">DebugState</span><span class="p">,</span> <span class="n">Score</span><span class="p">,</span> <span class="n">Artifact</span><span class="p">,</span> <span class="n">INPUT_KWS</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="kn">from</span> <span class="nn">logikon.debuggers.interface</span> <span class="kn">import</span> <span class="n">Debugger</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">ARTIFACT</span> <span class="o">=</span> <span class="s2">&quot;ARTIFACT&quot;</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="n">SCORE</span> <span class="o">=</span> <span class="s2">&quot;SCORE&quot;</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span> <span class="nn">logikon.schemas.results</span> <span class="kn">import</span> <span class="n">DebugState</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span> <span class="nn">logikon.debuggers.interface</span> <span class="kn">import</span> <span class="n">Debugger</span><span class="p">,</span> <span class="n">DebuggerConfig</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="n">ARTIFACT</span> <span class="o">=</span> <span class="s2">&quot;ARTIFACT&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">SCORE</span> <span class="o">=</span> <span class="s2">&quot;SCORE&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="k">class</span> <span class="nc">AbstractDebugger</span><span class="p">(</span><span class="n">Debugger</span><span class="p">):</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">    Base debugger class with default __call__ implementation.</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">__product__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">__requirements__</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">__pdescription__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">class</span> <span class="nc">AbstractDebugger</span><span class="p">(</span><span class="n">Debugger</span><span class="p">):</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">    Base debugger class with default __call__ implementation.</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">__product__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">__requirements__</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">__pdescription__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">__configclass__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_config</span><span class="p">:</span> <span class="n">DebugConfig</span><span class="p">):</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_debug_config</span> <span class="o">=</span> <span class="n">debug_config</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DebuggerConfig</span><span class="p">):</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>
 </span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="nd">@abstractmethod</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="k">def</span> <span class="nf">_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">:</span> <span class="n">DebugState</span><span class="p">):</span>
@@ -152,7 +167,7 @@
 </span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__product__</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
 </span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="nd">@classmethod</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]:</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__requirements__</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>
 </span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="nd">@classmethod</span>
@@ -161,32 +176,50 @@
 </span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Product description not defined for </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__pdescription__</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>    <span class="nd">@property</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">:</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="sd">        A :class:`logging.Logger` that can be used within the :meth:`run()` method.</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>        <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="k">class</span> <span class="nc">AbstractArtifactDebugger</span><span class="p">(</span><span class="n">AbstractDebugger</span><span class="p">):</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="sd">    Base debugger class for creating artifacts.</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>    <span class="nd">@property</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>        <span class="k">return</span> <span class="n">ARTIFACT</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>    <span class="nd">@classmethod</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="k">def</span> <span class="nf">get_config_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__configclass__</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config class not defined for </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>        <span class="c1"># check if configclass is subclass of DebuggerConfig</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__configclass__</span><span class="p">,</span> <span class="n">DebuggerConfig</span><span class="p">):</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config class </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> not derived from DebuggerConfig.&quot;</span><span class="p">)</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__configclass__</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>    <span class="nd">@property</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">:</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="sd">        A :class:`logging.Logger` that can be used within the :meth:`run()` method.</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>        <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>
 </span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>
-</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>
-</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a><span class="k">class</span> <span class="nc">AbstractScoreDebugger</span><span class="p">(</span><span class="n">AbstractDebugger</span><span class="p">):</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a><span class="sd">    Base debugger class for creating scroes.</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>
-</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>    <span class="nd">@property</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>        <span class="k">return</span> <span class="n">SCORE</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="k">class</span> <span class="nc">ArtifcatDebuggerConfig</span><span class="p">(</span><span class="n">DebuggerConfig</span><span class="p">):</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>    <span class="k">pass</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>
+</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a><span class="k">class</span> <span class="nc">AbstractArtifactDebugger</span><span class="p">(</span><span class="n">AbstractDebugger</span><span class="p">):</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a><span class="sd">    Base debugger class for creating artifacts.</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>
+</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>    <span class="n">__configclass__</span> <span class="o">=</span> <span class="n">ArtifcatDebuggerConfig</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>
+</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>    <span class="nd">@property</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>        <span class="k">return</span> <span class="n">ARTIFACT</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>
+</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a><span class="k">class</span> <span class="nc">ScoreDebuggerConfig</span><span class="p">(</span><span class="n">DebuggerConfig</span><span class="p">):</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>    <span class="k">pass</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos">86</span></a>
+</span><span id="L-87"><a href="#L-87"><span class="linenos">87</span></a><span class="k">class</span> <span class="nc">AbstractScoreDebugger</span><span class="p">(</span><span class="n">AbstractDebugger</span><span class="p">):</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos">88</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos">89</span></a><span class="sd">    Base debugger class for creating scores.</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos">90</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos">91</span></a>
+</span><span id="L-92"><a href="#L-92"><span class="linenos">92</span></a>    <span class="n">__configclass__</span> <span class="o">=</span> <span class="n">ScoreDebuggerConfig</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos">93</span></a>
+</span><span id="L-94"><a href="#L-94"><span class="linenos">94</span></a>    <span class="nd">@property</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos">95</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos">96</span></a>        <span class="k">return</span> <span class="n">SCORE</span>
 </span></pre></div>
 
 
@@ -226,17 +259,18 @@
 
     </div>
     <a class="headerlink" href="#AbstractDebugger"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractDebugger-14"><a href="#AbstractDebugger-14"><span class="linenos">14</span></a><span class="k">class</span> <span class="nc">AbstractDebugger</span><span class="p">(</span><span class="n">Debugger</span><span class="p">):</span>
-</span><span id="AbstractDebugger-15"><a href="#AbstractDebugger-15"><span class="linenos">15</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AbstractDebugger-16"><a href="#AbstractDebugger-16"><span class="linenos">16</span></a><span class="sd">    Base debugger class with default __call__ implementation.</span>
-</span><span id="AbstractDebugger-17"><a href="#AbstractDebugger-17"><span class="linenos">17</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="AbstractDebugger-18"><a href="#AbstractDebugger-18"><span class="linenos">18</span></a>
-</span><span id="AbstractDebugger-19"><a href="#AbstractDebugger-19"><span class="linenos">19</span></a>    <span class="n">__product__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="AbstractDebugger-20"><a href="#AbstractDebugger-20"><span class="linenos">20</span></a>    <span class="n">__requirements__</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="AbstractDebugger-21"><a href="#AbstractDebugger-21"><span class="linenos">21</span></a>    <span class="n">__pdescription__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractDebugger-13"><a href="#AbstractDebugger-13"><span class="linenos">13</span></a><span class="k">class</span> <span class="nc">AbstractDebugger</span><span class="p">(</span><span class="n">Debugger</span><span class="p">):</span>
+</span><span id="AbstractDebugger-14"><a href="#AbstractDebugger-14"><span class="linenos">14</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="AbstractDebugger-15"><a href="#AbstractDebugger-15"><span class="linenos">15</span></a><span class="sd">    Base debugger class with default __call__ implementation.</span>
+</span><span id="AbstractDebugger-16"><a href="#AbstractDebugger-16"><span class="linenos">16</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="AbstractDebugger-17"><a href="#AbstractDebugger-17"><span class="linenos">17</span></a>
+</span><span id="AbstractDebugger-18"><a href="#AbstractDebugger-18"><span class="linenos">18</span></a>    <span class="n">__product__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="AbstractDebugger-19"><a href="#AbstractDebugger-19"><span class="linenos">19</span></a>    <span class="n">__requirements__</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="AbstractDebugger-20"><a href="#AbstractDebugger-20"><span class="linenos">20</span></a>    <span class="n">__pdescription__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="AbstractDebugger-21"><a href="#AbstractDebugger-21"><span class="linenos">21</span></a>    <span class="n">__configclass__</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="AbstractDebugger-22"><a href="#AbstractDebugger-22"><span class="linenos">22</span></a>
-</span><span id="AbstractDebugger-23"><a href="#AbstractDebugger-23"><span class="linenos">23</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_config</span><span class="p">:</span> <span class="n">DebugConfig</span><span class="p">):</span>
-</span><span id="AbstractDebugger-24"><a href="#AbstractDebugger-24"><span class="linenos">24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_debug_config</span> <span class="o">=</span> <span class="n">debug_config</span>
+</span><span id="AbstractDebugger-23"><a href="#AbstractDebugger-23"><span class="linenos">23</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DebuggerConfig</span><span class="p">):</span>
+</span><span id="AbstractDebugger-24"><a href="#AbstractDebugger-24"><span class="linenos">24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
 </span><span id="AbstractDebugger-25"><a href="#AbstractDebugger-25"><span class="linenos">25</span></a>
 </span><span id="AbstractDebugger-26"><a href="#AbstractDebugger-26"><span class="linenos">26</span></a>    <span class="nd">@abstractmethod</span>
 </span><span id="AbstractDebugger-27"><a href="#AbstractDebugger-27"><span class="linenos">27</span></a>    <span class="k">def</span> <span class="nf">_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_state</span><span class="p">:</span> <span class="n">DebugState</span><span class="p">):</span>
@@ -257,7 +291,7 @@
 </span><span id="AbstractDebugger-42"><a href="#AbstractDebugger-42"><span class="linenos">42</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__product__</span>
 </span><span id="AbstractDebugger-43"><a href="#AbstractDebugger-43"><span class="linenos">43</span></a>
 </span><span id="AbstractDebugger-44"><a href="#AbstractDebugger-44"><span class="linenos">44</span></a>    <span class="nd">@classmethod</span>
-</span><span id="AbstractDebugger-45"><a href="#AbstractDebugger-45"><span class="linenos">45</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="AbstractDebugger-45"><a href="#AbstractDebugger-45"><span class="linenos">45</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]:</span>
 </span><span id="AbstractDebugger-46"><a href="#AbstractDebugger-46"><span class="linenos">46</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__requirements__</span>
 </span><span id="AbstractDebugger-47"><a href="#AbstractDebugger-47"><span class="linenos">47</span></a>
 </span><span id="AbstractDebugger-48"><a href="#AbstractDebugger-48"><span class="linenos">48</span></a>    <span class="nd">@classmethod</span>
@@ -266,12 +300,21 @@
 </span><span id="AbstractDebugger-51"><a href="#AbstractDebugger-51"><span class="linenos">51</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Product description not defined for </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 </span><span id="AbstractDebugger-52"><a href="#AbstractDebugger-52"><span class="linenos">52</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__pdescription__</span>
 </span><span id="AbstractDebugger-53"><a href="#AbstractDebugger-53"><span class="linenos">53</span></a>
-</span><span id="AbstractDebugger-54"><a href="#AbstractDebugger-54"><span class="linenos">54</span></a>    <span class="nd">@property</span>
-</span><span id="AbstractDebugger-55"><a href="#AbstractDebugger-55"><span class="linenos">55</span></a>    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">:</span>
-</span><span id="AbstractDebugger-56"><a href="#AbstractDebugger-56"><span class="linenos">56</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AbstractDebugger-57"><a href="#AbstractDebugger-57"><span class="linenos">57</span></a><span class="sd">        A :class:`logging.Logger` that can be used within the :meth:`run()` method.</span>
-</span><span id="AbstractDebugger-58"><a href="#AbstractDebugger-58"><span class="linenos">58</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="AbstractDebugger-59"><a href="#AbstractDebugger-59"><span class="linenos">59</span></a>        <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span id="AbstractDebugger-54"><a href="#AbstractDebugger-54"><span class="linenos">54</span></a>    <span class="nd">@classmethod</span>
+</span><span id="AbstractDebugger-55"><a href="#AbstractDebugger-55"><span class="linenos">55</span></a>    <span class="k">def</span> <span class="nf">get_config_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+</span><span id="AbstractDebugger-56"><a href="#AbstractDebugger-56"><span class="linenos">56</span></a>        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__configclass__</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="AbstractDebugger-57"><a href="#AbstractDebugger-57"><span class="linenos">57</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config class not defined for </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</span><span id="AbstractDebugger-58"><a href="#AbstractDebugger-58"><span class="linenos">58</span></a>        <span class="c1"># check if configclass is subclass of DebuggerConfig</span>
+</span><span id="AbstractDebugger-59"><a href="#AbstractDebugger-59"><span class="linenos">59</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__configclass__</span><span class="p">,</span> <span class="n">DebuggerConfig</span><span class="p">):</span>
+</span><span id="AbstractDebugger-60"><a href="#AbstractDebugger-60"><span class="linenos">60</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config class </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> not derived from DebuggerConfig.&quot;</span><span class="p">)</span>
+</span><span id="AbstractDebugger-61"><a href="#AbstractDebugger-61"><span class="linenos">61</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__configclass__</span>
+</span><span id="AbstractDebugger-62"><a href="#AbstractDebugger-62"><span class="linenos">62</span></a>
+</span><span id="AbstractDebugger-63"><a href="#AbstractDebugger-63"><span class="linenos">63</span></a>    <span class="nd">@property</span>
+</span><span id="AbstractDebugger-64"><a href="#AbstractDebugger-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">:</span>
+</span><span id="AbstractDebugger-65"><a href="#AbstractDebugger-65"><span class="linenos">65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="AbstractDebugger-66"><a href="#AbstractDebugger-66"><span class="linenos">66</span></a><span class="sd">        A :class:`logging.Logger` that can be used within the :meth:`run()` method.</span>
+</span><span id="AbstractDebugger-67"><a href="#AbstractDebugger-67"><span class="linenos">67</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="AbstractDebugger-68"><a href="#AbstractDebugger-68"><span class="linenos">68</span></a>        <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -310,14 +353,14 @@
                     <div class="decorator">@classmethod</div>
 
         <span class="def">def</span>
-        <span class="name">get_requirements</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">cls</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
+        <span class="name">get_requirements</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">cls</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]</span>:</span></span>
 
                 <label class="view-source-button" for="AbstractDebugger.get_requirements-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#AbstractDebugger.get_requirements"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractDebugger.get_requirements-44"><a href="#AbstractDebugger.get_requirements-44"><span class="linenos">44</span></a>    <span class="nd">@classmethod</span>
-</span><span id="AbstractDebugger.get_requirements-45"><a href="#AbstractDebugger.get_requirements-45"><span class="linenos">45</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="AbstractDebugger.get_requirements-45"><a href="#AbstractDebugger.get_requirements-45"><span class="linenos">45</span></a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">]]:</span>
 </span><span id="AbstractDebugger.get_requirements-46"><a href="#AbstractDebugger.get_requirements-46"><span class="linenos">46</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__requirements__</span>
 </span></pre></div>
 
@@ -350,6 +393,34 @@
     
 
                             </div>
+                            <div id="AbstractDebugger.get_config_class" class="classattr">
+                                        <input id="AbstractDebugger.get_config_class-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator">@classmethod</div>
+
+        <span class="def">def</span>
+        <span class="name">get_config_class</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">cls</span></span><span class="return-annotation">) -> <span class="n">Type</span>:</span></span>
+
+                <label class="view-source-button" for="AbstractDebugger.get_config_class-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#AbstractDebugger.get_config_class"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractDebugger.get_config_class-54"><a href="#AbstractDebugger.get_config_class-54"><span class="linenos">54</span></a>    <span class="nd">@classmethod</span>
+</span><span id="AbstractDebugger.get_config_class-55"><a href="#AbstractDebugger.get_config_class-55"><span class="linenos">55</span></a>    <span class="k">def</span> <span class="nf">get_config_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+</span><span id="AbstractDebugger.get_config_class-56"><a href="#AbstractDebugger.get_config_class-56"><span class="linenos">56</span></a>        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__configclass__</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="AbstractDebugger.get_config_class-57"><a href="#AbstractDebugger.get_config_class-57"><span class="linenos">57</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config class not defined for </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</span><span id="AbstractDebugger.get_config_class-58"><a href="#AbstractDebugger.get_config_class-58"><span class="linenos">58</span></a>        <span class="c1"># check if configclass is subclass of DebuggerConfig</span>
+</span><span id="AbstractDebugger.get_config_class-59"><a href="#AbstractDebugger.get_config_class-59"><span class="linenos">59</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__configclass__</span><span class="p">,</span> <span class="n">DebuggerConfig</span><span class="p">):</span>
+</span><span id="AbstractDebugger.get_config_class-60"><a href="#AbstractDebugger.get_config_class-60"><span class="linenos">60</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Config class </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> not derived from DebuggerConfig.&quot;</span><span class="p">)</span>
+</span><span id="AbstractDebugger.get_config_class-61"><a href="#AbstractDebugger.get_config_class-61"><span class="linenos">61</span></a>        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__configclass__</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Get type of config class (subclass of DebuggerConfig).</p>
+</div>
+
+
+                            </div>
                             <div id="AbstractDebugger.logger" class="classattr">
                                 <div class="attr variable">
             <span class="name">logger</span><span class="annotation">: logging.Logger</span>
@@ -373,6 +444,47 @@
                                 </dl>
                             </div>
                 </section>
+                <section id="ArtifcatDebuggerConfig">
+                            <input id="ArtifcatDebuggerConfig-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ArtifcatDebuggerConfig</span><wbr>(<span class="base"><a href="interface.html#DebuggerConfig">logikon.debuggers.interface.DebuggerConfig</a></span>):
+
+                <label class="view-source-button" for="ArtifcatDebuggerConfig-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#ArtifcatDebuggerConfig"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ArtifcatDebuggerConfig-71"><a href="#ArtifcatDebuggerConfig-71"><span class="linenos">71</span></a><span class="k">class</span> <span class="nc">ArtifcatDebuggerConfig</span><span class="p">(</span><span class="n">DebuggerConfig</span><span class="p">):</span>
+</span><span id="ArtifcatDebuggerConfig-72"><a href="#ArtifcatDebuggerConfig-72"><span class="linenos">72</span></a>    <span class="k">pass</span>
+</span></pre></div>
+
+
+    
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>pydantic.main.BaseModel</dt>
+                                <dd id="ArtifcatDebuggerConfig.__init__" class="function">BaseModel</dd>
+                <dd id="ArtifcatDebuggerConfig.Config" class="variable">Config</dd>
+                <dd id="ArtifcatDebuggerConfig.dict" class="function">dict</dd>
+                <dd id="ArtifcatDebuggerConfig.json" class="function">json</dd>
+                <dd id="ArtifcatDebuggerConfig.parse_obj" class="function">parse_obj</dd>
+                <dd id="ArtifcatDebuggerConfig.parse_raw" class="function">parse_raw</dd>
+                <dd id="ArtifcatDebuggerConfig.parse_file" class="function">parse_file</dd>
+                <dd id="ArtifcatDebuggerConfig.from_orm" class="function">from_orm</dd>
+                <dd id="ArtifcatDebuggerConfig.construct" class="function">construct</dd>
+                <dd id="ArtifcatDebuggerConfig.copy" class="function">copy</dd>
+                <dd id="ArtifcatDebuggerConfig.schema" class="function">schema</dd>
+                <dd id="ArtifcatDebuggerConfig.schema_json" class="function">schema_json</dd>
+                <dd id="ArtifcatDebuggerConfig.validate" class="function">validate</dd>
+                <dd id="ArtifcatDebuggerConfig.update_forward_refs" class="function">update_forward_refs</dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
                 <section id="AbstractArtifactDebugger">
                             <input id="AbstractArtifactDebugger-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
@@ -384,14 +496,16 @@
 
     </div>
     <a class="headerlink" href="#AbstractArtifactDebugger"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractArtifactDebugger-62"><a href="#AbstractArtifactDebugger-62"><span class="linenos">62</span></a><span class="k">class</span> <span class="nc">AbstractArtifactDebugger</span><span class="p">(</span><span class="n">AbstractDebugger</span><span class="p">):</span>
-</span><span id="AbstractArtifactDebugger-63"><a href="#AbstractArtifactDebugger-63"><span class="linenos">63</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AbstractArtifactDebugger-64"><a href="#AbstractArtifactDebugger-64"><span class="linenos">64</span></a><span class="sd">    Base debugger class for creating artifacts.</span>
-</span><span id="AbstractArtifactDebugger-65"><a href="#AbstractArtifactDebugger-65"><span class="linenos">65</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="AbstractArtifactDebugger-66"><a href="#AbstractArtifactDebugger-66"><span class="linenos">66</span></a>
-</span><span id="AbstractArtifactDebugger-67"><a href="#AbstractArtifactDebugger-67"><span class="linenos">67</span></a>    <span class="nd">@property</span>
-</span><span id="AbstractArtifactDebugger-68"><a href="#AbstractArtifactDebugger-68"><span class="linenos">68</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="AbstractArtifactDebugger-69"><a href="#AbstractArtifactDebugger-69"><span class="linenos">69</span></a>        <span class="k">return</span> <span class="n">ARTIFACT</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractArtifactDebugger-74"><a href="#AbstractArtifactDebugger-74"><span class="linenos">74</span></a><span class="k">class</span> <span class="nc">AbstractArtifactDebugger</span><span class="p">(</span><span class="n">AbstractDebugger</span><span class="p">):</span>
+</span><span id="AbstractArtifactDebugger-75"><a href="#AbstractArtifactDebugger-75"><span class="linenos">75</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="AbstractArtifactDebugger-76"><a href="#AbstractArtifactDebugger-76"><span class="linenos">76</span></a><span class="sd">    Base debugger class for creating artifacts.</span>
+</span><span id="AbstractArtifactDebugger-77"><a href="#AbstractArtifactDebugger-77"><span class="linenos">77</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="AbstractArtifactDebugger-78"><a href="#AbstractArtifactDebugger-78"><span class="linenos">78</span></a>
+</span><span id="AbstractArtifactDebugger-79"><a href="#AbstractArtifactDebugger-79"><span class="linenos">79</span></a>    <span class="n">__configclass__</span> <span class="o">=</span> <span class="n">ArtifcatDebuggerConfig</span>
+</span><span id="AbstractArtifactDebugger-80"><a href="#AbstractArtifactDebugger-80"><span class="linenos">80</span></a>
+</span><span id="AbstractArtifactDebugger-81"><a href="#AbstractArtifactDebugger-81"><span class="linenos">81</span></a>    <span class="nd">@property</span>
+</span><span id="AbstractArtifactDebugger-82"><a href="#AbstractArtifactDebugger-82"><span class="linenos">82</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="AbstractArtifactDebugger-83"><a href="#AbstractArtifactDebugger-83"><span class="linenos">83</span></a>        <span class="k">return</span> <span class="n">ARTIFACT</span>
 </span></pre></div>
 
 
@@ -417,7 +531,49 @@
                                 <dd id="AbstractArtifactDebugger.get_product" class="function"><a href="#AbstractDebugger.get_product">get_product</a></dd>
                 <dd id="AbstractArtifactDebugger.get_requirements" class="function"><a href="#AbstractDebugger.get_requirements">get_requirements</a></dd>
                 <dd id="AbstractArtifactDebugger.get_description" class="function"><a href="#AbstractDebugger.get_description">get_description</a></dd>
+                <dd id="AbstractArtifactDebugger.get_config_class" class="function"><a href="#AbstractDebugger.get_config_class">get_config_class</a></dd>
                 <dd id="AbstractArtifactDebugger.logger" class="variable"><a href="#AbstractDebugger.logger">logger</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="ScoreDebuggerConfig">
+                            <input id="ScoreDebuggerConfig-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ScoreDebuggerConfig</span><wbr>(<span class="base"><a href="interface.html#DebuggerConfig">logikon.debuggers.interface.DebuggerConfig</a></span>):
+
+                <label class="view-source-button" for="ScoreDebuggerConfig-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#ScoreDebuggerConfig"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ScoreDebuggerConfig-85"><a href="#ScoreDebuggerConfig-85"><span class="linenos">85</span></a><span class="k">class</span> <span class="nc">ScoreDebuggerConfig</span><span class="p">(</span><span class="n">DebuggerConfig</span><span class="p">):</span>
+</span><span id="ScoreDebuggerConfig-86"><a href="#ScoreDebuggerConfig-86"><span class="linenos">86</span></a>    <span class="k">pass</span>
+</span></pre></div>
+
+
+    
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>pydantic.main.BaseModel</dt>
+                                <dd id="ScoreDebuggerConfig.__init__" class="function">BaseModel</dd>
+                <dd id="ScoreDebuggerConfig.Config" class="variable">Config</dd>
+                <dd id="ScoreDebuggerConfig.dict" class="function">dict</dd>
+                <dd id="ScoreDebuggerConfig.json" class="function">json</dd>
+                <dd id="ScoreDebuggerConfig.parse_obj" class="function">parse_obj</dd>
+                <dd id="ScoreDebuggerConfig.parse_raw" class="function">parse_raw</dd>
+                <dd id="ScoreDebuggerConfig.parse_file" class="function">parse_file</dd>
+                <dd id="ScoreDebuggerConfig.from_orm" class="function">from_orm</dd>
+                <dd id="ScoreDebuggerConfig.construct" class="function">construct</dd>
+                <dd id="ScoreDebuggerConfig.copy" class="function">copy</dd>
+                <dd id="ScoreDebuggerConfig.schema" class="function">schema</dd>
+                <dd id="ScoreDebuggerConfig.schema_json" class="function">schema_json</dd>
+                <dd id="ScoreDebuggerConfig.validate" class="function">validate</dd>
+                <dd id="ScoreDebuggerConfig.update_forward_refs" class="function">update_forward_refs</dd>
 
             </div>
                                 </dl>
@@ -434,18 +590,20 @@
 
     </div>
     <a class="headerlink" href="#AbstractScoreDebugger"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractScoreDebugger-72"><a href="#AbstractScoreDebugger-72"><span class="linenos">72</span></a><span class="k">class</span> <span class="nc">AbstractScoreDebugger</span><span class="p">(</span><span class="n">AbstractDebugger</span><span class="p">):</span>
-</span><span id="AbstractScoreDebugger-73"><a href="#AbstractScoreDebugger-73"><span class="linenos">73</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="AbstractScoreDebugger-74"><a href="#AbstractScoreDebugger-74"><span class="linenos">74</span></a><span class="sd">    Base debugger class for creating scroes.</span>
-</span><span id="AbstractScoreDebugger-75"><a href="#AbstractScoreDebugger-75"><span class="linenos">75</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="AbstractScoreDebugger-76"><a href="#AbstractScoreDebugger-76"><span class="linenos">76</span></a>
-</span><span id="AbstractScoreDebugger-77"><a href="#AbstractScoreDebugger-77"><span class="linenos">77</span></a>    <span class="nd">@property</span>
-</span><span id="AbstractScoreDebugger-78"><a href="#AbstractScoreDebugger-78"><span class="linenos">78</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="AbstractScoreDebugger-79"><a href="#AbstractScoreDebugger-79"><span class="linenos">79</span></a>        <span class="k">return</span> <span class="n">SCORE</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AbstractScoreDebugger-88"><a href="#AbstractScoreDebugger-88"><span class="linenos">88</span></a><span class="k">class</span> <span class="nc">AbstractScoreDebugger</span><span class="p">(</span><span class="n">AbstractDebugger</span><span class="p">):</span>
+</span><span id="AbstractScoreDebugger-89"><a href="#AbstractScoreDebugger-89"><span class="linenos">89</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="AbstractScoreDebugger-90"><a href="#AbstractScoreDebugger-90"><span class="linenos">90</span></a><span class="sd">    Base debugger class for creating scores.</span>
+</span><span id="AbstractScoreDebugger-91"><a href="#AbstractScoreDebugger-91"><span class="linenos">91</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="AbstractScoreDebugger-92"><a href="#AbstractScoreDebugger-92"><span class="linenos">92</span></a>
+</span><span id="AbstractScoreDebugger-93"><a href="#AbstractScoreDebugger-93"><span class="linenos">93</span></a>    <span class="n">__configclass__</span> <span class="o">=</span> <span class="n">ScoreDebuggerConfig</span>
+</span><span id="AbstractScoreDebugger-94"><a href="#AbstractScoreDebugger-94"><span class="linenos">94</span></a>
+</span><span id="AbstractScoreDebugger-95"><a href="#AbstractScoreDebugger-95"><span class="linenos">95</span></a>    <span class="nd">@property</span>
+</span><span id="AbstractScoreDebugger-96"><a href="#AbstractScoreDebugger-96"><span class="linenos">96</span></a>    <span class="k">def</span> <span class="nf">product_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="AbstractScoreDebugger-97"><a href="#AbstractScoreDebugger-97"><span class="linenos">97</span></a>        <span class="k">return</span> <span class="n">SCORE</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Base debugger class for creating scroes.</p>
+            <div class="docstring"><p>Base debugger class for creating scores.</p>
 </div>
 
 
@@ -467,6 +625,7 @@
                                 <dd id="AbstractScoreDebugger.get_product" class="function"><a href="#AbstractDebugger.get_product">get_product</a></dd>
                 <dd id="AbstractScoreDebugger.get_requirements" class="function"><a href="#AbstractDebugger.get_requirements">get_requirements</a></dd>
                 <dd id="AbstractScoreDebugger.get_description" class="function"><a href="#AbstractDebugger.get_description">get_description</a></dd>
+                <dd id="AbstractScoreDebugger.get_config_class" class="function"><a href="#AbstractDebugger.get_config_class">get_config_class</a></dd>
                 <dd id="AbstractScoreDebugger.logger" class="variable"><a href="#AbstractDebugger.logger">logger</a></dd>
 
             </div>
