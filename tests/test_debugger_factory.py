@@ -28,7 +28,7 @@ def test_analyst_factory():
                 global_kwargs=dict(
                     expert_model="text-ada-002",
                     llm_framework="OpenAI",
-                )
+                ),
             )
 
             pipeline, _ = Director().create(config)
@@ -52,7 +52,7 @@ def test_analyst_factory3():
         global_kwargs=dict(
             expert_model="text-ada-002",
             llm_framework="OpenAI",
-        )
+        ),
     )
     pipeline, _ = Director().create(config)
     assert callable(pipeline)
@@ -64,7 +64,7 @@ def test_altern_requirements():
         global_kwargs=dict(
             expert_model="text-ada-002",
             llm_framework="OpenAI",
-        )
+        ),
     )
     pipeline, chain = Director().create(config)
 

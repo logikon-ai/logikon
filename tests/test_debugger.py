@@ -3,14 +3,22 @@ from typing import List, Type
 
 import pytest
 
-from logikon.analysts.base import AbstractArtifactAnalyst, AbstractScoreAnalyst, ScoreAnalystConfig, ArtifcatAnalystConfig
+from logikon.analysts.base import (
+    AbstractArtifactAnalyst,
+    AbstractScoreAnalyst,
+    ScoreAnalystConfig,
+    ArtifcatAnalystConfig,
+)
 from logikon.schemas.results import Artifact, AnalysisState, Score, INPUT_KWS
+
 
 class DummyAnalystConfig(ArtifcatAnalystConfig):
     pass
 
+
 class DummyAnalystConfig2(ScoreAnalystConfig):
     pass
+
 
 class DummyAnalyst1(AbstractArtifactAnalyst):
     """Dummy Analyst"""

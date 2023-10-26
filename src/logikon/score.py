@@ -12,7 +12,7 @@ from logikon.schemas.results import AnalysisState, Artifact, INPUT_KWS
 def score(
     prompt: Optional[str] = None,
     completion: Optional[str] = None,
-    config: Optional[Union[ScoreConfig,str]] = None,
+    config: Optional[Union[ScoreConfig, str]] = None,
 ) -> Optional[AnalysisState]:
     """Score the completion."""
 

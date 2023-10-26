@@ -42,8 +42,6 @@ def reln1() -> FuzzyArgMap:
     return FuzzyArgMap(nodelist=nodelist, edgelist=edgelist)
 
 
-
-
 def test_nx_exporter2(reln1: FuzzyArgMap):
     nx_exporter = RelevanceNetworkNXExporter(ArtifcatAnalystConfig())
     nx_map = nx_exporter._to_nx(reln1.dict())

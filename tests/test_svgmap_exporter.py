@@ -70,10 +70,6 @@ def nx_map3() -> nx.DiGraph:
     return nx_graph
 
 
-
-
-
-
 def test_preprocessor01(nx_map1):
     config = ArtifcatAnalystConfig()
     svgmap_exporter = SVGMapExporter(config)

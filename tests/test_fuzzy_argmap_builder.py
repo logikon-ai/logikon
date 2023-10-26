@@ -61,7 +61,6 @@ def nx_map2() -> nx.DiGraph:
     return nx_graph
 
 
-
 def test_preprocessor01(nx_map1: nx.DiGraph):
     config = ArtifcatAnalystConfig()
     analyst = FuzzyArgMapBuilder(config)
@@ -104,7 +103,7 @@ def test_reduction_workflow(nx_map1: nx.DiGraph):
     print(f"Expanded branching:\n{nx.node_link_data(fuzzy_argmap)}")
     assert nx.is_forest(fuzzy_argmap.reverse())
 
-    assert all(am.IN_FOREST in data for _,_,data in fuzzy_argmap.edges(data=True))
+    assert all(am.IN_FOREST in data for _, _, data in fuzzy_argmap.edges(data=True))
 
     fuzzy_argmap = analyst._post_process_fuzzy_argmap(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
 
@@ -113,8 +112,7 @@ def test_reduction_workflow(nx_map1: nx.DiGraph):
     assert fuzzy_argmap.nodes(data=True) == nx_map1.nodes(data=True)
     assert len(fuzzy_argmap.edges) == 2
     assert all(nx_map1.has_edge(u, v) for u, v in fuzzy_argmap.edges())
-    assert all("weight" in data for _,_,data in fuzzy_argmap.edges(data=True))
-
+    assert all("weight" in data for _, _, data in fuzzy_argmap.edges(data=True))
 
 
 def test_reduction_workflow2(nx_map2: nx.DiGraph):
@@ -139,7 +137,7 @@ def test_reduction_workflow2(nx_map2: nx.DiGraph):
     print(f"Expanded branching:\n{nx.node_link_data(fuzzy_argmap)}")
     assert not nx.is_forest(fuzzy_argmap.reverse())
 
-    assert all(am.IN_FOREST in data for _,_,data in fuzzy_argmap.edges(data=True))
+    assert all(am.IN_FOREST in data for _, _, data in fuzzy_argmap.edges(data=True))
 
     fuzzy_argmap = analyst._post_process_fuzzy_argmap(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
 
@@ -148,4 +146,4 @@ def test_reduction_workflow2(nx_map2: nx.DiGraph):
     assert fuzzy_argmap.nodes(data=True) == nx_map2.nodes(data=True)
     assert len(fuzzy_argmap.edges) == 6
     assert all(nx_map2.has_edge(u, v) for u, v in fuzzy_argmap.edges())
-    assert all("weight" in data for _,_,data in fuzzy_argmap.edges(data=True))
+    assert all("weight" in data for _, _, data in fuzzy_argmap.edges(data=True))

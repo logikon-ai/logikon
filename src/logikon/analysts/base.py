@@ -70,6 +70,7 @@ class AbstractAnalyst(Analyst):
 class ArtifcatAnalystConfig(AnalystConfig):
     pass
 
+
 class AbstractArtifactAnalyst(AbstractAnalyst):
     """
     Base analyst class for creating artifacts.
@@ -81,8 +82,10 @@ class AbstractArtifactAnalyst(AbstractAnalyst):
     def product_type(self) -> str:
         return ARTIFACT
 
+
 class ScoreAnalystConfig(AnalystConfig):
     pass
+
 
 class AbstractScoreAnalyst(AbstractAnalyst):
     """

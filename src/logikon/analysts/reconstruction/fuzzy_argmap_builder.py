@@ -119,7 +119,9 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
 
         return G
 
-    def _add_above_threshold_edges(self, fuzzy_argmap: nx.DiGraph, relevance_network: nx.DiGraph) -> list[tuple[Any,Any]]:
+    def _add_above_threshold_edges(
+        self, fuzzy_argmap: nx.DiGraph, relevance_network: nx.DiGraph
+    ) -> list[tuple[Any, Any]]:
         """add edges with weight above threshold from relevance network to fuzzy argmap (inplace)
 
         Args:

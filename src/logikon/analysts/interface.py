@@ -5,6 +5,7 @@ from typing import List, Union, Type
 
 from pydantic import BaseModel
 
+
 class Analyst(ABC):
     """Abstract base class for all analysts."""
 
@@ -43,6 +44,7 @@ class Analyst(ABC):
     @abstractmethod
     def product_type(self) -> str:
         pass
+
 
 class AnalystConfig(BaseModel):
     pass

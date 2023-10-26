@@ -24,7 +24,6 @@ class AbstractGraphScorer(AbstractScoreAnalyst):
         {"networkx_graph"},
     ]  # alternative requirements sets, first set takes precedence when automatically building pipeline
 
-
     @abstractmethod
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         pass

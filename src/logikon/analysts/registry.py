@@ -47,4 +47,3 @@ def get_analyst_registry() -> Mapping[str, List[type[Analyst]]]:
             assert all(issubclass(d, AbstractScoreAnalyst) for d in analysts)
 
     return _ANALYST_REGISTRY
-

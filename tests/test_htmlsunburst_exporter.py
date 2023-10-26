@@ -105,7 +105,6 @@ def nx_map4() -> nx.DiGraph:
     return nx_graph
 
 
-
 @pytest.fixture(name="nx_map5")
 def nx_map5() -> nx.DiGraph:
     data = {
@@ -151,7 +150,7 @@ def test_html_exporter_save(nx_map2):
     assert os.path.isfile("test_sunburst1.html")
 
 
-def test_html_exporter_weighted(nx_map3):
+def test_html_exporter_weighted1(nx_map3):
     config = ArtifcatAnalystConfig()
     htmlsunburst_exporter = HTMLSunburstExporter(config)
     tree_data, color_map, legend = htmlsunburst_exporter._to_tree_data(nx_map3, "Issue 3")
@@ -165,7 +164,7 @@ def test_html_exporter_weighted(nx_map3):
     assert os.path.isfile("test_sunburst2.html")
 
 
-def test_html_exporter_weighted(nx_map4):
+def test_html_exporter_weighted2(nx_map4):
     config = ArtifcatAnalystConfig()
     htmlsunburst_exporter = HTMLSunburstExporter(config)
     tree = htmlsunburst_exporter._trunc_to_tree(nx_map4)
@@ -180,7 +179,7 @@ def test_html_exporter_weighted(nx_map4):
     assert os.path.isfile("test_sunburst3.html")
 
 
-def test_html_exporter_weighted(nx_map5):
+def test_html_exporter_weighted3(nx_map5):
     config = ArtifcatAnalystConfig()
     htmlsunburst_exporter = HTMLSunburstExporter(config)
     tree = htmlsunburst_exporter._trunc_to_tree(nx_map5)
@@ -193,4 +192,3 @@ def test_html_exporter_weighted(nx_map5):
         f.write(htmlsunburst)
 
     assert os.path.isfile("test_sunburst4.html")
-

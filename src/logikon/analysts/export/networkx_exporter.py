@@ -75,17 +75,17 @@ class AbstractNetworkXExporter(AbstractArtifactAnalyst):
 
 # class NetworkXExporter(AbstractNetworkXExporter):
 #     """NetworkXExporter Analyst
-# 
+#
 #     This analyst exports an informal argmap as a networkx graph.
-# 
+#
 #     It requires the following artifacts:
 #     - informal_argmap
 #     """
-# 
+#
 #     __pdescription__ = "Informal argmap rendered as a networkx graph"
 #     __product__ = "networkx_graph"
 #     __requirements__ = ["informal_argmap"]
-# 
+#
 #     @property
 #     def __input_class__(self) -> type:
 #         return InformalArgMap

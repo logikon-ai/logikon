@@ -16,7 +16,9 @@ class Director:
     """Factory for creating a analyst pipeline based on a config."""
 
     @staticmethod
-    def run_pipeline(chain: Iterable[Analyst], inputs: List[Artifact] = [], analysis_state: Optional[AnalysisState] = None):
+    def run_pipeline(
+        chain: Iterable[Analyst], inputs: List[Artifact] = [], analysis_state: Optional[AnalysisState] = None
+    ):
         """runs analyst pipeline"""
 
         if analysis_state is None:
@@ -137,10 +139,7 @@ class Director:
 
         return analyst_classes
 
-
-    def _initialize_analysts(
-        self, config: ScoreConfig, analyst_classes: List[Type[Analyst]]
-    ) -> List[Analyst]:
+    def _initialize_analysts(self, config: ScoreConfig, analyst_classes: List[Type[Analyst]]) -> List[Analyst]:
         """initialize all analysts with config
 
         Args:
@@ -155,7 +154,6 @@ class Director:
             analysts.append(analyst_cls(config=analyst_config))
 
         return analysts
-
 
     def _build_chain(self, analysts: List[Analyst], input_ids: List[str]) -> List[Analyst]:
         """builds analyst chain respecting requirements

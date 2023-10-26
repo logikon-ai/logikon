@@ -18,9 +18,7 @@ def test_configs():
     assert config.global_kwargs["expert_model"] == "text-ada-002"
 
 
-
 def test_config_overwrite_global():
-
     config = ScoreConfig(
         global_kwargs=dict(
             expert_model="text-ada-002",

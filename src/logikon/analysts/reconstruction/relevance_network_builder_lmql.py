@@ -408,7 +408,9 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
         pros_and_cons_data = next((a.data for a in analysis_state.artifacts if a.id == "proscons"), None)
         if pros_and_cons_data is None:
-            raise ValueError("Missing required artifact: proscons. Available artifacts: " + str(analysis_state.artifacts))
+            raise ValueError(
+                "Missing required artifact: proscons. Available artifacts: " + str(analysis_state.artifacts)
+            )
         try:
             pros_and_cons = ProsConsList(**pros_and_cons_data)
         except:

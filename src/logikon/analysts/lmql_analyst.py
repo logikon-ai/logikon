@@ -9,6 +9,7 @@ import lmql
 from logikon.utils.model_registry import get_registry_model, register_model
 from logikon.analysts.base import AbstractArtifactAnalyst, ArtifcatAnalystConfig
 
+
 class LMQLAnalystConfig(ArtifcatAnalystConfig):
     """LMQLAnalystConfig
 
@@ -20,6 +21,7 @@ class LMQLAnalystConfig(ArtifcatAnalystConfig):
     llm_framework: str
     expert_model_kwargs: Optional[dict] = None
     generation_kwargs: Optional[dict] = None
+
 
 class LMQLAnalyst(AbstractArtifactAnalyst):
     """LMQLAnalyst

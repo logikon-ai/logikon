@@ -49,11 +49,10 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
             ebunch = [(u, v) for u, v, data in digraph.edges(data=True) if not data[am.IN_FOREST]]
             digraph.remove_edges_from(ebunch)
             return digraph
-        
+
         # Use nx.maximum_branching to truncate graph
         mbr = nx.maximum_branching(digraph.reverse(copy=True), preserve_attrs=True)
         mbr = mbr.reverse(copy=True)
-
 
         # re-add attributes to nodes
         for node, data in digraph.nodes.items():
@@ -61,7 +60,6 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
                 mbr.add_node(node, **data)
 
         return mbr
-
 
     def _to_tree_data(self, digraph: nx.DiGraph, issue: str) -> tuple[list[dict], dict, str]:
         """converts nx graph to tree data for sunburst"""
@@ -91,8 +89,8 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
 
             if digraph.out_degree(node) == 0:
                 parent = ""  # issue_id
-                color = px.colors.sequential.Blues[(2*n_roots + 4) % len(px.colors.sequential.Blues)]
-                #color = px.colors.qualitative.Pastel[n_roots % len(px.colors.qualitative.Pastel2)]
+                color = px.colors.sequential.Blues[(2 * n_roots + 4) % len(px.colors.sequential.Blues)]
+                # color = px.colors.qualitative.Pastel[n_roots % len(px.colors.qualitative.Pastel2)]
                 n_roots += 1
             else:
                 # get parent with highest link weight
