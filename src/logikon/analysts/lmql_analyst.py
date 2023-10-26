@@ -45,6 +45,9 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
                     model_kwargs["tokenizer"] = model_id
                 model = lmql.model(f"local:{model_id}", **model_kwargs)
 
+            if config.llm_framework == "llama.cpp":
+                model = lmql.model(f"local:llama.cpp:{model_id}", **model_kwargs)
+
             if config.llm_framework == "OpenAI":
                 model = lmql.model(model_id, **model_kwargs)
 
