@@ -7,6 +7,7 @@
 """
 
 from __future__ import annotations
+from typing import Any
 
 import copy
 import uuid
@@ -118,13 +119,22 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
 
         return G
 
-    def _add_above_threshold_edges(self, fuzzy_argmap: nx.DiGraph, relevance_network: nx.DiGraph):
+    def _add_above_threshold_edges(self, fuzzy_argmap: nx.DiGraph, relevance_network: nx.DiGraph) -> list[tuple[Any,Any]]:
         """add edges with weight above threshold from relevance network to fuzzy argmap (inplace)
 
         Args:
             fuzzy_argmap (nx.DiGraph): _description_
             relevance_network (nx.DiGraph): _description_
+
+        Returns:
+            adges_added (list[str]): list of edges that were added to fuzzy argmap
         """
+
+        is_forest = nx.is_forest(fuzzy_argmap.reverse())
+        if is_forest:
+            nx.set_edge_attributes(fuzzy_argmap, True, am.IN_FOREST)
+        else:
+            self.logger.warning("Fuzzy argmap is not a branching. Cannot set attribute 'in_branching' for edges.")
 
         support_weights = [
             data['weight']
@@ -144,22 +154,27 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
         self.logger.info(f"Minimum attack weight: {thrsh_attack_w}")
 
         if thrsh_support_w is None and thrsh_attack_w is None:
-            return
+            return []
+
+        edges_added = []
 
         # TODO: if there are more than _MAX_OUT_DEGREE outgoing edges from a node, we should only add the _MAX_OUT_DEGREE edges with the highest weights
-        n_edges = len(fuzzy_argmap.edges)
         for u, v, data in relevance_network.edges(data=True):
             if fuzzy_argmap.has_edge(u, v) or fuzzy_argmap.has_edge(v, u):
                 continue
-            # check degree
+            # check out-degree
             if fuzzy_argmap.out_degree(u) >= _MAX_OUT_DEGREE:
                 continue
+            data = {**data, am.IN_FOREST: False} if is_forest else data
             if data['valence'] == am.SUPPORT and thrsh_support_w is not None and data['weight'] > thrsh_support_w:
                 fuzzy_argmap.add_edge(u, v, **data)
             elif data['valence'] == am.ATTACK and thrsh_attack_w is not None and data['weight'] > thrsh_attack_w:
                 fuzzy_argmap.add_edge(u, v, **data)
+            edges_added.append((u, v))
 
-        self.logger.info(f"Added {len(fuzzy_argmap.edges) - n_edges} edges to fuzzy argmap.")
+        self.logger.info(f"Added {len(edges_added)} edges to fuzzy argmap.")
+
+        return edges_added
 
     def _analyze(self, analysis_state: AnalysisState):
         """Build fuzzy argmap from pros and cons.
@@ -193,7 +208,7 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
             relevance_network, attr='weight', default=_DEFAULT_WEIGHT, preserve_attrs=True, partition=None
         )
 
-        self._add_above_threshold_edges(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
+        edges_added = self._add_above_threshold_edges(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
 
         fuzzy_argmap = self._post_process_fuzzy_argmap(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
 
@@ -204,6 +219,7 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
             id=self.get_product(),
             description=self.get_description(),
             data=fuzzy_argmap,
+            metadata={"edges_added": edges_added},
         )
 
         analysis_state.artifacts.append(artifact)

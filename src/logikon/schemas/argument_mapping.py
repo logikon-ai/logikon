@@ -10,6 +10,8 @@ REASON = "reason"
 ATTACK = "attack"
 SUPPORT = "support"
 
+IN_FOREST = "in_forest"  # name of edge attribute indicating that edge is in argument maps spanning tree (forest)
+
 
 class AnnotationSpan(BaseModel):
     start: int
