@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Callable, Tuple, Mapping, Type
+from typing import List, Optional, Callable, Tuple, Mapping, Type, Iterable
 
 import copy
 import functools as ft
@@ -16,7 +16,7 @@ class DebuggerFactory:
     """Factory for creating a debugger pipeline based on a config."""
 
     @staticmethod
-    def run_pipeline(pipeline: List[Debugger], inputs: List[Artifact] = [], debug_state: Optional[DebugState] = None):
+    def run_pipeline(chain: Iterable[Debugger], inputs: List[Artifact] = [], debug_state: Optional[DebugState] = None):
         """runs debugger pipeline"""
 
         if debug_state is None:
@@ -41,7 +41,7 @@ class DebuggerFactory:
             state.inputs.append(input_artifact)
 
         # iterate over debuggers
-        for debugger in pipeline:
+        for debugger in chain:
             state = debugger(debug_state=state)
 
         return state
@@ -143,27 +143,27 @@ class DebuggerFactory:
 
         return debuggers_ini
 
-    def _build_pipeline(self, debuggers: List[Debugger], input_ids: List[str]) -> List[Debugger]:
-        """builds debugger pipeline respecting requirements
+    def _build_chain(self, debuggers: List[Debugger], input_ids: List[str]) -> List[Debugger]:
+        """builds debugger chain respecting requirements
 
         Args:
             debuggers (List[Debugger]): debuggers to be chained
             input_ids (List[str]): available inputs
 
         Returns:
-            List[Debugger]: chained debuggers (pipeline)
+            List[Debugger]: chained debuggers (pipeline chain)
         """
-        pipeline: list[Debugger] = []
+        chain: list[Debugger] = []
         while debuggers:
             added_any = False
-            products_available = {debugger.get_product() for debugger in pipeline} | set(input_ids)
+            products_available = {debugger.get_product() for debugger in chain} | set(input_ids)
             for debugger in debuggers:
                 requirements = debugger.get_requirements()
                 if requirements:
                     # use first requirement set to determine when to insert debugger
                     requirements = list(requirements[0]) if isinstance(requirements[0], set) else requirements
                 if set(requirements).issubset(products_available):
-                    pipeline.append(debugger)
+                    chain.append(debugger)
                     debuggers.remove(debugger)
                     added_any = True
             if not added_any:
@@ -171,7 +171,7 @@ class DebuggerFactory:
                 msg = f"Could not create debugger chain. Failed to satisfy any of the following debuggers' requirements: {debuggers_left}"
                 raise ValueError(msg)
 
-        return pipeline
+        return chain
 
     def create(self, config: ScoreConfig) -> Tuple[Optional[Callable], Optional[List[Debugger]]]:
         """Create a debugger pipeline based on a config."""
@@ -185,16 +185,16 @@ class DebuggerFactory:
 
         debuggers = self._initialize_debuggers(config, input_ids, registry)
 
-        pipeline = self._build_pipeline(debuggers, input_ids)
+        chain = self._build_chain(debuggers, input_ids)
 
-        if not pipeline:
+        if not chain:
             return None, None
 
-        self.logger.info("Built debugger pipeline:" + " -> ".join([str(type(debugger)) for debugger in pipeline]))
+        self.logger.info("Built debugger pipeline:" + " -> ".join([str(type(debugger)) for debugger in chain]))
 
-        pipeline_callable = ft.partial(self.run_pipeline, pipeline=pipeline)
+        pipeline = ft.partial(self.run_pipeline, chain=iter(chain))
 
-        return pipeline_callable, pipeline
+        return pipeline, chain
 
     @property
     def logger(self) -> logging.Logger:
