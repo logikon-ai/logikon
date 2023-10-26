@@ -106,6 +106,9 @@ class SVGMapExporter(AbstractArtifactAnalyst):
             else:
                 linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
 
+            if am.IN_FOREST in linkdata:
+                del linkdata[am.IN_FOREST]
+
             linkdata["penwidth"] = "1.5"
 
         return digraph

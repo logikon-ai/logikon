@@ -15,13 +15,13 @@ def nx_map1() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "claim 1\n", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
             {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": am.REASON, "id": "n1"},
             {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n2"},
         ],
         "links": [
-            {"valence": "pro", "source": "n1", "target": "n0"},
-            {"valence": "con", "source": "n2", "target": "n0"},
+            {"valence": "pro", "source": "n1", "target": "n0", "weight": 0.5, am.IN_FOREST: True},
+            {"valence": "con", "source": "n2", "target": "n0", "weight": 0.5, am.IN_FOREST: True},
         ],
     }
     nx_graph = nx.node_link_graph(data)
