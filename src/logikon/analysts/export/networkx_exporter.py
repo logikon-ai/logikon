@@ -7,13 +7,13 @@ from abc import abstractmethod
 import networkx as nx
 from unidecode import unidecode
 
-from logikon.debuggers.base import AbstractArtifactDebugger
+from logikon.analysts.base import AbstractArtifactAnalyst
 from logikon.schemas.argument_mapping import InformalArgMap, FuzzyArgMap
-from logikon.schemas.results import Artifact, DebugState
+from logikon.schemas.results import Artifact, AnalysisState
 
 
-class AbstractNetworkXExporter(AbstractArtifactDebugger):
-    """AbstractNetworkXExporter Debugger
+class AbstractNetworkXExporter(AbstractArtifactAnalyst):
+    """AbstractNetworkXExporter Analyst
 
     Provides base functionality to handle different argument maps
     and to export them as a networkx graph.
@@ -45,12 +45,12 @@ class AbstractNetworkXExporter(AbstractArtifactDebugger):
 
         return digraph
 
-    def _debug(self, debug_state: DebugState):
+    def _analyze(self, analysis_state: AnalysisState):
         """Reconstruct reasoning as argmap."""
 
         try:
             argmap_data = next(
-                artifact.data for artifact in debug_state.artifacts if artifact.id == self.get_requirements()[0]
+                artifact.data for artifact in analysis_state.artifacts if artifact.id == self.get_requirements()[0]
             )
         except StopIteration:
             msg = "Missing required artifact: informal_argmap"
@@ -70,13 +70,13 @@ class AbstractNetworkXExporter(AbstractArtifactDebugger):
             data=networkx_graph,
         )
 
-        debug_state.artifacts.append(artifact)
+        analysis_state.artifacts.append(artifact)
 
 
 # class NetworkXExporter(AbstractNetworkXExporter):
-#     """NetworkXExporter Debugger
+#     """NetworkXExporter Analyst
 # 
-#     This debugger exports an informal argmap as a networkx graph.
+#     This analyst exports an informal argmap as a networkx graph.
 # 
 #     It requires the following artifacts:
 #     - informal_argmap
@@ -92,9 +92,9 @@ class AbstractNetworkXExporter(AbstractArtifactDebugger):
 
 
 class RelevanceNetworkNXExporter(AbstractNetworkXExporter):
-    """RelevanceNetworkNXExporter Debugger
+    """RelevanceNetworkNXExporter Analyst
 
-    This debugger exports a relevance nets as a networkx graph.
+    This analyst exports a relevance nets as a networkx graph.
 
     It requires the following artifacts:
     - relevance_network

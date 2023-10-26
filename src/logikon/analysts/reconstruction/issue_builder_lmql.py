@@ -1,4 +1,4 @@
-"""Module with debugger for identifying text's central issue with LMQL
+"""Module with analyst for identifying text's central issue with LMQL
 
 ```mermaid
 flowchart TD
@@ -31,8 +31,8 @@ from __future__ import annotations
 
 import lmql
 
-from logikon.debuggers.reconstruction.lmql_debugger import LMQLDebugger
-from logikon.schemas.results import Artifact, DebugState
+from logikon.analysts.lmql_analyst import LMQLAnalyst
+from logikon.schemas.results import Artifact, AnalysisState
 
 N_DRAFTS = 3
 LABELS = "ABCDEFG"
@@ -110,10 +110,10 @@ def rate_issue_drafts(alternatives, questions, prompt, completion):
     '''
 
 
-class IssueBuilderLMQL(LMQLDebugger):
+class IssueBuilderLMQL(LMQLAnalyst):
     """IssueBuilderLMQL
 
-    This LMQLDebugger is responsible for summarizing the issue discussed in a text.
+    This LMQLAnalyst is responsible for summarizing the issue discussed in a text.
     """
 
     __pdescription__ = "Issue or decision problem addressed in the deliberation"
@@ -139,13 +139,13 @@ class IssueBuilderLMQL(LMQLDebugger):
             **self._generation_kwargs,
         )
 
-    def _debug(self, debug_state: DebugState):
+    def _analyze(self, analysis_state: AnalysisState):
         """Extract central issue of text (prompt/completion)."""
 
-        prompt, completion = debug_state.get_prompt_completion()
+        prompt, completion = analysis_state.get_prompt_completion()
         if prompt is None or completion is None:
             raise ValueError(
-                f"Prompt or completion is None. {self.__class__} requires both prompt and completion to debug."
+                f"Prompt or completion is None. {self.__class__} requires both prompt and completion to analyse."
             )
 
         # draft summarizations
@@ -184,4 +184,4 @@ class IssueBuilderLMQL(LMQLDebugger):
             data=issue,
         )
 
-        debug_state.artifacts.append(artifact)
+        analysis_state.artifacts.append(artifact)

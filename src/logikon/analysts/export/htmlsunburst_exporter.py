@@ -15,17 +15,17 @@ from unidecode import unidecode
 
 import logikon
 import logikon.schemas.argument_mapping as am
-from logikon.debuggers.base import AbstractArtifactDebugger
-from logikon.schemas.results import Artifact, DebugState
+from logikon.analysts.base import AbstractArtifactAnalyst
+from logikon.schemas.results import Artifact, AnalysisState
 
 MAX_LABEL_LEN = 12
 WITH_LEGEND = False
 
 
-class HTMLSunburstExporter(AbstractArtifactDebugger):
-    """HTMLSunburstExporter Debugger
+class HTMLSunburstExporter(AbstractArtifactAnalyst):
+    """HTMLSunburstExporter Analyst
 
-    This debugger exports an a networkx graph as html sunburst vial plotly express.
+    This analyst exports an a networkx graph as html sunburst vial plotly express.
 
     It requires the following artifacts:
     - fuzzy_argmap_nx, OR
@@ -148,17 +148,17 @@ class HTMLSunburstExporter(AbstractArtifactDebugger):
 
         return html
 
-    def _debug(self, debug_state: DebugState):
+    def _analyze(self, analysis_state: AnalysisState):
         """Reconstruct reasoning as argmap."""
 
-        issue = next(a.data for a in debug_state.artifacts if a.id == "issue")
+        issue = next(a.data for a in analysis_state.artifacts if a.id == "issue")
 
         networkx_graph: Optional[nx.DiGraph] = next(
-            (artifact.data for artifact in debug_state.artifacts if artifact.id == "fuzzy_argmap_nx"), None
+            (artifact.data for artifact in analysis_state.artifacts if artifact.id == "fuzzy_argmap_nx"), None
         )
         if networkx_graph is None:
             networkx_graph = next(
-                (artifact.data for artifact in debug_state.artifacts if artifact.id == "networkx_graph"), None
+                (artifact.data for artifact in analysis_state.artifacts if artifact.id == "networkx_graph"), None
             )
 
         if networkx_graph is None:
@@ -175,4 +175,4 @@ class HTMLSunburstExporter(AbstractArtifactDebugger):
             data=html_sunburst,
         )
 
-        debug_state.artifacts.append(artifact)
+        analysis_state.artifacts.append(artifact)

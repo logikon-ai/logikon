@@ -4,8 +4,8 @@ import pytest
 import os
 
 import logikon.schemas.argument_mapping as am
-from logikon.debuggers.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
-from logikon.debuggers.base import ArtifcatDebuggerConfig
+from logikon.analysts.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
+from logikon.analysts.base import ArtifcatAnalystConfig
 
 
 @pytest.fixture(name="nx_map1")
@@ -56,12 +56,12 @@ def nx_map2() -> nx.DiGraph:
 
 
 def test_preprocessor01(nx_map1: nx.DiGraph):
-    config = ArtifcatDebuggerConfig()
-    debugger = FuzzyArgMapBuilder(config)
+    config = ArtifcatAnalystConfig()
+    analyst = FuzzyArgMapBuilder(config)
 
     print(nx.node_link_data(nx_map1))
 
-    rn_pp = debugger._preprocess_network(nx_map1)
+    rn_pp = analyst._preprocess_network(nx_map1)
 
     print(nx.node_link_data(rn_pp))
 
@@ -76,12 +76,12 @@ def test_preprocessor01(nx_map1: nx.DiGraph):
 
 
 def test_reduction_workflow(nx_map1: nx.DiGraph):
-    config = ArtifcatDebuggerConfig()
-    debugger = FuzzyArgMapBuilder(config)
+    config = ArtifcatAnalystConfig()
+    analyst = FuzzyArgMapBuilder(config)
 
     print(f"Original rel network:\n{nx.node_link_data(nx_map1)}")
 
-    relevance_network = debugger._preprocess_network(nx_map1)
+    relevance_network = analyst._preprocess_network(nx_map1)
 
     print(f"With pseudo edges:\n{nx.node_link_data(relevance_network)}")
 
@@ -91,11 +91,11 @@ def test_reduction_workflow(nx_map1: nx.DiGraph):
 
     print(f"Maximum branching:\n{nx.node_link_data(fuzzy_argmap)}")
 
-    debugger._add_above_threshold_edges(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
+    analyst._add_above_threshold_edges(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
 
     print(f"Expanded branching:\n{nx.node_link_data(fuzzy_argmap)}")
 
-    fuzzy_argmap = debugger._post_process_fuzzy_argmap(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
+    fuzzy_argmap = analyst._post_process_fuzzy_argmap(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)
 
     print(f"Postprocessed fuzzy argmap:\n{nx.node_link_data(fuzzy_argmap)}")
 

@@ -1,4 +1,4 @@
-"""Module with debugger for reducing fuzzy nx graph to deterministic nx graph.
+"""Module with analyst for reducing fuzzy nx graph to deterministic nx graph.
 
 1. Find an optimal branching of the fuzzy nx graph
 2. Determine minimum weight of attack / support edges in branching
@@ -14,8 +14,8 @@ import uuid
 import networkx as nx
 import numpy as np
 
-from logikon.debuggers.base import AbstractArtifactDebugger
-from logikon.schemas.results import Artifact, DebugState
+from logikon.analysts.base import AbstractArtifactAnalyst
+from logikon.schemas.results import Artifact, AnalysisState
 import logikon.schemas.argument_mapping as am
 
 
@@ -24,10 +24,10 @@ _DEFAULT_WEIGHT = 0  # default weight for edges in relevance graphs
 _MAX_OUT_DEGREE = 3  # maximum out degree of nodes in fuzzy argmap
 
 
-class FuzzyArgMapBuilder(AbstractArtifactDebugger):
+class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
     """FuzzyArgMapBuilder
 
-    This LMQLDebugger is responsible for reducing a quasi-complete relevance network to a fuzzy argument map (nx graph).
+    This LMQLAnalyst is responsible for reducing a quasi-complete relevance network to a fuzzy argument map (nx graph).
 
     """
 
@@ -161,11 +161,11 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
 
         self.logger.info(f"Added {len(fuzzy_argmap.edges) - n_edges} edges to fuzzy argmap.")
 
-    def _debug(self, debug_state: DebugState):
+    def _analyze(self, analysis_state: AnalysisState):
         """Build fuzzy argmap from pros and cons.
 
         Args:
-            debug_state (DebugState): current debug_state to which new artifact is added
+            analysis_state (AnalysisState): current analysis_state to which new artifact is added
 
         Raises:
             ValueError: Failure to create Fuzzy argument map
@@ -179,10 +179,10 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
 
         """
 
-        relevance_network = next((a.data for a in debug_state.artifacts if a.id == "relevance_network_nx"), None)
+        relevance_network = next((a.data for a in analysis_state.artifacts if a.id == "relevance_network_nx"), None)
         if relevance_network is None:
             raise ValueError(
-                "Missing required artifact: relevance_network. Available artifacts: " + str(debug_state.artifacts)
+                "Missing required artifact: relevance_network. Available artifacts: " + str(analysis_state.artifacts)
             )
 
         self._sanity_checks(relevance_network)
@@ -206,4 +206,4 @@ class FuzzyArgMapBuilder(AbstractArtifactDebugger):
             data=fuzzy_argmap,
         )
 
-        debug_state.artifacts.append(artifact)
+        analysis_state.artifacts.append(artifact)

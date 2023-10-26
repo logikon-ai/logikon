@@ -1,4 +1,4 @@
-"""Module with debugger for building a fuzzy (informal) argument map with LMQL
+"""Module with analyst for building a fuzzy (informal) argument map with LMQL
 
 ```mermaid
 flowchart TD
@@ -45,9 +45,9 @@ import tqdm
 
 import lmql
 
-from logikon.debuggers.reconstruction.lmql_debugger import LMQLDebugger
-import logikon.debuggers.reconstruction.lmql_queries as lmql_queries
-from logikon.schemas.results import Artifact, DebugState
+from logikon.analysts.lmql_analyst import LMQLAnalyst
+import logikon.analysts.lmql_queries as lmql_queries
+from logikon.schemas.results import Artifact, AnalysisState
 from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
 from logikon.schemas.argument_mapping import FuzzyArgMap, FuzzyArgMapEdge, ArgMapNode
 
@@ -241,10 +241,10 @@ def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
     '''
 
 
-class RelevanceNetworkBuilderLMQL(LMQLDebugger):
+class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
     """RelevanceNetworkBuilderLMQL
 
-    This LMQLDebugger is responsible for creating a relevance network, i.e. a (quasi-) complete fuzzy argmap, from a pros and cons list and a given issue.
+    This LMQLAnalyst is responsible for creating a relevance network, i.e. a (quasi-) complete fuzzy argmap, from a pros and cons list and a given issue.
 
     """
 
@@ -385,11 +385,11 @@ class RelevanceNetworkBuilderLMQL(LMQLDebugger):
         map.edgelist.append(edge)
         return edge
 
-    def _debug(self, debug_state: DebugState):
+    def _analyze(self, analysis_state: AnalysisState):
         """Build fuzzy argmap from pros and cons.
 
         Args:
-            debug_state (DebugState): current debug_state to which new artifact is added
+            analysis_state (AnalysisState): current analysis_state to which new artifact is added
 
         Raises:
             ValueError: Failure to create Fuzzy argument map
@@ -402,13 +402,13 @@ class RelevanceNetworkBuilderLMQL(LMQLDebugger):
 
         """
 
-        issue = next((a.data for a in debug_state.artifacts if a.id == "issue"), None)
+        issue = next((a.data for a in analysis_state.artifacts if a.id == "issue"), None)
         if issue is None:
-            raise ValueError("Missing required artifact: issue. Available artifacts: " + str(debug_state.artifacts))
+            raise ValueError("Missing required artifact: issue. Available artifacts: " + str(analysis_state.artifacts))
 
-        pros_and_cons_data = next((a.data for a in debug_state.artifacts if a.id == "proscons"), None)
+        pros_and_cons_data = next((a.data for a in analysis_state.artifacts if a.id == "proscons"), None)
         if pros_and_cons_data is None:
-            raise ValueError("Missing required artifact: proscons. Available artifacts: " + str(debug_state.artifacts))
+            raise ValueError("Missing required artifact: proscons. Available artifacts: " + str(analysis_state.artifacts))
         try:
             pros_and_cons = ProsConsList(**pros_and_cons_data)
         except:
@@ -457,4 +457,4 @@ class RelevanceNetworkBuilderLMQL(LMQLDebugger):
             metadata=dict(unpacking=unpacking),
         )
 
-        debug_state.artifacts.append(artifact)
+        analysis_state.artifacts.append(artifact)

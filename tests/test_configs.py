@@ -1,8 +1,8 @@
 # test score function
 
 from logikon.schemas.configs import ScoreConfig
-from logikon.debuggers.registry import get_debugger_registry
-from logikon.debuggers.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
+from logikon.analysts.registry import get_analyst_registry
+from logikon.analysts.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
 
 
 def test_configs():
@@ -26,10 +26,10 @@ def test_config_overwrite_global():
             expert_model="text-ada-002",
             llm_framework="OpenAI",
         ),
-        debugger_configs={
+        analyst_configs={
             "ProsConsBuilderLMQL": {"llm_framework": "transformers"},
         },
     )
-    config = config.cast(get_debugger_registry())
+    config = config.cast(get_analyst_registry())
 
-    assert config.get_debugger_config(ProsConsBuilderLMQL).llm_framework == "transformers"
+    assert config.get_analyst_config(ProsConsBuilderLMQL).llm_framework == "transformers"

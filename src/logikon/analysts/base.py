@@ -1,17 +1,17 @@
 import logging
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import List, Optional, Union, Type
 
-from logikon.schemas.results import DebugState
-from logikon.debuggers.interface import Debugger, DebuggerConfig
+from logikon.schemas.results import AnalysisState
+from logikon.analysts.interface import Analyst, AnalystConfig
 
 ARTIFACT = "ARTIFACT"
 SCORE = "SCORE"
 
 
-class AbstractDebugger(Debugger):
+class AbstractAnalyst(Analyst):
     """
-    Base debugger class with default __call__ implementation.
+    Base analyst class with default __call__ implementation.
     """
 
     __product__: Optional[str] = None
@@ -19,20 +19,20 @@ class AbstractDebugger(Debugger):
     __pdescription__: Optional[str] = None
     __configclass__: Optional[Type] = None
 
-    def __init__(self, config: DebuggerConfig):
+    def __init__(self, config: AnalystConfig):
         self._config = config
 
     @abstractmethod
-    def _debug(self, debug_state: DebugState):
-        """Debug debug_state."""
+    def _analyze(self, analysis_state: AnalysisState):
+        """Analysis given state."""
         pass
 
-    def __call__(self, debug_state: DebugState) -> DebugState:
-        """Carries out debugging process associated with this debugger for given debug_state."""
+    def __call__(self, analysis_state: AnalysisState) -> AnalysisState:
+        """Carries out analysis associated with this analyst for given analysis_state."""
 
-        self._debug(debug_state=debug_state)
+        self._analyze(analysis_state=analysis_state)
 
-        return debug_state
+        return analysis_state
 
     @classmethod
     def get_product(cls) -> str:
@@ -54,9 +54,9 @@ class AbstractDebugger(Debugger):
     def get_config_class(cls) -> Type:
         if cls.__configclass__ is None:
             raise ValueError(f"Config class not defined for {cls.__name__}.")
-        # check if configclass is subclass of DebuggerConfig
-        if not issubclass(cls.__configclass__, DebuggerConfig):
-            raise ValueError(f"Config class {cls.__name__} not derived from DebuggerConfig.")
+        # check if configclass is subclass of AnalystConfig
+        if not issubclass(cls.__configclass__, AnalystConfig):
+            raise ValueError(f"Config class {cls.__name__} not derived from AnalystConfig.")
         return cls.__configclass__
 
     @property
@@ -67,29 +67,29 @@ class AbstractDebugger(Debugger):
         return logging.getLogger(self.__class__.__name__)
 
 
-class ArtifcatDebuggerConfig(DebuggerConfig):
+class ArtifcatAnalystConfig(AnalystConfig):
     pass
 
-class AbstractArtifactDebugger(AbstractDebugger):
+class AbstractArtifactAnalyst(AbstractAnalyst):
     """
-    Base debugger class for creating artifacts.
+    Base analyst class for creating artifacts.
     """
 
-    __configclass__ = ArtifcatDebuggerConfig
+    __configclass__ = ArtifcatAnalystConfig
 
     @property
     def product_type(self) -> str:
         return ARTIFACT
 
-class ScoreDebuggerConfig(DebuggerConfig):
+class ScoreAnalystConfig(AnalystConfig):
     pass
 
-class AbstractScoreDebugger(AbstractDebugger):
+class AbstractScoreAnalyst(AbstractAnalyst):
     """
-    Base debugger class for creating scores.
+    Base analyst class for creating scores.
     """
 
-    __configclass__ = ScoreDebuggerConfig
+    __configclass__ = ScoreAnalystConfig
 
     @property
     def product_type(self) -> str:

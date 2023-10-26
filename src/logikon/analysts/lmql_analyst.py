@@ -1,4 +1,4 @@
-# lmql_debugger.py
+# lmql_analyst.py
 
 from __future__ import annotations
 
@@ -6,13 +6,13 @@ from typing import Optional, Type
 
 import lmql
 
-from logikon.debuggers.model_registry import get_registry_model, register_model
-from logikon.debuggers.base import AbstractArtifactDebugger, ArtifcatDebuggerConfig
+from logikon.utils.model_registry import get_registry_model, register_model
+from logikon.analysts.base import AbstractArtifactAnalyst, ArtifcatAnalystConfig
 
-class LMQLDebuggerConfig(ArtifcatDebuggerConfig):
-    """LMQLDebuggerConfig
+class LMQLAnalystConfig(ArtifcatAnalystConfig):
+    """LMQLAnalystConfig
 
-    Configuration for LMQLDebugger.
+    Configuration for LMQLAnalyst.
 
     """
 
@@ -21,16 +21,16 @@ class LMQLDebuggerConfig(ArtifcatDebuggerConfig):
     expert_model_kwargs: Optional[dict] = None
     generation_kwargs: Optional[dict] = None
 
-class LMQLDebugger(AbstractArtifactDebugger):
-    """LMQLDebugger
+class LMQLAnalyst(AbstractArtifactAnalyst):
+    """LMQLAnalyst
 
-    Base class for reconstruction debuggers that use `lmql` module.
+    Base class for reconstruction analysts that use `lmql` module.
 
     """
 
-    __configclass__: Type[ArtifcatDebuggerConfig] = LMQLDebuggerConfig
+    __configclass__: Type[ArtifcatAnalystConfig] = LMQLAnalystConfig
 
-    def __init__(self, config: LMQLDebuggerConfig):
+    def __init__(self, config: LMQLAnalystConfig):
         super().__init__(config)
 
         model_id = config.expert_model

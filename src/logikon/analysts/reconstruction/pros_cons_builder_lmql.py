@@ -1,4 +1,4 @@
-"""Module with debugger for building a pros & cons list with LMQL
+"""Module with analyst for building a pros & cons list with LMQL
 
 ```mermaid
 flowchart TD
@@ -44,9 +44,9 @@ import uuid
 
 import lmql
 
-from logikon.debuggers.reconstruction.lmql_debugger import LMQLDebugger
-import logikon.debuggers.reconstruction.lmql_queries as lmql_queries
-from logikon.schemas.results import Artifact, DebugState
+from logikon.analysts.lmql_analyst import LMQLAnalyst
+import logikon.analysts.lmql_queries as lmql_queries
+from logikon.schemas.results import Artifact, AnalysisState
 from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
 import logikon.schemas.argument_mapping as am
 
@@ -496,10 +496,10 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
     '''
 
 
-class ProsConsBuilderLMQL(LMQLDebugger):
+class ProsConsBuilderLMQL(LMQLAnalyst):
     """ProsConsBuilderLMQL
 
-    This LMQLDebugger is responsible for reconstructing a pros and cons list for a given issue.
+    This LMQLAnalyst is responsible for reconstructing a pros and cons list for a given issue.
 
     """
 
@@ -723,11 +723,11 @@ class ProsConsBuilderLMQL(LMQLDebugger):
 
         return revised_pros_and_cons
 
-    def _debug(self, debug_state: DebugState):
+    def _analyze(self, analysis_state: AnalysisState):
         """Extract pros and cons of text (prompt/completion).
 
         Args:
-            debug_state (DebugState): current debug_state to which new artifact is added
+            analysis_state (AnalysisState): current analysis_state to which new artifact is added
 
         Raises:
             ValueError: Failure to create pros and cons list
@@ -740,12 +740,12 @@ class ProsConsBuilderLMQL(LMQLDebugger):
 
         """
 
-        prompt, completion = debug_state.get_prompt_completion()
-        issue = next(a.data for a in debug_state.artifacts if a.id == "issue")
+        prompt, completion = analysis_state.get_prompt_completion()
+        issue = next(a.data for a in analysis_state.artifacts if a.id == "issue")
 
         if prompt is None or completion is None:
             raise ValueError(
-                f"Prompt or completion is None. {self.__class__} requires both prompt and completion to debug."
+                f"Prompt or completion is None. {self.__class__} requires both prompt and completion to analyze."
             )
 
         # mine reasons
@@ -792,4 +792,4 @@ class ProsConsBuilderLMQL(LMQLDebugger):
             metadata={"reasons_list": reasons, "unused_reasons_list": unused_reasons},
         )
 
-        debug_state.artifacts.append(artifact)
+        analysis_state.artifacts.append(artifact)

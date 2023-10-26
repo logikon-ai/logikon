@@ -23,7 +23,7 @@ class BaseCTModel(BaseModel):
 
 
 class Artifact(BaseCTModel):
-    """An artifact serving as input and/or generated through logical debugging."""
+    """An artifact serving as input and/or generated through logical analysis."""
 
     data: Any
     dtype: Optional[str] = None
@@ -36,7 +36,7 @@ class Score(BaseCTModel):
     comment: Optional[str] = None
 
 
-class DebugState(BaseModel):
+class AnalysisState(BaseModel):
     """Scores for the completion."""
 
     inputs: list[Artifact] = []

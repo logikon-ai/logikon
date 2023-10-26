@@ -4,16 +4,16 @@ from typing import Any, Dict, List, Optional, Union
 
 import copy
 
-from logikon.debuggers.factory import DebuggerFactory
+from logikon.analysts.director import Director
 from logikon.schemas.configs import ScoreConfig
-from logikon.schemas.results import DebugState, Artifact, INPUT_KWS
+from logikon.schemas.results import AnalysisState, Artifact, INPUT_KWS
 
 
 def score(
     prompt: Optional[str] = None,
     completion: Optional[str] = None,
     config: Optional[Union[ScoreConfig,str]] = None,
-) -> Optional[DebugState]:
+) -> Optional[AnalysisState]:
     """Score the completion."""
 
     if config is None:
@@ -39,12 +39,12 @@ def score(
             )
         config.inputs.append(Artifact(id=INPUT_KWS.completion, description="Completion", data=completion, dtype="str"))
 
-    # Dynamically construct debugger pipeline based on config
-    debugger_pipeline, _ = DebuggerFactory().create(config)
-    if not debugger_pipeline:
-        return DebugState()
+    # Dynamically create analyst pipeline based on config
+    pipeline, _ = Director().create(config)
+    if not pipeline:
+        return AnalysisState()
 
-    # Debug the completion
-    debug_results = debugger_pipeline(inputs=config.inputs)
+    # Analyze the completion
+    analysis_results = pipeline(inputs=config.inputs)
 
-    return debug_results
+    return analysis_results

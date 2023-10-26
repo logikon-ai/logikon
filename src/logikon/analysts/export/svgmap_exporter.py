@@ -12,14 +12,14 @@ from unidecode import unidecode
 
 import logikon
 import logikon.schemas.argument_mapping as am
-from logikon.debuggers.base import AbstractArtifactDebugger
-from logikon.schemas.results import Artifact, DebugState
+from logikon.analysts.base import AbstractArtifactAnalyst
+from logikon.schemas.results import Artifact, AnalysisState
 
 
-class SVGMapExporter(AbstractArtifactDebugger):
-    """SVGMapExporter Debugger
+class SVGMapExporter(AbstractArtifactAnalyst):
+    """SVGMapExporter Analyst
 
-    This debugger exports an a networkx graph as svg via graphviz.
+    This analyst exports an a networkx graph as svg via graphviz.
 
     It requires the following artifacts:
     - fuzzy_argmap_nx, OR
@@ -140,15 +140,15 @@ class SVGMapExporter(AbstractArtifactDebugger):
 
         return svg
 
-    def _debug(self, debug_state: DebugState):
+    def _analyze(self, analysis_state: AnalysisState):
         """Reconstruct reasoning as argmap."""
 
         networkx_graph: Optional[nx.DiGraph] = next(
-            (artifact.data for artifact in debug_state.artifacts if artifact.id == "fuzzy_argmap_nx"), None
+            (artifact.data for artifact in analysis_state.artifacts if artifact.id == "fuzzy_argmap_nx"), None
         )
         if networkx_graph is None:
             networkx_graph = next(
-                (artifact.data for artifact in debug_state.artifacts if artifact.id == "networkx_graph"), None
+                (artifact.data for artifact in analysis_state.artifacts if artifact.id == "networkx_graph"), None
             )
 
         if networkx_graph is None:
@@ -163,4 +163,4 @@ class SVGMapExporter(AbstractArtifactDebugger):
             data=svg_argmap,
         )
 
-        debug_state.artifacts.append(artifact)
+        analysis_state.artifacts.append(artifact)

@@ -3,7 +3,7 @@ from typing import List, Optional
 
 import pytest
 
-from logikon.debuggers.reconstruction.pros_cons_builder_lmql import (
+from logikon.analysts.reconstruction.pros_cons_builder_lmql import (
     EXAMPLES_ISSUE_PROSCONS,
     format_proscons,
     format_examples,
