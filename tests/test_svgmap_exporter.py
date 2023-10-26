@@ -15,9 +15,9 @@ def nx_map1() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": am.REASON, "id": "n1"},
+            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n2"},
         ],
         "links": [
             {"valence": "pro", "source": "n1", "target": "n0"},
@@ -39,7 +39,7 @@ def nx_map2() -> nx.DiGraph:
                 "text": 10 * (f"argument-{i} and "),
                 "label": f"arg{i}",
                 "annotations": [],
-                "nodeType": "proposition",
+                "nodeType": am.REASON,
                 "id": f"n{i}",
             }
             for i in range(16)
@@ -57,9 +57,9 @@ def nx_map3() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": am.REASON, "id": "n1"},
+            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n2"},
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.25},

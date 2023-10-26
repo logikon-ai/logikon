@@ -40,6 +40,9 @@ class SVGMapExporter(AbstractArtifactAnalyst):
     _NODE_TEMPLATE = """<
     <TABLE BORDER="4" COLOR="{bgcolor}" CELLPADDING="2" CELLSPACING="2"  BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>{label}</B></FONT></TD></TR><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0">{text}</FONT></TD></TR></TABLE>
     >"""
+    _CLAIM_NODE_TEMPLATE = """<
+    <TABLE BORDER="4" COLOR="{bgcolor}" CELLPADDING="2" CELLSPACING="2"  BGCOLOR="white" STYLE="rounded" ALIGN="center"><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>{label}</B></FONT></TD></TR><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0">{text}</FONT></TD></TR></TABLE>
+    >"""
 
     def __init__(self, config):
         super().__init__(config)
@@ -76,7 +79,12 @@ class SVGMapExporter(AbstractArtifactAnalyst):
             textlines = textwrap.wrap(nodedata["label"], width=25)
             label = "<BR/>".join(textlines)
 
-            nodedata["label"] = self._NODE_TEMPLATE.format(
+            if nodedata.get("nodeType") == am.CENTRAL_CLAIM:
+                template = self._CLAIM_NODE_TEMPLATE
+            else:
+                template = self._NODE_TEMPLATE
+
+            nodedata["label"] = template.format(
                 text=text,
                 label=label,
                 bgcolor="lightblue",
@@ -112,7 +120,7 @@ class SVGMapExporter(AbstractArtifactAnalyst):
             comment=f'Created with `logikon` python module version {logikon.__version__}',
             graph_attr=dict(
                 format="svg",
-                rankdir="TD",
+                rankdir="BT",
                 ratio="compress",
                 orientation="portrait",
                 # overlap="compress",
@@ -125,18 +133,8 @@ class SVGMapExporter(AbstractArtifactAnalyst):
         for edge, edgedata in digraph.edges.items():
             dot.edge(str(edge[0]), str(edge[-1]), **edgedata)
 
-        # dot: pydot.Graph = nx.nx_pydot.to_pydot(digraph)
-        # dot.set("rankdir", "RL")
-        # dot.set("ratio", "compress")
-        # # dot.set("size", "24")
-        # dot.set("orientation", "portrait")
-        # dot.set("overlap", "compress")
-
-        # gv = graphviz.Source(str(dot))
-
         dot.format = "svg"
         svg = dot.pipe(encoding="utf-8")
-        # svg = dot.create_svg(prog=["dot"])
 
         return svg
 
