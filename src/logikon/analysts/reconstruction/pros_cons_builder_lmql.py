@@ -40,6 +40,7 @@ import copy
 import functools as ft
 import pprint
 import random
+import re
 import uuid
 
 import lmql
@@ -123,6 +124,13 @@ EXAMPLES_ISSUE_PROSCONS = [
 
 ### FORMATTERS ###
 
+def trunk_to_sentence(text: str) -> str:
+    """Truncates text by cutting off incomplete sentences."""
+    text = text.strip(" \'\n")
+    if text[-1] not in [".", "!", "?"]:
+        # split text at any of ".", "!", "?"
+        text = "".join(re.split(r"([.!?])", text)[:-1])
+    return text
 
 def format_reason(reason: Claim, max_len: int = -1) -> str:
     label_text = f"[{reason.label}]: {reason.text}"
@@ -197,7 +205,7 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
         - For each argument, sketch the argument's gist in one or two grammatically correct sentences, staying close to the original wording, and provide a telling title (2-4 words). I.e.:
             ```
             - title: "a very short title"
-              gist: "the argument's gist in 1-2 sentences."
+              gist: "the argument's gist in 1-2 short sentences (less than {MAX_LEN_GIST} chars)."
             ```
         - Avoid repeating one and the same argument in different words.
         - You don't have to distinguish between pro and con arguments.
@@ -224,7 +232,7 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
                 if not TITLE.endswith('\"'):
                     "\" "
                 title = TITLE.strip('\"')
-                "\n  gist: \"[GIST]" where STOPS_AT(GIST, "\"") and STOPS_AT(GIST, "\n") and len(GIST) < MAX_LEN_GIST
+                "\n  gist: \"[@trunk_to_sentence GIST]" where STOPS_AT(GIST, "\"") and STOPS_AT(GIST, "\n") and len(GIST) < MAX_LEN_GIST
                 if not GIST.endswith('\"'):
                     "\" "
                 gist = GIST.strip('\"')
