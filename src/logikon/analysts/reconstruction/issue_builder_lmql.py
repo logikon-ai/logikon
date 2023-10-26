@@ -55,7 +55,7 @@ def strip_issue_tag(text: str) -> str:
 
 @lmql.query
 def key_issue(prompt, completion):
-    """
+    '''lmql
     sample(n=3, temperature=.4, chunksize=4)
         "### System\n\n"
         "You are a helpful argumentation analysis assistant.\n\n"
@@ -78,7 +78,7 @@ def key_issue(prompt, completion):
         "[@strip_issue_tag ISSUE]"
     where
         STOPS_AT(ISSUE, "</ISSUE>")
-    """
+    '''
 
 
 @lmql.query
