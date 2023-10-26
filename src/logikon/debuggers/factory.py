@@ -81,10 +81,10 @@ class DebuggerFactory:
                         f"Inconsistent configuration. {key.get_product()} provided as input but also as metric / artifact."
                     )
 
-    def _initialize_debuggers(
+    def _collect_debuggers(
         self, config: ScoreConfig, input_ids: List[str], registry: Mapping[str, List[type[Debugger]]]
-    ) -> List[Debugger]:
-        """collect and initialize all debuggers required for running current configuration
+    ) -> List[type[Debugger]]:
+        """collect all debuggers required for running current configuration
 
         Args:
             config (ScoreConfig): configuration
@@ -93,21 +93,21 @@ class DebuggerFactory:
         """
 
         # Create list of debuggers classes from config and registry
-        debuggers: List[Type[Debugger]] = []
+        debugger_classes: List[Type[Debugger]] = []
         for key in config.metrics + config.artifacts:
             if isinstance(key, str):
-                new_debugger = registry[key][0]  # first debugger class in registry list is default
+                debugger_cls = registry[key][0]  # first debugger class in registry list is default
             else:
-                new_debugger = key
-            debuggers.append(new_debugger)
+                debugger_cls = key
+            debugger_classes.append(debugger_cls)
 
         # Check if all requirements are met and add further debuggers as necessary
         requirements_satisfied = False
 
         while not requirements_satisfied:
-            products = {debugger.get_product() for debugger in debuggers}
+            products = {debugger.get_product() for debugger in debugger_classes}
             missing_products = set()
-            for debugger in debuggers:
+            for debugger in debugger_classes:
                 requirements = debugger.get_requirements()
                 if requirements and isinstance(requirements[0], set):
                     if not any(set(rs).issubset(products | set(input_ids)) for rs in requirements):
@@ -133,15 +133,29 @@ class DebuggerFactory:
                     msg = f"Debugger requirement '{missing_product_kw}' does not correspond to a registered debugger."
                     raise ValueError(msg)
                 new_debugger = registry[missing_product_kw][0]
-                debuggers.append(new_debugger)
+                debugger_classes.append(new_debugger)
+
+        return debugger_classes
+
+
+    def _initialize_debuggers(
+        self, config: ScoreConfig, debugger_classes: List[Type[Debugger]]
+    ) -> List[Debugger]:
+        """initialize all debuggers with config
+
+        Args:
+            config (ScoreConfig): configuration
+            debugger_classes: List[Type[Debugger]]: debugger classes to initialize
+        """
 
         # Initialize debuggers
-        debuggers_ini = []
-        for debugger in debuggers:
-            debugger_config = config.get_debugger_config(debugger)
-            debuggers_ini.append(debugger(config=debugger_config))
+        debuggers = []
+        for debugger_cls in debugger_classes:
+            debugger_config = config.get_debugger_config(debugger_cls)
+            debuggers.append(debugger_cls(config=debugger_config))
 
-        return debuggers_ini
+        return debuggers
+
 
     def _build_chain(self, debuggers: List[Debugger], input_ids: List[str]) -> List[Debugger]:
         """builds debugger chain respecting requirements
@@ -183,7 +197,9 @@ class DebuggerFactory:
 
         self._run_consistency_checks(config, input_ids, registry)
 
-        debuggers = self._initialize_debuggers(config, input_ids, registry)
+        debugger_classes = self._collect_debuggers(config, input_ids, registry)
+
+        debuggers = self._initialize_debuggers(config, debugger_classes)
 
         chain = self._build_chain(debuggers, input_ids)
 
