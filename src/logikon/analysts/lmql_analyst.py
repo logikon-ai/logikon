@@ -7,6 +7,7 @@ from typing import Optional, Type
 import lmql
 
 from logikon.utils.model_registry import get_registry_model, register_model
+from logikon.utils.prompt_templates_registry import get_prompt_template
 from logikon.analysts.base import AbstractArtifactAnalyst, ArtifcatAnalystConfig
 
 
@@ -61,6 +62,8 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
             raise ValueError(f"Model {model_id} is not an lmql model.")
 
         model_kwargs.pop("tokenizer", None)
+
         self._model: lmql.LLM = model
         self._model_kwargs = model_kwargs
         self._generation_kwargs = config.generation_kwargs if config.generation_kwargs is not None else {}
+        self._prompt_template = get_prompt_template(model_kwargs.pop("prompt_template", None))
