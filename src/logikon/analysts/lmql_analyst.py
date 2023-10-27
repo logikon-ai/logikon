@@ -7,7 +7,7 @@ from typing import Optional, Type
 import lmql
 
 from logikon.utils.model_registry import get_registry_model, register_model
-from logikon.utils.prompt_templates_registry import get_prompt_template
+from logikon.utils.prompt_templates_registry import get_prompt_template, PromptTemplate
 from logikon.analysts.base import AbstractArtifactAnalyst, ArtifcatAnalystConfig
 
 
@@ -63,7 +63,20 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
 
         model_kwargs.pop("tokenizer", None)
 
+        prompt_template = model_kwargs.pop("prompt_template", None)
+        if isinstance(prompt_template, dict):
+            # try to parse prompt template
+            try:
+                prompt_template = PromptTemplate.from_dict(prompt_template)
+            except Exception as e:
+                self.logger.warning(f"Failed to parse prompt template: {e}. Will use defaul prompt template.")
+                prompt_template = None
+        if isinstance(prompt_template, str) or prompt_template is None:
+            prompt_template = get_prompt_template(prompt_template)
+        else:
+            raise ValueError(f"Invalid prompt template: {prompt_template}")
+
         self._model: lmql.LLM = model
         self._model_kwargs = model_kwargs
         self._generation_kwargs = config.generation_kwargs if config.generation_kwargs is not None else {}
-        self._prompt_template = get_prompt_template(model_kwargs.pop("prompt_template", None))
+        self._prompt_template = prompt_template

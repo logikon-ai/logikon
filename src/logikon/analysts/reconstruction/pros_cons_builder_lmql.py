@@ -643,6 +643,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                     pro.dict(),
                     revised_pros_and_cons.roots[new_target_idx].dict(),
                     issue=issue,
+                    prmpt_data=self._prompt_template.to_dict(),
                     model=self._model,
                     **self._generation_kwargs,
                 )
@@ -701,6 +702,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                     con.dict(),
                     revised_pros_and_cons.roots[new_target_idx].dict(),
                     issue=issue,
+                    prmpt_data=self._prompt_template.to_dict(),
                     model=self._model,
                     **self._generation_kwargs,
                 )
