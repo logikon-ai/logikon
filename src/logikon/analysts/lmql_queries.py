@@ -8,16 +8,12 @@ import lmql
 
 from logikon.schemas.pros_cons import Claim
 import logikon.schemas.argument_mapping as am
+from logikon.utils.prompt_templates_registry import PromptTemplate
 
 
 def system_prompt() -> str:
-    """Returns the system prompt used in all lmql queries"""
-    system_prompt = """
-### System
-        
-You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible.
-"""
-
+    """Returns the bare system prompt used in all lmql queries"""
+    system_prompt = "You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible."
     return system_prompt
 
 
@@ -28,6 +24,7 @@ def supports_q(argument_data: dict, claim_data: dict):
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
         """
+        ### System
         {system_prompt()}
 
         ### User
@@ -66,6 +63,7 @@ def attacks_q(argument_data: dict, claim_data: dict):
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
         """
+        ### System
         {system_prompt()}
 
         ### User
@@ -106,6 +104,7 @@ def most_confirmed(argument_data: dict, claims_data: list):
         assert len(claims) <= 10
         labels = [l for l in "ABCDEFGHIJ"][:len(claims)]
         """
+        ### System
         {system_prompt()}
 
         ### User
@@ -144,6 +143,7 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
         assert len(claims) <= 10
         labels = [l for l in "ABCDEFGHIJ"][:len(claims)]
         """
+        ### System
         {system_prompt()}
 
         ### User
@@ -178,17 +178,18 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
 
 
 @lmql.query
-def valence(argument_data: dict, claim_data: dict, issue: str = ""):
+def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict):
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
+        prmpt = PromptTemplate(**prmpt_data)
         issue_text = f"Both claim and consideration have been set forth in a debate about this issue: {issue}\n" if issue else ""
         """
-        {system_prompt()}
+        {prmpt.sys_start}
+        {system_prompt()}{prmpt.sys_end}
 
-        ### User
-
+        {prmpt.user_start}
         Assignment: Identify whether a given consideration speaks for or against a claim.
 
         {issue_text}Read the following consideration and claim carefully.
@@ -203,22 +204,21 @@ def valence(argument_data: dict, claim_data: dict, issue: str = ""):
         Does the consideration speak for, or against the claim?
 
         Here is some explanation and a simple heuristic that may help you to solve this task:
-        Assuming that both the claim and the consideration were true, is it more plausible to connect them with "because" or with "although"?
+        Assume that (clear-thinking and fact-loving) Bob accepts both the claim and the consideration. Which is, for Bob, the more plausible way to express his stance?
 
-        (A) "{claim.text} BECAUSE {argument.text}"
-        (B) "{claim.text} ALTHOUGH {argument.text}"
+        (A) "{claim.text} Which is (partly) because I believe: {argument.text}"
+        (B) "{claim.text} Nonetheless, I also believe that: {argument.text}"
 
         If (A) sounds more plausible, then the consideration is an argument for the claim (speaks for). If (B) is more plausible, the consideration is an objection to the claim (speaks against).
 
         So, given your thorough assessment, which is correct:
 
-        (A) The consideration speaks for the claim.
-        (B) The consideration speaks against the claim.
+        (A) The consideration tends to speak for the claim.
+        (B) The consideration tends to speak against the claim.
 
-        Just answer with (A/B). You'll be asked to justify your answer later on.
+        Just answer with (A/B). You'll be asked to justify your answer later on.{prmpt.user_end}
 
-        ### Assistant
-
+        {prmpt.ass_start}
         Answer: ([LABEL]"""
     distribution
         LABEL in ["A", "B"]

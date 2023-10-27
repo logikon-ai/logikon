@@ -183,6 +183,7 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
     '''lmql
     sample(temperature=.4, chunksize=4)
         """
+        ### System
         {lmql_queries.system_prompt()}
 
         ### User
@@ -299,6 +300,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
     sample(temperature=.4, chunksize=4)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
         """
+        ### System
         {lmql_queries.system_prompt()}
 
         ### User
@@ -435,6 +437,7 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
         pros_and_cons = ProsConsList(**pros_and_cons_data)
         formatted_pcl = format_proscons(issue, pros_and_cons, unused_reasons)
         """
+        ### System
         {lmql_queries.system_prompt()}
 
         ### User

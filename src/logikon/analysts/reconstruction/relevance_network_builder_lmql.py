@@ -161,6 +161,7 @@ def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
     sample(temperature=.4, top_p=0.95, chunksize=4)
         reason = Claim(**reason_data)
         """
+        ### System
         {lmql_queries.system_prompt()}
 
         ### User
