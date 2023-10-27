@@ -184,7 +184,7 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
         prmpt = PromptTemplate(**prmpt_data)
-        issue_text = f"Both claim and consideration have been set forth in a debate about this issue: {issue}\n" if issue else ""
+        issue_text = f"The following claim and consideration are drawn from a balanced debate, containing an equal share of pros and cons, about this issue: {issue}\n" if issue else ""
         """
         {prmpt.sys_start}
         {system_prompt()}{prmpt.sys_end}
@@ -192,7 +192,7 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
         {prmpt.user_start}
         Assignment: Identify whether a given consideration speaks for or against a claim.
 
-        {issue_text}Read the following consideration and claim carefully.
+        {issue_text}Read the consideration and claim carefully.
 
         <consideration>
         {argument.label}: {argument.text}
@@ -201,20 +201,20 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
         {claim.label}: {claim.text}
         </claim>
 
-        Does the consideration speak for, or against the claim?
+        Does the consideration speak for, or rather against the claim?
 
-        Here is some explanation and a simple heuristic that may help you to solve this task:
-        Which is more plausible way?
+        Here is a simple heuristic that may help you to solve the task:
+        Which is the more plausible way to connect claim and consideration (assuming both were true)?
 
         (A) "{claim.text} BECAUSE: {argument.text}"
         (B) "{claim.text} BUT: {argument.text}"
 
-        If (A) sounds more plausible, then the consideration is an argument for the claim (speaks for). If (B) is more plausible, the consideration is an objection to the claim (speaks against).
+        If (A) sounds more plausible, then the consideration is likely an argument for the claim (speaks for). If (B) is more plausible, the consideration is likely an objection against the claim (speaks against).
 
         So, given your thorough assessment, which is correct:
 
-        (A) The consideration tends to speak for the claim.
-        (B) The consideration tends to speak against the claim.
+        (A) The consideration speaks for the claim.
+        (B) The consideration speaks against the claim.
 
         Just answer with (A/B). You'll be asked to justify your answer later on.{prmpt.user_end}
 
