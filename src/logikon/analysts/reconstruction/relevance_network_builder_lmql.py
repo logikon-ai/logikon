@@ -199,6 +199,7 @@ def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
         - The individual claims you extract may mutually support each other, or represent independent reasons for one and the same conclusion; yet such argumentative relations need not be recorded (at this point).
         - If the argumentation gist contains a single claim, just include that very claim in your list.
         - Avoid repeating one and the same claim in different words.
+        - Each individual claim should be specific and unambiguous; avoid in particular anaphora and other context-dependent references (such as "it", "that", "this", "the previous", ...).
         - IMPORTANT: Stay faithful to the gist! Don't invent your own claims. Don't uncover implicit assumptions. Only provide claims which are explicitly contained in the gist.
         - Use yaml syntax and "```" code fences to structure your answer.
 
