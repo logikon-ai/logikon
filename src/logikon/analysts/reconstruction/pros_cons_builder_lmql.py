@@ -347,7 +347,7 @@ def build_pros_and_cons(reasons_data: list, issue: str):
             elif marker == "- ":  # new root
                 "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<MAX_LEN_TITLE
                 "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
-                root = RootClaim(label=TITLE.strip(')'), text=CLAIM.strip('\"'))
+                root = RootClaim(label=TITLE.strip(')'), text=CLAIM.strip('\n\"'))
                 "  pros:\n"
                 while unused_reasons:
                     "[MARKER]" where MARKER in ["  cons:\n", "  - "]
@@ -428,7 +428,7 @@ def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict,
             elif marker == "- ":  # new root
                 "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
                 "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
-                root = RootClaim(label=TITLE.strip(')'), text=CLAIM.strip('\"'))
+                root = RootClaim(label=TITLE.strip(')'), text=CLAIM.strip('\n\"'))
                 "  pros:\n"
                 while unused_reasons:
                     "[MARKER]" where MARKER in ["  cons:\n", "  - "]
