@@ -204,10 +204,10 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
         Does the consideration speak for, or against the claim?
 
         Here is some explanation and a simple heuristic that may help you to solve this task:
-        Assume that (clear-thinking and fact-loving) Bob accepts both the claim and the consideration. Which is, for Bob, the more plausible way to express his stance?
+        Which is more plausible way?
 
-        (A) "{claim.text} Which is (partly) because I believe: {argument.text}"
-        (B) "{claim.text} Nonetheless, I also believe that: {argument.text}"
+        (A) "{claim.text} BECAUSE: {argument.text}"
+        (B) "{claim.text} BUT: {argument.text}"
 
         If (A) sounds more plausible, then the consideration is an argument for the claim (speaks for). If (B) is more plausible, the consideration is an objection to the claim (speaks against).
 
