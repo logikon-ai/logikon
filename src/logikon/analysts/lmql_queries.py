@@ -178,40 +178,42 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
 
 
 @lmql.query
-def valence(argument_data: dict, claim_data: dict):
+def valence(argument_data: dict, claim_data: dict, issue: str = ""):
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
+        issue_text = f"Both claim and consideration have been set forth in a debate about this issue: {issue}\n" if issue else ""
         """
         {system_prompt()}
 
         ### User
 
-        Assignment: Identify whether an argument speaks for or against a claim.
+        Assignment: Identify whether a given consideration speaks for or against a claim.
 
-        Read the following argument and claim carefully.
+        {issue_text}Read the following consideration and claim carefully.
 
-        <argument>
+        <consideration>
         {argument.label}: {argument.text}
-        </argument>
+        </consideration>
         <claim>
         {claim.label}: {claim.text}
         </claim>
 
-        Does the argument a pro reason for, or a con reason against against the claim?
+        Does the consideration speak for, or against the claim?
 
-        Here is a simple test: Which of the following is more plausible:
+        Here is some explanation and a simple heuristic that may help you to solve this task:
+        Assuming that both the claim and the consideration were true, is it more plausible to connect them with "because" or with "although"?
 
         (A) "{claim.text} BECAUSE {argument.text}"
         (B) "{claim.text} ALTHOUGH {argument.text}"
 
-        In case (A), the argument speaks for (supports) the claim. In case (B) the argument speaks against (disconfirms) the claim.
+        If (A) sounds more plausible, then the consideration is an argument for the claim (speaks for). If (B) is more plausible, the consideration is an objection to the claim (speaks against).
 
         So, given your thorough assessment, which is correct:
 
-        (A) The argument speaks for the claim.
-        (B) The argument speaks against the claim.
+        (A) The consideration speaks for the claim.
+        (B) The consideration speaks against the claim.
 
         Just answer with (A/B). You'll be asked to justify your answer later on.
 

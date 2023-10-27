@@ -302,7 +302,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
     # the following function calculates the strength of the argumentative relation between tow claims
     def _relation_strength(
-        self, source_node: ArgMapNode, target_node: ArgMapNode, valence: Optional[str] = None
+        self, source_node: ArgMapNode, target_node: ArgMapNode, valence: Optional[str] = None, issue: str = ""
     ) -> Tuple[float, str]:
         """Calculate the valence and strength of an argumentative relation
 
@@ -322,6 +322,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         lmql_result = lmql_queries.valence(
             dict(label=source_node.label, text=source_node.text),
             dict(label=target_node.label, text=target_node.text),
+            issue=issue,
             model=self._model,
             **self._generation_kwargs,
         )
@@ -365,7 +366,12 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         return node
 
     def _add_fuzzy_edge(
-        self, map: FuzzyArgMap, source_node: ArgMapNode, target_node: ArgMapNode, valence: Optional[str] = None
+        self,
+        map: FuzzyArgMap,
+        source_node: ArgMapNode,
+        target_node: ArgMapNode,
+        valence: Optional[str] = None,
+        issue: str = "",
     ) -> FuzzyArgMapEdge:
         """Add fuzzy edge to fuzzy argmap
 
@@ -374,11 +380,12 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
             target_node (ArgMapNode): target node
             source_node (ArgMapNode): source node
             valence (str, optional): fixed valence to assume, automatically determines most likely val if None
+            issue (str, optional): issue addressed by arguments
 
         Returns:
             FuzzyArgMapEdge: newly added edge
         """
-        w, val = self._relation_strength(source_node, target_node, valence=valence)
+        w, val = self._relation_strength(source_node, target_node, valence=valence, issue=issue)
         if valence is not None:
             val = valence
         edge = FuzzyArgMapEdge(source=source_node.id, target=target_node.id, valence=val, weight=w)
@@ -427,12 +434,12 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
             for pro in root.pros:
                 source_node = self._add_node(relevance_network, pro, type=am.REASON)
                 self._add_fuzzy_edge(
-                    relevance_network, source_node=source_node, target_node=target_node, valence=am.SUPPORT
+                    relevance_network, source_node=source_node, target_node=target_node, valence=am.SUPPORT, issue=issue
                 )
             for con in root.cons:
                 source_node = self._add_node(relevance_network, con, type=am.REASON)
                 self._add_fuzzy_edge(
-                    relevance_network, source_node=source_node, target_node=target_node, valence=am.ATTACK
+                    relevance_network, source_node=source_node, target_node=target_node, valence=am.ATTACK, issue=issue
                 )
 
         # add fuzzy reason-reason edges

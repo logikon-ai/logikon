@@ -124,6 +124,7 @@ EXAMPLES_ISSUE_PROSCONS = [
 
 ### FORMATTERS ###
 
+
 def trunk_to_sentence(text: str) -> str:
     """Truncates text by cutting off incomplete sentences."""
     text = text.strip(" \'\n")
@@ -131,6 +132,7 @@ def trunk_to_sentence(text: str) -> str:
         # split text at any of ".", "!", "?"
         text = "".join(re.split(r"([.!?])", text)[:-1])
     return text
+
 
 def format_reason(reason: Claim, max_len: int = -1) -> str:
     label_text = f"[{reason.label}]: {reason.text}"
@@ -637,6 +639,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 lmql_result = lmql_queries.valence(
                     pro.dict(),
                     revised_pros_and_cons.roots[new_target_idx].dict(),
+                    issue=issue,
                     model=self._model,
                     **self._generation_kwargs,
                 )
@@ -694,6 +697,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 lmql_result = lmql_queries.valence(
                     con.dict(),
                     revised_pros_and_cons.roots[new_target_idx].dict(),
+                    issue=issue,
                     model=self._model,
                     **self._generation_kwargs,
                 )
