@@ -6,6 +6,7 @@ import logging
 
 import pydantic
 
+
 class PromptTemplate(pydantic.BaseModel):
     """PromptTemplate
 
@@ -29,7 +30,8 @@ class PromptTemplate(pydantic.BaseModel):
 
     def __getitem__(self, key: str) -> str:
         return getattr(self, key)
-    
+
+
 _DEFAULT_KEY = "llama"
 
 _PROMPT_TEMPLATE_REGISTRY = {
@@ -59,14 +61,15 @@ _PROMPT_TEMPLATE_REGISTRY = {
     ),
 }
 
+
 def get_prompt_template(tmpl_key: str | None = None) -> PromptTemplate:
     """Returns prompt template to use with lmql queries"""
     if tmpl_key is None:
         tmpl_key = _DEFAULT_KEY
     if tmpl_key not in _PROMPT_TEMPLATE_REGISTRY:
-        logging.getLogger("prompt_templates_registry").warning(f"Invalid prompt template key: {tmpl_key}, using default template {_DEFAULT_KEY}.")
+        logging.getLogger("prompt_templates_registry").warning(
+            f"Invalid prompt template key: {tmpl_key}, using default template {_DEFAULT_KEY}."
+        )
         tmpl_key = _DEFAULT_KEY
 
     return _PROMPT_TEMPLATE_REGISTRY[tmpl_key]
-    
-
