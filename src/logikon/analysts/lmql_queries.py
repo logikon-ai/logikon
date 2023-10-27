@@ -181,7 +181,7 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
 # The heuristic in the following lmql query implements Wolfgang Spohn's
 # explication of the reason relation as probabilistic relevance.
 # 
-# W. Spohn, The Laws of Belief, OUP 2012. pp. 32ff.
+# W. Spohn, The Laws of Belief, OUP 2012, pp. 32ff.
 #
 @lmql.query
 def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict):
