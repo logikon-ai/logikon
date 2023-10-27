@@ -204,13 +204,15 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
         Does the consideration speak for, or rather against the claim?
 
         Here is a simple heuristic that may help you to solve the task:
-        Which is the more plausible way to connect claim and consideration (assuming both were true)?
+        Suppose that Bob, who is clear-thinking and fact-loving, is unsure about claim "{claim.label}".
+        Now, let's assume that Bob newly learns about and accepts the consideration "{argument.label}".
+        Is this novel consideration rather going to:
 
-        (A) "{claim.text} BECAUSE: {argument.text}"
-        (B) "{claim.text} BUT: {argument.text}"
+        (A) strengthen Bob's belief in "{claim.label}".
+        (B) weaken Bob's belief in "{claim.label}".
 
-        If (A) sounds more plausible, then the consideration is likely an argument for the claim (speaks for). If (B) is more plausible, the consideration is likely an objection against the claim (speaks against).
-
+        In case (A), the consideration speaks for the claim; in case (B), it speaks against the claim.
+        
         So, given your thorough assessment, which is correct:
 
         (A) The consideration speaks for the claim.
@@ -223,6 +225,14 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
     distribution
         LABEL in ["A", "B"]
     '''
+
+
+#        Which is the more plausible way to connect claim and consideration (assuming both were true)?
+#
+#        (A) "{claim.text} BECAUSE: {argument.text}"
+#        (B) "{claim.text} BUT: {argument.text}"
+#
+#        If (A) sounds more plausible, then the consideration is likely an argument for the claim (speaks for). If (B) is more plausible, the consideration is likely an objection against the claim (speaks against).
 
 
 def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str, float]]:
