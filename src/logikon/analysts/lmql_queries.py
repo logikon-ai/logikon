@@ -177,6 +177,12 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
     '''
 
 
+#
+# The heuristic in the following lmql query implements Wolfgang Spohn's
+# explication of the reason relation as probabilistic relevance.
+# 
+# W. Spohn, The Laws of Belief, OUP 2012. pp. 32ff.
+#
 @lmql.query
 def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict):
     '''lmql
@@ -226,13 +232,6 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
         LABEL in ["A", "B"]
     '''
 
-
-#        Which is the more plausible way to connect claim and consideration (assuming both were true)?
-#
-#        (A) "{claim.text} BECAUSE: {argument.text}"
-#        (B) "{claim.text} BUT: {argument.text}"
-#
-#        If (A) sounds more plausible, then the consideration is likely an argument for the claim (speaks for). If (B) is more plausible, the consideration is likely an objection against the claim (speaks against).
 
 
 def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str, float]]:
