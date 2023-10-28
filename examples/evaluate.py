@@ -105,7 +105,7 @@ def upload_results(eval_results: list[EvalResultRecord], results_dataset: dict):
 def main(
     artifacts: list[str] = typer.Option(["fuzzy_argmap_nx"], help="Artifacts to create."),
     metrics: list[str] = typer.Option(
-        ["argmap_size", "argmap_avg_katz_centrality", "argmap_attack_ratio"], help="Metrics to compute."
+        ["argmap_size", "n_root_nodes", "argmap_avg_katz_centrality", "argmap_attack_ratio"], help="Metrics to compute."
     ),
     expert_model: str = typer.Option("stabilityai/StableBeluga-13B", help="Expert model to use."),
     expert_tokenizer: str = typer.Option("stabilityai/StableBeluga-13B", help="Expert tokenizer to use."),
