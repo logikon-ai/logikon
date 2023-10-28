@@ -180,7 +180,7 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
 #
 # The heuristic in the following lmql query implements Wolfgang Spohn's
 # explication of the reason relation as probabilistic relevance.
-# 
+#
 # W. Spohn, The Laws of Belief, OUP 2012, pp. 32ff.
 #
 @lmql.query
@@ -218,7 +218,7 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
         (B) weaken Bob's belief in "{claim.label}".
 
         In case (A), the consideration speaks for the claim; in case (B), it speaks against the claim.
-        
+
         So, given your thorough assessment, which is correct:
 
         (A) The consideration speaks for the claim.
@@ -231,7 +231,6 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
     distribution
         LABEL in ["A", "B"]
     '''
-
 
 
 def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str, float]]:
