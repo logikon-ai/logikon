@@ -14,6 +14,7 @@ from logikon.analysts.score.argmap_graph_scores import (
     ArgMapGraphAttackRatioScorer,
     ArgMapGraphAvgKatzCScorer,
     ArgMapGraphSizeScorer,
+    ArgMapRootCountScorer,
 )
 
 # TODO: set up a product registry for storing product_kw/product_cls mapping
@@ -29,6 +30,7 @@ _ANALYST_REGISTRY: Mapping[str, List[type[Analyst]]] = {
     "svg_argmap": [SVGMapExporter],
     "html_sunburst": [HTMLSunburstExporter],
     "argmap_size": [ArgMapGraphSizeScorer],
+    "n_root_nodes": [ArgMapRootCountScorer],
     "argmap_avg_katz_centrality": [ArgMapGraphAvgKatzCScorer],
     "argmap_attack_ratio": [ArgMapGraphAttackRatioScorer],
 }

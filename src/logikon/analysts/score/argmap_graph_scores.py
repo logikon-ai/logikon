@@ -60,6 +60,15 @@ class ArgMapGraphSizeScorer(AbstractGraphScorer):
         return len(digraph.nodes), "", None
 
 
+class ArgMapRootCountScorer(AbstractGraphScorer):
+    __pdescription__ = "Cont the number of root nodes in argument map (out degree = 0)"
+    __product__ = "n_root_nodes"
+
+    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
+        root_nodes = [n for n, d in digraph.out_degree() if d == 0]
+        return len(root_nodes), "", None
+
+
 class ArgMapGraphAvgKatzCScorer(AbstractGraphScorer):
     __pdescription__ = "Average Katz centrality of all nodes in the graph"
     __product__ = "argmap_avg_katz_centrality"
