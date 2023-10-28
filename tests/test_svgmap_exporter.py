@@ -35,12 +35,16 @@ def nx_map2() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
+            {"text": "claim 1\n", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "claim 2\n", "label": "claim2", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n1"},
+        ]
+        + [
             {
                 "text": 10 * (f"argument-{i} and "),
                 "label": f"arg{i}",
                 "annotations": [],
                 "nodeType": am.REASON,
-                "id": f"n{i}",
+                "id": f"n{2+i}",
             }
             for i in range(16)
         ],
@@ -102,10 +106,10 @@ def test_svg_exporter_save(nx_map2):
     svgmap = svgmap_exporter._to_svg(nx_map2)
     assert isinstance(svgmap, str)
 
-    with open("test_graph.svg", 'w') as f:
+    with open("test_graph1.svg", 'w') as f:
         f.write(svgmap)
 
-    assert os.path.isfile("test_graph.svg")
+    assert os.path.isfile("test_graph1.svg")
 
 
 def test_svg_exporter_weighted(nx_map3):
@@ -114,7 +118,7 @@ def test_svg_exporter_weighted(nx_map3):
     svgmap = svgmap_exporter._to_svg(nx_map3)
     assert isinstance(svgmap, str)
 
-    with open("test_graph.svg", 'w') as f:
+    with open("test_graph2.svg", 'w') as f:
         f.write(svgmap)
 
-    assert os.path.isfile("test_graph.svg")
+    assert os.path.isfile("test_graph2.svg")

@@ -129,9 +129,15 @@ class SVGMapExporter(AbstractArtifactAnalyst):
                 # overlap="compress",
             ),
         )
+        # subgraph with central claims on same rank
+        with dot.subgraph(name='central_claims', graph_attr=dict(rank='same')) as subgraph:
+            for node, nodedata in digraph.nodes.items():
+                if nodedata.get("nodeType") == am.CENTRAL_CLAIM:
+                    subgraph.node(str(node), **nodedata)
 
         for node, nodedata in digraph.nodes.items():
-            dot.node(str(node), **nodedata)
+            if nodedata.get("nodeType") != am.CENTRAL_CLAIM:
+                dot.node(str(node), **nodedata)
 
         for edge, edgedata in digraph.edges.items():
             dot.edge(str(edge[0]), str(edge[-1]), **edgedata)
