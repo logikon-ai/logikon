@@ -15,6 +15,7 @@ import logikon.schemas.argument_mapping as am
 from logikon.analysts.base import AbstractArtifactAnalyst
 from logikon.schemas.results import Artifact, AnalysisState
 
+_ARROWWIDTH = 2
 
 class SVGMapExporter(AbstractArtifactAnalyst):
     """SVGMapExporter Analyst
@@ -101,7 +102,7 @@ class SVGMapExporter(AbstractArtifactAnalyst):
                     if linkdata["valence"] == am.ATTACK
                     else sns.color_palette("blend:darkgrey,darkgreen", as_cmap=True)
                 )
-                color = cmap(0.2 + linkdata.pop("weight"))  # dropping weight from edge data
+                color = cmap(linkdata.pop("weight"))  # dropping weight from edge data
                 linkdata["color"] = matplotlib.colors.to_hex(color)
             else:
                 linkdata["color"] = "red" if linkdata["valence"] == am.ATTACK else "darkgreen"
@@ -109,7 +110,7 @@ class SVGMapExporter(AbstractArtifactAnalyst):
             if am.IN_FOREST in linkdata:
                 del linkdata[am.IN_FOREST]
 
-            linkdata["penwidth"] = "1.5"
+            linkdata["penwidth"] = _ARROWWIDTH
 
         return digraph
 
