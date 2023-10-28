@@ -50,6 +50,7 @@ path = "src/logikon/__about__.py"
 dependencies = [
   "coverage[toml]>=6.5",
   "pydantic==1.10.12",
+  "typer",
   "pytest",
   "python-dotenv",
   "pdoc",
