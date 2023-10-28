@@ -166,7 +166,7 @@ def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
 
         ### User
 
-        Your Assignment: Unpack the individual claims contained in an argumentation.
+        Your Assignment: Unpack the individual reasons contained in an argumentation.
 
         Use the following inputs (the title and gist of an argumentation that addresses an issue) to solve your assignment.
 
@@ -178,47 +178,47 @@ def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
         </argumentation>
         </inputs>
 
-        What are the individual claims and basic reasons contained in this argumentation?
+        What are the basic reasons contained in this argumentation?
 
         Let me give you more detailed instructions:
 
-        - Read the gist carefully and extract all individual claims it sets forth.
-        - State each claim clearly in simple and plain language.
-        - The basic claims you extract must not contain any reasoning (as indicated, e.g., by "because", "since", "therefore" ...).
-        - For each argumentation, state all the claims it makes in one grammatically correct sentences, staying close to the original wording. Provide a distinct title, too. I.e.:
+        - Read the gist carefully and extract all individual reasons it sets forth.
+        - State each reason clearly in simple and plain language.
+        - Each individual reason should be self-contained and unambiguous; avoid in particular anaphora and other context-dependent references (such as "it", "that", "this", "the previous", ...).
+        - The basic reason-statements you extract must themselves not contain any reasoning (as indicated, e.g., by "because", "since", "therefore" ...).
+        - State every reason in one grammatically correct sentence, staying close to the original wording. Provide a distinct title, too. I.e.:
             ```
             argumentation:
               issue: "repeat argumentation issue"
               title: "repeat argumentation title"
               gist: "repeat argumentation gist"
-              claims:
-              - title: "first claim title"
-                claim: "state first claim in one sentence."
+              reasons:
+              - title: "first reason title"
+                reason: "state first reason in one sentence."
               - ...
             ```
-        - The individual claims you extract may mutually support each other, or represent independent reasons for one and the same conclusion; yet such argumentative relations need not be recorded (at this point).
-        - If the argumentation gist contains a single claim, just include that very claim in your list.
-        - Avoid repeating one and the same claim in different words.
-        - Each individual claim should be specific and unambiguous; avoid in particular anaphora and other context-dependent references (such as "it", "that", "this", "the previous", ...).
-        - IMPORTANT: Stay faithful to the gist! Don't invent your own claims. Don't uncover implicit assumptions. Only provide claims which are explicitly contained in the gist.
+        - The individual reasons you extract may mutually support each other, or represent independent reasons for one and the same conclusion; yet such argumentative relations need not be recorded (at this point).
+        - If the argumentation gist contains a single reason, just include that very reason in your list.
+        - Avoid repeating one and the same reason in different words.
+        - IMPORTANT: Stay faithful to the gist! Don't invent your own reasons. Don't uncover implicit assumptions. Only provide reasons which are explicitly contained in the gist.
         - Use yaml syntax and "```" code fences to structure your answer.
 
         I'll give you a few examples that illustrate the task.
 
         {format_examples()}
 
-        Please, process the above inputs and unpack the individual claims contained in the argumentation.
+        Please, process the above inputs and unpack the individual reasons contained in the argumentation.
 
         ### Assistant
 
-        The argumentation makes the following basic claims:
+        The argumentation makes the following basic reasons:
 
         ```yaml
         argumentation:
           issue: "{issue}"
           title: "{reason.label}"
           gist: "{reason.text}"
-          claims:"""
+          reasons:"""
         claims = []
         marker = ""
         n = 0
@@ -233,7 +233,7 @@ def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
                 if not TITLE.endswith('\"'):
                     "\" "
                 title = TITLE.strip('\"')
-                "\n    claim: \"[CLAIM]" where STOPS_AT(CLAIM, "\"") and STOPS_AT(CLAIM, "\n") and len(CLAIM) < MAX_LEN_GIST
+                "\n    reason: \"[CLAIM]" where STOPS_AT(CLAIM, "\"") and STOPS_AT(CLAIM, "\n") and len(CLAIM) < MAX_LEN_GIST
                 if not CLAIM.endswith('\"'):
                     "\" "
                 claim = CLAIM.strip('\"')
