@@ -74,8 +74,7 @@ def key_issue(prompt, completion):
         "Be as brief and concise as possible. Think of your answer as the headline of an argument or debate.\n"
         "Enclose your answer in \"<ISSUE>\" / \"</ISSUE>\" tags.\n\n"
         "### Assistant\n\n"
-        "<ISSUE>\n"
-        "[@strip_issue_tag ISSUE]"
+        "<ISSUE>[@strip_issue_tag ISSUE]"
     where
         STOPS_AT(ISSUE, "</ISSUE>")
     '''
