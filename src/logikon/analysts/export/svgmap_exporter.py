@@ -15,7 +15,7 @@ import logikon.schemas.argument_mapping as am
 from logikon.analysts.base import AbstractArtifactAnalyst
 from logikon.schemas.results import Artifact, AnalysisState
 
-_ARROWWIDTH = 2
+_ARROWWIDTH = "2"
 
 class SVGMapExporter(AbstractArtifactAnalyst):
     """SVGMapExporter Analyst
