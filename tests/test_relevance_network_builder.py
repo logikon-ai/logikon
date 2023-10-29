@@ -4,7 +4,10 @@ import pytest
 import os
 
 import logikon.schemas.argument_mapping as am
-from logikon.analysts.reconstruction.relevance_network_builder_lmql import RelevanceNetworkBuilderLMQL, RelevanceNetworkBuilderConfig
+from logikon.analysts.reconstruction.relevance_network_builder_lmql import (
+    RelevanceNetworkBuilderLMQL,
+    RelevanceNetworkBuilderConfig,
+)
 
 
 @pytest.fixture(name="map1")

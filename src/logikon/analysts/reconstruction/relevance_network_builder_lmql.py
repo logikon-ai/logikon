@@ -256,7 +256,6 @@ class RelevanceNetworkBuilderConfig(LMQLAnalystConfig):
     keep_pcl_valences: bool = True
 
 
-
 class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
     """RelevanceNetworkBuilderLMQL
 
@@ -274,7 +273,6 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
     def __init__(self, config: RelevanceNetworkBuilderConfig):
         super().__init__(config)
         self._keep_pcl_valences = config.keep_pcl_valences
-
 
     def _unpack_reason(self, reason_data: dict, issue: str) -> List[Claim]:
         """Internal (class method) wrapper for lmql query function."""
@@ -371,7 +369,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         return prob_1 * prob_2, valence
 
     def _dialectically_equivalent(self, relevance_network: FuzzyArgMap, node1: ArgMapNode, node2: ArgMapNode) -> bool:
-        """Checks whether two reasons are dialectically equivalent relative to central claims 
+        """Checks whether two reasons are dialectically equivalent relative to central claims
 
         If two reasons have common parent central claims, they are dialectically equivalent
         iff they have identical argumentative relations to each common root claim.
@@ -393,16 +391,14 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
             [
                 edge.target
                 for edge in relevance_network.edgelist
-                if edge.source == node1.id and 
-                relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
+                if edge.source == node1.id and relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
             ]
         )
         node2_parents = set(
             [
                 edge.target
                 for edge in relevance_network.edgelist
-                if edge.source == node2.id and 
-                relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
+                if edge.source == node2.id and relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
             ]
         )
 
@@ -441,13 +437,10 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
                 for edge in relevance_network.edgelist
                 if edge.source == node2.id and edge.target in node2_parents
             ]
-        )        
+        )
         equivalent = len(node1_valences.intersection(node2_valences)) == 0
 
         return equivalent
-
-
-        
 
     def _add_node(self, map: FuzzyArgMap, claim: Claim, type: str = am.REASON) -> ArgMapNode:
         """Add node to fuzzy argmap
@@ -554,8 +547,14 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
                     continue
                 valence = None
                 if self._keep_pcl_valences:
-                    valence = am.SUPPORT if self._dialectically_equivalent(relevance_network, source_node, target_node) else am.ATTACK
-                self._add_fuzzy_edge(relevance_network, source_node=source_node, target_node=target_node, valence=valence)
+                    valence = (
+                        am.SUPPORT
+                        if self._dialectically_equivalent(relevance_network, source_node, target_node)
+                        else am.ATTACK
+                    )
+                self._add_fuzzy_edge(
+                    relevance_network, source_node=source_node, target_node=target_node, valence=valence
+                )
 
         if relevance_network is None:
             self.logger.warning("Failed to build relevance network (relevance_network is None).")
