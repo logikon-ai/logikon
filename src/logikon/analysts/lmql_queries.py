@@ -210,12 +210,12 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
         Does the consideration speak for, or rather against the claim?
 
         Here is a simple heuristic that may help you to solve the task:
-        Suppose that Bob, who is clear-thinking and fact-loving, is unsure about claim "{claim.label}".
-        Now, let's assume that Bob newly learns about and accepts the consideration "{argument.label}".
+        Suppose that Bob, who is clear-thinking and fact-loving, is unsure about the claim "{claim.text}".
+        Now, let's assume that Bob newly learns about and accepts the consideration "{argument.text}".
         Is this novel consideration rather going to:
 
-        (A) strengthen Bob's belief in "{claim.label}".
-        (B) weaken Bob's belief in "{claim.label}".
+        (A) strengthen Bob's belief in the claim.
+        (B) weaken Bob's belief in the claim.
 
         In case (A), the consideration speaks for the claim; in case (B), it speaks against the claim.
 
