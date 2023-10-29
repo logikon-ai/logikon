@@ -46,6 +46,7 @@ import tqdm
 import lmql
 
 from logikon.analysts.lmql_analyst import LMQLAnalyst, LMQLAnalystConfig
+from logikon.utils.prompt_templates_registry import PromptTemplate
 from logikon.analysts.base import ArtifcatAnalystConfig
 import logikon.analysts.lmql_queries as lmql_queries
 from logikon.schemas.results import Artifact, AnalysisState
@@ -157,16 +158,16 @@ def format_examples() -> str:
 
 
 @lmql.query
-def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
+def unpack_reason(reason_data: dict, issue: str, prmpt_data: dict) -> List[Claim]:  # type: ignore
     '''lmql
     sample(temperature=.4, top_p=0.95, chunksize=4)
         reason = Claim(**reason_data)
+        prmpt = PromptTemplate(**prmpt_data)
         """
-        ### System
-        {lmql_queries.system_prompt()}
+        {prmpt.sys_start}
+        {lmql_queries.system_prompt()}{prmpt.sys_end}
 
-        ### User
-
+        {prmpt.user_start}
         Your Assignment: Unpack the individual reasons contained in an argumentation.
 
         Use the following inputs (the title and gist of an argumentation that addresses an issue) to solve your assignment.
@@ -208,10 +209,8 @@ def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
 
         {format_examples()}
 
-        Please, process the above inputs and unpack the individual reasons contained in the argumentation.
-
-        ### Assistant
-
+        Please, process the above inputs and unpack the individual reasons contained in the argumentation.{prmpt.user_end}
+        {prmpt.ass_start}
         The argumentation makes the following basic reasons:
 
         ```yaml
@@ -276,7 +275,13 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
     def _unpack_reason(self, reason_data: dict, issue: str) -> List[Claim]:
         """Internal (class method) wrapper for lmql query function."""
-        return unpack_reason(reason_data=reason_data, issue=issue, model=self._model, **self._generation_kwargs)
+        return unpack_reason(
+            reason_data=reason_data,
+            issue=issue,
+            prmpt_data=self._prompt_template.to_dict(),
+            model=self._model,
+            **self._generation_kwargs,
+        )
 
     def _unpack_reasons(
         self, pros_and_cons: ProsConsList, issue: str
