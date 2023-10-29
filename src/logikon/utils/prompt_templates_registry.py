@@ -51,7 +51,7 @@ _PROMPT_TEMPLATE_REGISTRY = {
         ass_start="",
         ass_end="",
     ),
-    "chat_ml": PromptTemplate(
+    "chatml": PromptTemplate(
         sys_start="<|im_start|>system",
         sys_end="<|im_end|>",
         user_start="<|im_start|>user",
