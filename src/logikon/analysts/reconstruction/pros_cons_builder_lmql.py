@@ -47,6 +47,7 @@ import lmql
 
 from logikon.analysts.lmql_analyst import LMQLAnalyst
 import logikon.analysts.lmql_queries as lmql_queries
+from logikon.utils.prompt_templates_registry import PromptTemplate
 from logikon.schemas.results import Artifact, AnalysisState
 from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
 import logikon.schemas.argument_mapping as am

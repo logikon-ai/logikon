@@ -32,6 +32,7 @@ from __future__ import annotations
 import lmql
 
 import logikon.analysts.lmql_queries as lmql_queries
+from logikon.utils.prompt_templates_registry import PromptTemplate
 from logikon.analysts.lmql_analyst import LMQLAnalyst
 from logikon.schemas.results import Artifact, AnalysisState
 
