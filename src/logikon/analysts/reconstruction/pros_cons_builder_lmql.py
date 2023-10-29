@@ -179,15 +179,15 @@ def format_examples() -> str:
 
 
 @lmql.query
-def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
+def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  # type: ignore
     '''lmql
     sample(temperature=.4, chunksize=4)
+        prmpt = PromptTemplate(**prmpt_data)
         """
-        ### System
-        {lmql_queries.system_prompt()}
+        {prmpt.sys_start}
+        {lmql_queries.system_prompt()}{prmpt.sys_end}
 
-        ### User
-
+        {prmpt.user_start}
         Your Assignment: Summarize all the arguments (pros and cons) presented in a text.
 
         Use the following inputs (a TEXT that addresses an ISSUE) to solve your assignment.
@@ -245,16 +245,16 @@ def mine_reasons(prompt, completion, issue) -> List[Claim]:  # type: ignore
 
 
 @lmql.query
-def build_pros_and_cons(reasons_data: list, issue: str):
+def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
     '''lmql
     sample(temperature=.4, chunksize=4)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
+        prmpt = PromptTemplate(**prmpt_data)
         """
-        ### System
-        {lmql_queries.system_prompt()}
+        {prmpt.sys_start}
+        {lmql_queries.system_prompt()}{prmpt.sys_end}
 
-        ### User
-
+        {prmpt.user_start}
         Assignment: Organize an unstructured set of reasons as a pros & cons list.
 
         Let's begin by thinking through the basic issue addressed by the reasons:
@@ -379,19 +379,21 @@ def build_pros_and_cons(reasons_data: list, issue: str):
 
 
 @lmql.query
-def add_unused_reasons(reasons_data: list, issue: str, pros_and_cons_data: dict, unused_reasons_data: list):
+def add_unused_reasons(
+    reasons_data: list, issue: str, pros_and_cons_data: dict, unused_reasons_data: list, prmpt_data: dict
+):
     '''lmql
     sample(temperature=.4, chunksize=4)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
         unused_reasons = [Claim(**reason_data) for reason_data in unused_reasons_data]
         pros_and_cons = ProsConsList(**pros_and_cons_data)
         formatted_pcl = format_proscons(issue, pros_and_cons, unused_reasons)
+        prmpt = PromptTemplate(**prmpt_data)
         """
-        ### System
-        {lmql_queries.system_prompt()}
+        {prmpt.sys_start}
+        {lmql_queries.system_prompt()}{prmpt.sys_end}
 
-        ### User
-
+        {prmpt.user_start}
         Assignment: Organize the aforementioned unstructured set of reasons as a pros & cons list.
 
         ### Assistant
@@ -472,11 +474,24 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
 
     def _mine_reasons(self, prompt, completion, issue) -> List[Claim]:
         """Internal wrapper (class-method) for lmql.query function."""
-        return mine_reasons(prompt, completion, issue, model=self._model, **self._generation_kwargs)
+        return mine_reasons(
+            prompt,
+            completion,
+            issue,
+            prmpt_data=self._prompt_template.to_dict(),
+            model=self._model,
+            **self._generation_kwargs,
+        )
 
     def _build_pros_and_cons(self, reasons_data: list[dict], issue: str) -> Tuple[ProsConsList, List[Claim]]:
         """Internal wrapper (class-method) for lmql.query function."""
-        return build_pros_and_cons(reasons_data, issue, model=self._model, **self._generation_kwargs)
+        return build_pros_and_cons(
+            reasons_data,
+            issue,
+            prmpt_data=self._prompt_template.to_dict(),
+            model=self._model,
+            **self._generation_kwargs,
+        )
 
     def _add_unused_reasons(
         self,
@@ -487,7 +502,13 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
     ) -> Tuple[ProsConsList, List[Claim]]:
         """Internal wrapper (class-method) for lmql.query function."""
         return add_unused_reasons(
-            reasons_data, issue, pros_and_cons_data, unused_reasons_data, model=self._model, **self._generation_kwargs
+            reasons_data,
+            issue,
+            pros_and_cons_data,
+            unused_reasons_data,
+            prmpt_data=self._prompt_template.to_dict(),
+            model=self._model,
+            **self._generation_kwargs,
         )
 
     def _ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
