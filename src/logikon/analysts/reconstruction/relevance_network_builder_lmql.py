@@ -361,6 +361,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         lmql_result = query_fn(
             dict(label=source_node.label, text=source_node.text),
             dict(label=target_node.label, text=target_node.text),
+            prmpt_data=self._prompt_template.to_dict(),
             model=self._model,
             **self._generation_kwargs,
         )

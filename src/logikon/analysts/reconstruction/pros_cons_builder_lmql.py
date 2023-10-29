@@ -559,6 +559,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 lmql_result = lmql_queries.most_confirmed(
                     pro.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
+                    prmpt_data=self._prompt_template.to_dict(),
                     model=self._model,
                     **self._generation_kwargs,
                 )
@@ -578,6 +579,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 lmql_result = lmql_queries.most_disconfirmed(
                     pro.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
+                    prmpt_data=self._prompt_template.to_dict(),
                     model=self._model,
                     **self._generation_kwargs,
                 )
@@ -618,6 +620,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 lmql_result = lmql_queries.most_disconfirmed(
                     con.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
+                    prmpt_data=self._prompt_template.to_dict(),
                     model=self._model,
                     **self._generation_kwargs,
                 )
@@ -637,6 +640,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 lmql_result = lmql_queries.most_confirmed(
                     con.dict(),
                     [r.dict() for r in revised_pros_and_cons.roots],
+                    prmpt_data=self._prompt_template.to_dict(),
                     model=self._model,
                     **self._generation_kwargs,
                 )
