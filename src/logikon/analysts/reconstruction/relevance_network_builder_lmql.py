@@ -34,7 +34,7 @@ flowchart TD
 """
 
 from __future__ import annotations
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Optional, Dict, Type
 
 import copy
 import functools as ft
@@ -45,7 +45,8 @@ import tqdm
 
 import lmql
 
-from logikon.analysts.lmql_analyst import LMQLAnalyst
+from logikon.analysts.lmql_analyst import LMQLAnalyst, LMQLAnalystConfig
+from logikon.analysts.base import ArtifcatAnalystConfig
 import logikon.analysts.lmql_queries as lmql_queries
 from logikon.schemas.results import Artifact, AnalysisState
 from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
@@ -243,6 +244,19 @@ def unpack_reason(reason_data: dict, issue: str) -> List[Claim]:  # type: ignore
     '''
 
 
+class RelevanceNetworkBuilderConfig(LMQLAnalystConfig):
+    """RelevanceNetworkBuilderConfig
+
+    Configuration for RelevanceNetworkBuilder.
+
+    Fields:
+        keep_pcl_valences (bool): keep (i.e. don't revise) global valences from pros and cons list
+    """
+
+    keep_pcl_valences: bool = True
+
+
+
 class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
     """RelevanceNetworkBuilderLMQL
 
@@ -255,6 +269,12 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
     __pdescription__ = (
         "Relevance network describing comprehensively the strengths of pairwise support and attack relations"
     )
+    __configclass__: Type[ArtifcatAnalystConfig] = RelevanceNetworkBuilderConfig
+
+    def __init__(self, config: RelevanceNetworkBuilderConfig):
+        super().__init__(config)
+        self._keep_pcl_valences = config.keep_pcl_valences
+
 
     def _unpack_reason(self, reason_data: dict, issue: str) -> List[Claim]:
         """Internal (class method) wrapper for lmql query function."""
@@ -349,6 +369,85 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         prob_2 = next(prob for label, prob in lmql_queries.get_distribution(lmql_result) if label == "A")
 
         return prob_1 * prob_2, valence
+
+    def _dialectically_equivalent(self, relevance_network: FuzzyArgMap, node1: ArgMapNode, node2: ArgMapNode) -> bool:
+        """Checks whether two reasons are dialectically equivalent relative to central claims 
+
+        If two reasons have common parent central claims, they are dialectically equivalent
+        iff they have identical argumentative relations to each common root claim.
+        If two reasons have no common root claims, they are dialectically equivalent
+        iff one is only supporting and the other only attacking central claims.
+
+        This function is hence assuming that the central claims are mutually exclusive (contrary).
+
+        Args:
+            relevance_network (FuzzyArgMap): argmap relative to which dialectic equivalence is assessed
+            source_node (ArgMapNode): first node
+            target_node (ArgMapNode): second node
+
+        Returns:
+            bool: true if two nodes are dialectically equivalent, false otherwise
+        """
+        # determine parent central claims of two nodes
+        node1_parents = set(
+            [
+                edge.target
+                for edge in relevance_network.edgelist
+                if edge.source == node1.id and 
+                relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
+            ]
+        )
+        node2_parents = set(
+            [
+                edge.target
+                for edge in relevance_network.edgelist
+                if edge.source == node2.id and 
+                relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
+            ]
+        )
+
+        common_parents = node1_parents.intersection(node2_parents)
+
+        # Case 1: there are common parents
+        if len(common_parents) > 0:
+            equivalent = True
+            for parent in common_parents:
+                node1_valence = next(
+                    edge.valence
+                    for edge in relevance_network.edgelist
+                    if edge.source == node1.id and edge.target == parent
+                )
+                node2_valence = next(
+                    edge.valence
+                    for edge in relevance_network.edgelist
+                    if edge.source == node2.id and edge.target == parent
+                )
+                if node1_valence != node2_valence:
+                    equivalent = False
+                    break
+            return equivalent
+
+        # Case 2: there are no common parents
+        node1_valences = set(
+            [
+                edge.valence
+                for edge in relevance_network.edgelist
+                if edge.source == node1.id and edge.target in node1_parents
+            ]
+        )
+        node2_valences = set(
+            [
+                edge.valence
+                for edge in relevance_network.edgelist
+                if edge.source == node2.id and edge.target in node2_parents
+            ]
+        )        
+        equivalent = len(node1_valences.intersection(node2_valences)) == 0
+
+        return equivalent
+
+
+        
 
     def _add_node(self, map: FuzzyArgMap, claim: Claim, type: str = am.REASON) -> ArgMapNode:
         """Add node to fuzzy argmap
@@ -453,7 +552,10 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
                     continue
                 if source_node.nodeType == am.CENTRAL_CLAIM or target_node.nodeType == am.CENTRAL_CLAIM:
                     continue
-                self._add_fuzzy_edge(relevance_network, source_node=source_node, target_node=target_node)
+                valence = None
+                if self._keep_pcl_valences:
+                    valence = am.SUPPORT if self._dialectically_equivalent(relevance_network, source_node, target_node) else am.ATTACK
+                self._add_fuzzy_edge(relevance_network, source_node=source_node, target_node=target_node, valence=valence)
 
         if relevance_network is None:
             self.logger.warning("Failed to build relevance network (relevance_network is None).")
