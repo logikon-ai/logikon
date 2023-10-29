@@ -214,10 +214,8 @@ def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  #
         - Avoid repeating one and the same argument in different words.
         - You don't have to distinguish between pro and con arguments.
         - IMPORTANT: Stay faithful to the text! Don't invent your own reasons. Only provide reasons which are either presented or discussed in the text.
-        - Use yaml syntax and "```" code fences to structure your answer.
-
-        ### Assistant
-
+        - Use yaml syntax and "```" code fences to structure your answer.{prmpt.user_end}
+        {prmpt.ass_start}
         The TEXT sets forth the following arguments:
 
         ```yaml
@@ -262,10 +260,8 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
 
         <issue>{issue}</issue>
 
-        What are the basic options available to an agent who needs to address this issue? Keep your answer short: sketch each option in a few words only, one per line. Use "<options>"/"</options>" tags.
-
-        ### Assistant
-
+        What are the basic options available to an agent who needs to address this issue? Keep your answer short: sketch each option in a few words only, one per line. Use "<options>"/"</options>" tags.{prmpt.user_end}
+        {prmpt.ass_start}
         The options available to an agent who faces the above issue are:
 
         <options>
@@ -281,9 +277,8 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
                 "[OPTION]" where STOPS_AT(OPTION, "\n") and len(OPTION) < MAX_LEN_TITLE
                 options.append(OPTION.strip("\n "))
         """
-
-        ### User
-
+        {prmpt.ass_end}
+        {prmpt.user_start}
         Thanks, let's keep that in mind.
 
         Let us now come back to the main assignment: constructing a pros & cons list from a set of reasons.
@@ -320,10 +315,8 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
         * Use simple and plain language.
         * If you identify multiple root claims, make sure they are mutually exclusive alternatives.
         * Avoid repeating one and the same root claim in different words.
-        * Use yaml syntax and "```" code fences to structure your answer.
-
-        ### Assistant
-
+        * Use yaml syntax and "```" code fences to structure your answer.{prmpt.user_end}
+        {prmpt.ass_start}
         Let me recall the basic options before producing the pros and cons list:
         """
         for option in options:
@@ -409,10 +402,8 @@ def add_unused_reasons(
             f_ureason = format_reason(ureason, 50)
             "{f_ureason}"
         """
-        Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
-
-        ### Assistant
-
+        Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?{prmpt.user_end}
+        {prmpt.ass_start}
         ```yaml
         reasons:
         """
