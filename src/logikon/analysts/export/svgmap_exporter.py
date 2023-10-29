@@ -132,7 +132,7 @@ class SVGMapExporter(AbstractArtifactAnalyst):
             ),
         )
         # subgraph with central claims on same rank
-        with dot.subgraph(name='central_claims', graph_attr=dict(rank='same')) as subgraph:
+        with dot.subgraph(name='central_claims', graph_attr=dict(rank='sink')) as subgraph:
             for node, nodedata in digraph.nodes.items():
                 if nodedata.get("nodeType") == am.CENTRAL_CLAIM:
                     subgraph.node(str(node), **nodedata)
