@@ -126,6 +126,7 @@ class IssueBuilderLMQL(LMQLAnalyst):
         return key_issue(
             prompt=prompt,
             completion=completion,
+            prmpt_data=self._prompt_template.to_dict(),
             model=self._model,
             **self._generation_kwargs,
         )
@@ -137,6 +138,7 @@ class IssueBuilderLMQL(LMQLAnalyst):
             questions=questions,
             prompt=prompt,
             completion=completion,
+            prmpt_data=self._prompt_template.to_dict(),
             model=self._model,
             **self._generation_kwargs,
         )
