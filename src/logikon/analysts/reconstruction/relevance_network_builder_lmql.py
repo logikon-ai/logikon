@@ -138,10 +138,10 @@ def format_example(example_data: dict) -> str:
     formatted += f"  title: \"{example_data['title']}\"\n"
     formatted += f"  gist: \"{example_data['gist']}\"\n"
     # claims block
-    formatted += "claims:\n"
+    formatted += "reasons:\n"
     for claim in example_data['claims']:
         formatted += f"  - title: \"{claim['title']}\"\n"
-        formatted += f"    claim: \"{claim['claim']}\"\n"
+        formatted += f"    reason: \"{claim['claim']}\"\n"
     formatted += "```\n"
     return formatted
 
