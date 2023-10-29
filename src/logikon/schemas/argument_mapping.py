@@ -44,3 +44,15 @@ class FuzzyArgMapEdge(ArgMapEdge):
 class FuzzyArgMap(BaseModel):
     nodelist: list[ArgMapNode] = []
     edgelist: list[FuzzyArgMapEdge] = []
+
+    def get_node(self, node_id: str) -> ArgMapNode:
+        """Get node by node id."""
+        for node in self.nodelist:
+            if node.id == node_id:
+                return node
+        raise ValueError(f"Node with id {node_id} not found.")
+
+    def get_node_type(self, node_id: str) -> str:
+        """Get node type by node id."""
+        node = self.get_node(node_id)
+        return node.nodeType
