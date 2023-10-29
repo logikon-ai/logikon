@@ -18,17 +18,17 @@ def system_prompt() -> str:
 
 
 @lmql.query
-def supports_q(argument_data: dict, claim_data: dict):
+def supports_q(argument_data: dict, claim_data: dict, prmpt_data: dict):
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
+        prmpt = PromptTemplate(**prmpt_data)
         """
-        ### System
-        {system_prompt()}
+        {prmpt.sys_start}
+        {system_prompt()}{prmpt.sys_end}
 
-        ### User
-
+        {prmpt.user_start}
         Assignment: Identify if an argument supports a claim.
 
         Read the following argument carefully.
@@ -46,10 +46,8 @@ def supports_q(argument_data: dict, claim_data: dict):
         (A) Yes, the argument supports the claim.
         (B) No, the argument does not support the claim.
 
-        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on.
-
-        ### Assistant
-
+        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on.{prmpt.user_end}
+        {prmpt.ass_start}
         Answer: ([LABEL]"""
     distribution
         LABEL in ["A", "B"]
@@ -57,17 +55,17 @@ def supports_q(argument_data: dict, claim_data: dict):
 
 
 @lmql.query
-def attacks_q(argument_data: dict, claim_data: dict):
+def attacks_q(argument_data: dict, claim_data: dict, prmpt_data: dict):
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
+        prmpt = PromptTemplate(**prmpt_data)
         """
-        ### System
-        {system_prompt()}
+        {prmpt.sys_start}
+        {system_prompt()}{prmpt.sys_end}
 
-        ### User
-
+        {prmpt.user_start}
         Assignment: Identify if an argument speaks against a claim.
 
         Read the following argument carefully.
@@ -85,10 +83,8 @@ def attacks_q(argument_data: dict, claim_data: dict):
         (A) Yes, the argument disconfirms the claim.
         (B) No, the argument does not disconfirm the claim.
 
-        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on.
-
-        ### Assistant
-
+        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on.{prmpt.user_end}
+        {prmpt.ass_start}
         Answer: ([LABEL]"""
     distribution
         LABEL in ["A", "B"]
@@ -96,19 +92,19 @@ def attacks_q(argument_data: dict, claim_data: dict):
 
 
 @lmql.query
-def most_confirmed(argument_data: dict, claims_data: list):
+def most_confirmed(argument_data: dict, claims_data: list, prmpt_data: dict):
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
         claims = [Claim(**claim_data) for claim_data in claims_data]
         assert len(claims) <= 10
         labels = [l for l in "ABCDEFGHIJ"][:len(claims)]
+        prmpt = PromptTemplate(**prmpt_data)
         """
-        ### System
-        {system_prompt()}
+        {prmpt.sys_start}
+        {system_prompt()}{prmpt.sys_end}
 
-        ### User
-
+        {prmpt.user_start}
         Assignment: Identify the claim which is most strongly supported by an argument.
 
         Read the following argument carefully.
@@ -124,10 +120,8 @@ def most_confirmed(argument_data: dict, claims_data: list):
         for label, claim in zip(labels, claims):
             "({label}) \"{claim.label}: {claim.text}\"\n"
         """
-        Just answer with ({'/'.join(labels)}). You'll be asked to justify your answer later on.
-
-        ### Assistant
-
+        Just answer with ({'/'.join(labels)}). You'll be asked to justify your answer later on.{prmpt.user_end}
+        {prmpt.ass_start}
         Answer: ([LABEL]"""
     distribution
         LABEL in labels
@@ -135,19 +129,19 @@ def most_confirmed(argument_data: dict, claims_data: list):
 
 
 @lmql.query
-def most_disconfirmed(argument_data: dict, claims_data: list):
+def most_disconfirmed(argument_data: dict, claims_data: list, prmpt_data: dict):
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
         claims = [Claim(**claim_data) for claim_data in claims_data]
         assert len(claims) <= 10
         labels = [l for l in "ABCDEFGHIJ"][:len(claims)]
+        prmpt = PromptTemplate(**prmpt_data)
         """
-        ### System
-        {system_prompt()}
+        {prmpt.sys_start}
+        {system_prompt()}{prmpt.sys_end}
 
-        ### User
-
+        {prmpt.user_start}
         Assignment: Identify the claim which is supported by an argument.
 
         Read the following argument carefully.
@@ -167,10 +161,8 @@ def most_disconfirmed(argument_data: dict, claims_data: list):
             text = text[0].lower() + text[1:]
             "({label}) \"It is not the case that {text}\"\n"
         """
-        Just answer with ({'/'.join(labels)}). You'll be asked to justify your answer later on.
-
-        ### Assistant
-
+        Just answer with ({'/'.join(labels)}). You'll be asked to justify your answer later on.{prmpt.user_end}
+        {prmpt.ass_start}
         Answer: ([LABEL]"""
     distribution
         LABEL in labels
@@ -225,7 +217,6 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
         (B) The consideration speaks against the claim.
 
         Just answer with (A/B). You'll be asked to justify your answer later on.{prmpt.user_end}
-
         {prmpt.ass_start}
         Answer: ([LABEL]"""
     distribution
