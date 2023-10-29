@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import lmql
 
+import logikon.analysts.lmql_queries as lmql_queries
 from logikon.analysts.lmql_analyst import LMQLAnalyst
 from logikon.schemas.results import Artifact, AnalysisState
 
@@ -54,12 +55,13 @@ def strip_issue_tag(text: str) -> str:
 
 
 @lmql.query
-def key_issue(prompt, completion):
+def key_issue(prompt, completion, prmpt_data: dict):
     '''lmql
     sample(n=3, temperature=.4, chunksize=4)
-        "### System\n\n"
-        "You are a helpful argumentation analysis assistant.\n\n"
-        "### User\n\n"
+        prmpt = PromptTemplate(**prmpt_data)
+        "{prmpt.sys_start}"
+        "{lmql_queries.system_prompt()}{prmpt.sys_end}"
+        "{prmpt.user_start}"
         "Assignment: Analyse and reconstruct a text's argumentation.\n\n"
         "The argumentative analysis proceeds in three steps:\n\n"
         "1. Identify central issue\n"
@@ -72,8 +74,8 @@ def key_issue(prompt, completion):
         "## Step 1\n\n"
         "State the central issue / decision problem discussed in the TEXT in a few words.\n"
         "Be as brief and concise as possible. Think of your answer as the headline of an argument or debate.\n"
-        "Enclose your answer in \"<ISSUE>\" / \"</ISSUE>\" tags.\n\n"
-        "### Assistant\n\n"
+        "Enclose your answer in \"<ISSUE>\" / \"</ISSUE>\" tags.{prmpt.user_end}"
+        "{prmpt.ass_start}"
         "<ISSUE> [@strip_issue_tag ISSUE]"
     where
         STOPS_AT(ISSUE, "</ISSUE>")
@@ -81,13 +83,14 @@ def key_issue(prompt, completion):
 
 
 @lmql.query
-def rate_issue_drafts(alternatives, questions, prompt, completion):
+def rate_issue_drafts(alternatives, questions, prompt, completion, prmpt_data: dict):
     '''lmql
     argmax(chunksize=4)
         labels = [alternative.get('label') for alternative in alternatives]
-        "### System\n\n"
-        "You are a helpful argumentation analysis assistant.\n\n"
-        "### User\n\n"
+        prmpt = PromptTemplate(**prmpt_data)
+        "{prmpt.sys_start}"
+        "{lmql_queries.system_prompt()}{prmpt.sys_end}"
+        "{prmpt.user_start}"
         "Assignment: Rate different summarizations of a text's key issue.\n\n"
         "Before we start, let's study the text to-be-analysed carefully.\n\n"
         "<TEXT>\n"
@@ -99,8 +102,8 @@ def rate_issue_drafts(alternatives, questions, prompt, completion):
             "({alternative.get('label')}) \"{alternative.get('text')}\"\n"
         "</ALTERNATIVES>\n\n"
         "Compare and evaluate the different alternatives according to {len(alternatives)} relevant criteria which are put as questions. (At this point, just answer each question with {'/'.join(labels)}; you'll be asked to explain your answers later.)\n"
-        "Conclude with an aggregate assessment of the alternatives.\n\n"
-        "### Assistant\n\n"
+        "Conclude with an aggregate assessment of the alternatives.{prmpt.user_end}"
+        "{prmpt.ass_start}"
         for question in questions:
             "{question} \n"
             "Answer: ([ANSWER])\n\n" where ANSWER in set(labels)
