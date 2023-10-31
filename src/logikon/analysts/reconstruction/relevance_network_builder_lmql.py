@@ -55,8 +55,7 @@ from logikon.schemas.argument_mapping import FuzzyArgMap, FuzzyArgMapEdge, ArgMa
 
 import logikon.schemas.argument_mapping as am
 
-MAX_N_REASONS = 50
-MAX_N_ROOTS = 10
+MAX_N_RELATIONS = 20
 MAX_LEN_TITLE = 32
 MAX_LEN_GIST = 180
 N_DRAFTS = 3
@@ -544,13 +543,21 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
                     relevance_network, source_node=source_node, target_node=target_node, valence=am.ATTACK, issue=issue
                 )
 
+        # TODO: improve naive sampling
         # add fuzzy reason-reason edges
         for target_node in tqdm.tqdm(relevance_network.nodelist):
-            for source_node in relevance_network.nodelist:
-                if source_node.id == target_node.id:
-                    continue
-                if source_node.nodeType == am.CENTRAL_CLAIM or target_node.nodeType == am.CENTRAL_CLAIM:
-                    continue
+
+            if target_node.nodeType == am.CENTRAL_CLAIM:
+                continue            
+
+            source_nodes = [
+                node for node in relevance_network.nodelist 
+                if node.id != target_node.id and node.nodeType == am.REASON
+            ]
+            if len(source_nodes) > MAX_N_RELATIONS:
+                source_nodes = random.sample(source_nodes, MAX_N_RELATIONS)
+
+            for source_node in source_nodes:
                 valence = None
                 if self._keep_pcl_valences:
                     valence = (
