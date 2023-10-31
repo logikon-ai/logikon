@@ -546,13 +546,11 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         # TODO: improve naive sampling
         # add fuzzy reason-reason edges
         for target_node in tqdm.tqdm(relevance_network.nodelist):
-
             if target_node.nodeType == am.CENTRAL_CLAIM:
-                continue            
+                continue
 
             source_nodes = [
-                node for node in relevance_network.nodelist 
-                if node.id != target_node.id and node.nodeType == am.REASON
+                node for node in relevance_network.nodelist if node.id != target_node.id and node.nodeType == am.REASON
             ]
             if len(source_nodes) > MAX_N_RELATIONS:
                 source_nodes = random.sample(source_nodes, MAX_N_RELATIONS)
