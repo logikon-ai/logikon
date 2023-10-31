@@ -534,6 +534,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                     i += 1
                     new_label = f"{reason.label}-{str(i)}"
                 reason.label = new_label
+                labels.append(new_label)
 
         return unique_reasons
 
