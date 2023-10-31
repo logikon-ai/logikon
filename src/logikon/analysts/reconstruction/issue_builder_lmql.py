@@ -29,6 +29,8 @@ flowchart TD
 """
 from __future__ import annotations
 
+import re
+
 import lmql
 
 import logikon.analysts.lmql_queries as lmql_queries
@@ -53,7 +55,13 @@ QUESTIONS_EVAL = [
 
 def strip_issue_tag(text: str) -> str:
     """Strip issue tag from text."""
-    return text.strip("</ISSUE>").strip("\n ")
+    text = text.strip("</ISSUE>")
+    text = text.strip("\n ")
+    if text[-1] not in [".", "!", "?"]:
+        # split text at any of ".", "!", "?"
+        splits = re.split(r"([.!?])", text)
+        text = "".join(splits[:-1]) if len(splits) > 1 else text
+    return text
 
 
 @lmql.query

@@ -55,7 +55,7 @@ import logikon.schemas.argument_mapping as am
 MAX_N_REASONS = 50
 MAX_N_ROOTS = 10
 MAX_LEN_TITLE = 32
-MAX_LEN_ROOTCLAIM = 120
+MAX_LEN_ROOTCLAIM = 128
 MAX_LEN_GIST = 180
 N_DRAFTS = 3
 LABELS = "ABCDEFG"
@@ -131,7 +131,8 @@ def trunk_to_sentence(text: str) -> str:
     text = text.strip(" \'\n")
     if text[-1] not in [".", "!", "?"]:
         # split text at any of ".", "!", "?"
-        text = "".join(re.split(r"([.!?])", text)[:-1])
+        splits = re.split(r"([.!?])", text)
+        text = "".join(splits[:-1]) if len(splits) > 1 else text
     return text
 
 
@@ -275,6 +276,8 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
                 break
             else:
                 "[OPTION]" where STOPS_AT(OPTION, "\n") and len(OPTION) < MAX_LEN_TITLE
+                if not OPTION.endswith("\n"):
+                    "\n"
                 options.append(OPTION.strip("\n "))
         """
         {prmpt.ass_end}
@@ -341,6 +344,8 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
             elif marker == "- ":  # new root
                 "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<MAX_LEN_TITLE
                 "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
+                if not CLAIM.endswith("\n"):
+                    "\n"
                 root = RootClaim(label=TITLE.strip(')'), text=CLAIM.strip('\n\"'))
                 "  pros:\n"
                 while unused_reasons:
@@ -420,8 +425,10 @@ def add_unused_reasons(
             if marker == "```":
                 break
             elif marker == "- ":  # new root
-                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<32
-                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<128
+                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<MAX_LEN_TITLE
+                "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
+                if not CLAIM.endswith("\n"):
+                    "\n"
                 root = RootClaim(label=TITLE.strip(')'), text=CLAIM.strip('\n\"'))
                 "  pros:\n"
                 while unused_reasons:
