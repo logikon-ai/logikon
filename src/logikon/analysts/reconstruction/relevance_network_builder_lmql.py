@@ -160,7 +160,7 @@ def format_examples() -> str:
 @lmql.query
 def unpack_reason(reason_data: dict, issue: str, prmpt_data: dict) -> List[Claim]:  # type: ignore
     '''lmql
-    sample(temperature=.4, top_p=0.8, chunksize=6)
+    sample(temperature=.3, chunksize=6)
         reason = Claim(**reason_data)
         prmpt = PromptTemplate(**prmpt_data)
         """
