@@ -12,13 +12,13 @@ argumentation networks with multiple root claims.
 ## Basic Concepts
 
 A fuzzy argument map is a *weighted* DAG $G=<N,E,W>$.
-Negative weight represent attack relations, positive weights support relations.
+Negative weights represent attack relations, positive weights support relations.
 
 A "root node" is any node with out-degree 0. (In graph-theory, these "root nodes" 
 are sinks.) The set of root nodes is denoted $N^r$, and the set non-root nodes is
-defined as $N^*$:=$N \setminus N^r$.
+referred to as $N^*$:=$N \setminus N^r$.
 
-The set of all paths p from node n1 to node n2 is denoted by $P_{n1,n2}_$.
+The set of all paths from node n1 to node n2 is denoted by $P_{n1,n2}_$.
 
 ## Marginal root support of a single argument node
 
@@ -31,7 +31,7 @@ where $w(e)$ is the weight of edge $e$, if $|P_{n,t}|$>0. If $|P_{n,t}|$=0, then
 
 MRS(n,t) := 0.
 
-Informally, MRS(n,t) measures the valence and weight of n in s simple pros cons list
+Informally, MRS(n,t) measures the valence and weight of n in a simple pros cons list
 with root claim t.
 
 ## Root support
@@ -128,10 +128,10 @@ class AbstractBalanceScorer(AbstractGraphScorer):
         for t in central_nodes:
             mrs[t] = {}
             nodes = [n for n in digraph_r.nodes if n not in central_nodes]
-            paths = nx.all_simple_paths(digraph_r, t, nodes)
+            paths = list(nx.all_simple_paths(digraph_r, t, nodes))
             for n in nodes:
-                paths_n = [p for p in paths if p[-1][-1] == n]
-                weights = [np.prod([digraph_r[u][v]["weight"] for u, v in p]) for p in paths_n]
+                paths_n = [p for p in paths if p[-1] == n]
+                weights = [np.prod([digraph_r[u][v]["weight"] for u, v in zip(p[:-1], p[1:])]) for p in paths_n]
                 mrs[t][n] = np.mean(weights) if weights else default
 
         return mrs
@@ -150,9 +150,9 @@ class MeanRootSupportScorer(AbstractBalanceScorer):
             self.logger.warning("No central claims or root nodes found, cannot calculate mean root support")
             return 0, "No central claims or root nodes found, cannot calculate mean root support", None
 
-        mrs = self._get_marginal_root_support(digraph_r, central_nodes, 0)
+        mrs = self._get_marginal_root_support(digraph_r, central_nodes)
 
-        mean_root_support = np.mean([np.mean(list(mrs[t].values())) for t in central_nodes])  # type: ignore
+        mean_root_support = np.mean([np.mean([v for v in mrs[t].values() if v is not None]) for t in central_nodes])
 
         return float(mean_root_support), "", None
 
@@ -170,9 +170,11 @@ class MeanAbsRootSupportScorer(AbstractBalanceScorer):
             self.logger.warning("No central claims or root nodes found, cannot calculate mean absolute root support")
             return 0, "No central claims or root nodes found, cannot calculate mean root support", None
 
-        mrs = self._get_marginal_root_support(digraph_r, central_nodes, 0)
+        mrs = self._get_marginal_root_support(digraph_r, central_nodes)
 
-        mean_absolute_root_support = np.mean([abs(np.mean(list(mrs[t].values()))) for t in central_nodes])  # type: ignore
+        mean_absolute_root_support = np.mean(
+            [abs(np.mean([v for v in mrs[t].values() if v is not None])) for t in central_nodes]
+        )
 
         return float(mean_absolute_root_support), "", None
 
@@ -186,14 +188,14 @@ class GlobalBalanceScorer(AbstractBalanceScorer):
     def _get_mrs_star(self, mrs: dict[str, dict[str, Optional[float]]]) -> dict[str, dict[str, float]]:
         """Calculates MRS' from MRS"""
         mrs_star: dict[str, dict[str, float]] = {}
-        nodes = mrs[mrs.keys()[0]].keys()  # type: ignore
+        nodes = list(list(mrs.values())[0].keys())
         mrs_node = {n: [mrs[t][n] for t in mrs if mrs[t][n] is not None] for n in nodes}
         for t in mrs:
             mrs_star[t] = {}
             for n in mrs[t]:
                 if mrs[t][n] is None:
                     if mrs_node[n]:
-                        mrs_star[t][n] = np.mean(mrs_node[n]) / len(mrs_node[n])  # type: ignore
+                        mrs_star[t][n] = -np.mean(mrs_node[n]) / len(mrs_node[n])  # type: ignore
                     else:
                         mrs_star[t][n] = 0
                 else:

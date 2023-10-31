@@ -16,6 +16,11 @@ from logikon.analysts.score.argmap_graph_scores import (
     ArgMapGraphSizeScorer,
     ArgMapRootCountScorer,
 )
+from logikon.analysts.score.balance_scores import (
+    MeanRootSupportScorer,
+    MeanAbsRootSupportScorer,
+    GlobalBalanceScorer,
+)
 
 # TODO: set up a product registry for storing product_kw/product_cls mapping
 
@@ -33,6 +38,9 @@ _ANALYST_REGISTRY: Mapping[str, List[type[Analyst]]] = {
     "n_root_nodes": [ArgMapRootCountScorer],
     "argmap_avg_katz_centrality": [ArgMapGraphAvgKatzCScorer],
     "argmap_attack_ratio": [ArgMapGraphAttackRatioScorer],
+    "mean_root_support": [MeanRootSupportScorer],
+    "mean_absolute_root_support": [MeanAbsRootSupportScorer],
+    "global_balance": [GlobalBalanceScorer],
 }
 
 
