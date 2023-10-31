@@ -70,8 +70,8 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
                 prompt_template = PromptTemplate.from_dict(prompt_template)
             except Exception as e:
                 self.logger.warning(f"Failed to parse prompt template: {e}. Will use defaul prompt template.")
-                prompt_template = None
-        if isinstance(prompt_template, str) or prompt_template is None:
+                prompt_template = get_prompt_template()
+        elif isinstance(prompt_template, str):
             prompt_template = get_prompt_template(prompt_template)
         else:
             raise ValueError(f"Invalid prompt template: {prompt_template}")
