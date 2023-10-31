@@ -58,7 +58,7 @@ def strip_issue_tag(text: str) -> str:
 @lmql.query
 def key_issue(prompt, completion, prmpt_data: dict):
     '''lmql
-    sample(n=3, temperature=.7, top_p=.8, chunksize=4)
+    sample(n=3, temperature=.6, top_p=.8, chunksize=4)
         prmpt = PromptTemplate(**prmpt_data)
         "{prmpt.sys_start}"
         "{lmql_queries.system_prompt()}{prmpt.sys_end}"
