@@ -246,7 +246,7 @@ def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  #
 @lmql.query
 def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
     '''lmql
-    sample(temperature=.3, chunksize=6)
+    sample(temperature=.4, chunksize=6)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
         prmpt = PromptTemplate(**prmpt_data)
         """
