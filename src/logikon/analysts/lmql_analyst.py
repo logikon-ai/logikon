@@ -64,7 +64,10 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
         model_kwargs.pop("tokenizer", None)
 
         prompt_template = model_kwargs.pop("prompt_template", None)
-        if isinstance(prompt_template, dict):
+        if prompt_template is None:
+            self.logger.info(f"No prompt template provided. Will use default prompt template.")
+            prompt_template = get_prompt_template()
+        elif isinstance(prompt_template, dict):
             # try to parse prompt template
             try:
                 prompt_template = PromptTemplate.from_dict(prompt_template)
