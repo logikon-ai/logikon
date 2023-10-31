@@ -36,6 +36,7 @@ from logikon.utils.prompt_templates_registry import PromptTemplate
 from logikon.analysts.lmql_analyst import LMQLAnalyst
 from logikon.schemas.results import Artifact, AnalysisState
 
+MAX_LEN_ISSUE = 80
 N_DRAFTS = 3
 LABELS = "ABCDEFG"
 QUESTIONS_EVAL = [
@@ -79,7 +80,7 @@ def key_issue(prompt, completion, prmpt_data: dict):
         "{prmpt.ass_start}"
         "<ISSUE> [@strip_issue_tag ISSUE]"
     where
-        STOPS_AT(ISSUE, "</ISSUE>")
+        STOPS_AT(ISSUE, "</ISSUE>") and len(ISSUE) < MAX_LEN_ISSUE
     '''
 
 
