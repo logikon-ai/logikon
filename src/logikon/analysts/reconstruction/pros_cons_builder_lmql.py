@@ -209,7 +209,7 @@ def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  #
         - Go through the text from beginning to end and extract all arguments in the order of appearance.
         - For each argument, sketch the argument's gist in one or two grammatically correct sentences, staying close to the original wording, and provide a telling title (2-4 words). I.e.:
             ```
-            - title: "a very short title"
+            - title: "very short title (2-4 words)"
               gist: "the argument's gist in 1-2 short sentences (less than {MAX_LEN_GIST} chars)."
             ```
         - Avoid repeating one and the same argument in different words.
