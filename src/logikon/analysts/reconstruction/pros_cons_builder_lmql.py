@@ -238,7 +238,7 @@ def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  #
                 "\n  gist: \"[@trunk_to_sentence GIST]" where STOPS_AT(GIST, "\"") and STOPS_AT(GIST, "\n") and len(GIST) < MAX_LEN_GIST
                 if not GIST.endswith('\"'):
                     "\" "
-                gist = GIST.strip('\"')
+                gist = GIST.strip(' \"\n')
                 reasons.append(Claim(label=title, text=gist))
         return reasons
     '''
