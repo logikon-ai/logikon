@@ -387,7 +387,7 @@ def add_unused_reasons(
     '''lmql
     argmax(chunksize=6)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
-        unused_reasons = [Claim(**reason_data) for reason_data in unused_reasons_data]
+        unused_reasons = [Claim(**ureason_data) for ureason_data in unused_reasons_data]
         pros_and_cons = ProsConsList(**pros_and_cons_data)
         formatted_pcl = format_proscons(issue, pros_and_cons, unused_reasons)
         prmpt = PromptTemplate(**prmpt_data)
