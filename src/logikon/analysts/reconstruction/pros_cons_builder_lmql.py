@@ -234,7 +234,7 @@ def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  #
                 "title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and STOPS_AT(TITLE, "\n") and len(TITLE) < MAX_LEN_TITLE
                 if not TITLE.endswith('\"'):
                     "\" "
-                title = TITLE.strip('\"')
+                title = TITLE.strip(' \"\n')
                 "\n  gist: \"[@trunk_to_sentence GIST]" where STOPS_AT(GIST, "\"") and STOPS_AT(GIST, "\n") and len(GIST) < MAX_LEN_GIST
                 if not GIST.endswith('\"'):
                     "\" "
