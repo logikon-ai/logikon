@@ -31,12 +31,16 @@ class AbstractGraphScorer(AbstractScoreAnalyst):
     def _analyze(self, analysis_state: AnalysisState):
         """Score the argmap."""
 
-        try:
-            networkx_graph: nx.DiGraph = next(
-                artifact.data for artifact in analysis_state.artifacts if artifact.id == "networkx_graph"
+        networkx_graph: Optional[nx.DiGraph] = next(
+            (artifact.data for artifact in analysis_state.artifacts if artifact.id == "fuzzy_argmap_nx"), None
+        )
+        if networkx_graph is None:
+            networkx_graph = next(
+                (artifact.data for artifact in analysis_state.artifacts if artifact.id == "networkx_graph"), None
             )
-        except StopIteration:
-            msg = "Missing required artifact: networkx_graph"
+
+        if networkx_graph is None:
+            msg = f"Missing any of the required artifacts: {self.get_requirements()}"
             raise ValueError(msg)
 
         value, comment, metadata = self._calculate_score(networkx_graph)
