@@ -52,7 +52,7 @@ from logikon.schemas.results import Artifact, AnalysisState
 from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
 import logikon.schemas.argument_mapping as am
 
-MAX_N_REASONS = 50
+MAX_N_REASONS = 18
 MAX_N_ROOTS = 10
 MAX_LEN_TITLE = 32
 MAX_LEN_ROOTCLAIM = 128
