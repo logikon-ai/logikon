@@ -38,9 +38,9 @@ _PROMPT_TEMPLATE_REGISTRY = {
     "llama": PromptTemplate(
         sys_start="### System\n",
         sys_end="",
-        user_start="### User\n",
+        user_start="\n### User\n",
         user_end="",
-        ass_start="### Assistant\n",
+        ass_start="\n### Assistant\n",
         ass_end="",
     ),
     "mistral_instruct": PromptTemplate(
