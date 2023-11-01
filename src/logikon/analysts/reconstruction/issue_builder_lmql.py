@@ -177,7 +177,7 @@ class IssueBuilderLMQL(LMQLAnalyst):
             }
             for enum, result in enumerate(results)
         ]
-        self.logger.info(f"Drafts: {issue_drafts}")
+        self.logger.debug(f"Drafts: {issue_drafts}")
 
         # rate summarizations and choose best
         result = self._rate_issue_drafts(

@@ -152,8 +152,8 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
         thrsh_support_w = np.median(support_weights) if support_weights else None
         thrsh_attack_w = np.median(attack_weights) if attack_weights else None
 
-        self.logger.info(f"Minimum support weight: {thrsh_support_w}")
-        self.logger.info(f"Minimum attack weight: {thrsh_attack_w}")
+        self.logger.debug(f"Minimum support weight: {thrsh_support_w}")
+        self.logger.debug(f"Minimum attack weight: {thrsh_attack_w}")
 
         if thrsh_support_w is None and thrsh_attack_w is None:
             return []
@@ -174,7 +174,7 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
                 fuzzy_argmap.add_edge(u, v, **data)
             edges_added.append((u, v))
 
-        self.logger.info(f"Added {len(edges_added)} edges to fuzzy argmap.")
+        self.logger.debug(f"Added {len(edges_added)} edges to fuzzy argmap.")
 
         return edges_added
 

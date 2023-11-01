@@ -351,7 +351,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
             model=self._model,
             **self._generation_kwargs,
         )
-        self.logger.info(f"Eliciting valence with lmql query: '{lmql_result.prompt}'")
+        #self.logger.debug(f"Eliciting valence with lmql query: '{lmql_result.prompt}'")
         if valence is None:
             valence = lmql_queries.label_to_valence(lmql_result.variables[lmql_result.distribution_variable])
         prob_1 = next(
@@ -526,7 +526,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
         # unpack individual reasons
         pros_and_cons, unpacking = self._unpack_reasons(pros_and_cons, issue)
-        self.logger.info(f"Unpacked pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
+        self.logger.debug(f"Unpacked pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         # create fuzzy argmap from fuzzy pros and cons list (reason-root edges)
         relevance_network = FuzzyArgMap()

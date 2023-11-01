@@ -697,7 +697,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                     }
                 )
 
-        self.logger.info(f"Identified {len(revisions)} revision of pros and cons list.")
+        self.logger.debug(f"Identified {len(revisions)} revision of pros and cons list.")
 
         # revise pros and cons list according to revision instructions
         for revision in revisions:
@@ -745,7 +745,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         if not all(isinstance(reason, Claim) for reason in reasons):
             raise ValueError(f"Reasons are not of type Claim. Got {reasons}.")
         reasons = self._ensure_unique_labels(reasons)
-        self.logger.info(f"Mined reasons: {pprint.pformat(reasons)}")
+        self.logger.debug(f"Mined reasons: {pprint.pformat(reasons)}")
 
         # build pros and cons list
         pros_and_cons, unused_reasons = self._build_pros_and_cons(reasons_data=[r.dict() for r in reasons], issue=issue)
@@ -753,7 +753,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
         # add unused reasons
         if unused_reasons:
-            self.logger.info(f"Unused reasons: {pprint.pformat(unused_reasons)}")
+            self.logger.debug(f"Unused reasons: {pprint.pformat(unused_reasons)}")
             pros_and_cons, unused_reasons = self._add_unused_reasons(
                 reasons_data=[r.dict() for r in reasons],
                 issue=issue,
@@ -763,11 +763,11 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             if unused_reasons:
                 self.logger.info(f"Failed to integrate the following reasons: {pprint.pformat(unused_reasons)}")
         # TODO: consider drafting alternative pros&cons lists and choosing best
-        self.logger.info(f"Built pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
+        self.logger.debug(f"Built pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         # double-check and revise
         pros_and_cons = self._check_and_revise(pros_and_cons, reasons, issue)
-        self.logger.info(f"Revised pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
+        self.logger.debug(f"Revised pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
         if pros_and_cons is None:
             self.logger.warning("Failed to build pros and cons list (pros_and_cons is None).")
