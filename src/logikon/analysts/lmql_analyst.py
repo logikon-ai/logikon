@@ -22,6 +22,7 @@ class LMQLAnalystConfig(ArtifcatAnalystConfig):
     llm_framework: str
     expert_model_kwargs: Optional[dict] = None
     generation_kwargs: Optional[dict] = None
+    lmql_query_timeout: int = 300
 
 
 class LMQLAnalyst(AbstractArtifactAnalyst):
@@ -84,3 +85,4 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
         self._model_kwargs = model_kwargs
         self._generation_kwargs = config.generation_kwargs if config.generation_kwargs is not None else {}
         self._prompt_template = prompt_template
+        self._lmql_query_timeout = config.lmql_query_timeout
