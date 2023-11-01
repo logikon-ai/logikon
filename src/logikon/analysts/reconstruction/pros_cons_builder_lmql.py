@@ -183,7 +183,7 @@ def format_examples() -> str:
 @lmql.query
 def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  # type: ignore
     '''lmql
-    sample(temperature=.4, chunksize=6)
+    sample(temperature=.4, chunksize=10)
         prmpt = PromptTemplate(**prmpt_data)
         """
         {prmpt.sys_start}
