@@ -74,9 +74,6 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
 
         root_nodes = [node for node, data in G.nodes.items() if data['nodeType'] == am.CENTRAL_CLAIM]
 
-        if len(root_nodes) <= 1:
-            return G
-
         # add pseudo super-root
         pseudo_root = f"super-root-{uuid.uuid4()}"
         G.add_node(pseudo_root, nodeType=am.CENTRAL_CLAIM, pseudo=True)
