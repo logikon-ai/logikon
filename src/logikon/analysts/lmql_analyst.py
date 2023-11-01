@@ -41,13 +41,14 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
         model = get_registry_model(model_id)
 
         if model is None:
+            model_prefix = "local:" if "endpoint" not in model_kwargs else ""
             if config.llm_framework == "transformers":
                 if "tokenizer" not in model_kwargs:
                     model_kwargs["tokenizer"] = model_id
-                model = lmql.model(f"local:{model_id}", **model_kwargs)
+                model = lmql.model(f"{model_prefix}{model_id}", **model_kwargs)
 
             if config.llm_framework == "llama.cpp":
-                model = lmql.model(f"local:llama.cpp:{model_id}", **model_kwargs)
+                model = lmql.model(f"{model_prefix}llama.cpp:{model_id}", **model_kwargs)
 
             if config.llm_framework == "OpenAI":
                 model = lmql.model(model_id, **model_kwargs)
