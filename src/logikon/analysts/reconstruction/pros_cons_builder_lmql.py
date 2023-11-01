@@ -281,7 +281,7 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
                 if not OPTION.endswith("\n"):
                     "\n"
                 options.append(OPTION.strip("\n "))
-        if marker != "</options>"
+        if marker != "</options>":
             "</options>"
         """
         {prmpt.ass_end}
