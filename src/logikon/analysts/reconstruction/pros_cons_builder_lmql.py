@@ -41,6 +41,7 @@ import functools as ft
 import pprint
 import random
 import re
+import signal
 import uuid
 
 import lmql
@@ -479,26 +480,46 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
     __product__ = "proscons"
     __requirements__ = ["issue"]
 
+    # timeout handler
+    def _timeout_handler(self, signum, frame):
+        raise TimeoutError("LMQL query timed out.")
+
     def _mine_reasons(self, prompt, completion, issue) -> List[Claim]:
         """Internal wrapper (class-method) for lmql.query function."""
-        return mine_reasons(
-            prompt,
-            completion,
-            issue,
-            prmpt_data=self._prompt_template.to_dict(),
-            model=self._model,
-            **self._generation_kwargs,
-        )
+        signal.signal(signal.SIGALRM, self._timeout_handler)
+        try:
+            signal.alarm(self._lmql_query_timeout)
+            return mine_reasons(
+                prompt,
+                completion,
+                issue,
+                prmpt_data=self._prompt_template.to_dict(),
+                model=self._model,
+                **self._generation_kwargs,
+            )
+        except TimeoutError:
+            self.logger.warning("LMQL query _mine_reasons timed out.")
+            return []
+        finally:
+            signal.alarm(0)
 
     def _build_pros_and_cons(self, reasons_data: list[dict], issue: str) -> Tuple[ProsConsList, List[Claim]]:
         """Internal wrapper (class-method) for lmql.query function."""
-        return build_pros_and_cons(
-            reasons_data,
-            issue,
-            prmpt_data=self._prompt_template.to_dict(),
-            model=self._model,
-            **self._generation_kwargs,
-        )
+        signal.signal(signal.SIGALRM, self._timeout_handler)
+        try:
+            signal.alarm(self._lmql_query_timeout)
+            return build_pros_and_cons(
+                reasons_data,
+                issue,
+                prmpt_data=self._prompt_template.to_dict(),
+                model=self._model,
+                **self._generation_kwargs,
+            )
+        except TimeoutError:
+            self.logger.warning("LMQL query build_pros_and_cons timed out.")
+            return ProsConsList(roots=[]), []
+        finally:
+            signal.alarm(0)
 
     def _add_unused_reasons(
         self,
@@ -508,15 +529,23 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         unused_reasons_data: list,
     ) -> Tuple[ProsConsList, List[Claim]]:
         """Internal wrapper (class-method) for lmql.query function."""
-        return add_unused_reasons(
-            reasons_data,
-            issue,
-            pros_and_cons_data,
-            unused_reasons_data,
-            prmpt_data=self._prompt_template.to_dict(),
-            model=self._model,
-            **self._generation_kwargs,
-        )
+        signal.signal(signal.SIGALRM, self._timeout_handler)
+        try:
+            signal.alarm(self._lmql_query_timeout)
+            return add_unused_reasons(
+                reasons_data,
+                issue,
+                pros_and_cons_data,
+                unused_reasons_data,
+                prmpt_data=self._prompt_template.to_dict(),
+                model=self._model,
+                **self._generation_kwargs,
+            )
+        except TimeoutError:
+            self.logger.warning("LMQL query add_unused_reasons timed out.")
+            return ProsConsList(roots=[]), []
+        finally:
+            signal.alarm(0)
 
     def _ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
         """Revises labels of reasons to ensure uniqueness
