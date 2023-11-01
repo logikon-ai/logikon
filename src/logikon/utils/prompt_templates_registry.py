@@ -52,11 +52,11 @@ _PROMPT_TEMPLATE_REGISTRY = {
         ass_end="",
     ),
     "chatml": PromptTemplate(
-        sys_start="<|im_start|>system",
+        sys_start="<|im_start|>system\n",
         sys_end="<|im_end|>",
-        user_start="<|im_start|>user",
+        user_start="\n<|im_start|>user\n",
         user_end="<|im_end|>",
-        ass_start="<|im_start|>assistant",
+        ass_start="\n<|im_start|>assistant\n",
         ass_end="<|im_end|>",
     ),
 }
