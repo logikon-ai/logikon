@@ -496,7 +496,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         """Internal wrapper (class-method) for lmql.query function."""
         #signal.signal(signal.SIGALRM, self._timeout_handler)
         #try:
-        signal.alarm(self._lmql_query_timeout)
+        #signal.alarm(self._lmql_query_timeout)
         reasons: List[Claim] = mine_reasons(
             prompt,
             completion,
@@ -521,7 +521,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         """Internal wrapper (class-method) for lmql.query function."""
         #signal.signal(signal.SIGALRM, self._timeout_handler)
         #try:
-        signal.alarm(self._lmql_query_timeout)
+        #signal.alarm(self._lmql_query_timeout)
         return build_pros_and_cons(
             reasons_data,
             issue,
