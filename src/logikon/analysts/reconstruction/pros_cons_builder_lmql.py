@@ -271,18 +271,18 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
         <options>
         """
         options = []
-        marker = ""
+        markero = ""
         while len(options)<MAX_N_ROOTS:
-            "[MARKER]" where MARKER in ["</options>", "- "]
-            marker = MARKER
-            if marker == "</options>":
+            "[MARKERO]" where MARKERO in ["</options>", "- "]
+            markero = MARKERO
+            if markero == "</options>":
                 break
             else:
                 "[OPTION]" where STOPS_AT(OPTION, "\n") and len(OPTION) < MAX_LEN_TITLE
                 if not OPTION.endswith("\n"):
                     "\n"
                 options.append(OPTION.strip("\n "))
-        if marker != "</options>":
+        if markero != "</options>":
             "</options> "
         else:
             " "
