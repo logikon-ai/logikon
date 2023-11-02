@@ -208,10 +208,12 @@ def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  #
         Let me give you more detailed instructions:
 
         - Go through the text from beginning to end and extract all arguments in the order of appearance.
-        - For each argument, sketch the argument's gist in one or two grammatically correct sentences, staying close to the original wording, and provide a telling title (2-4 words). I.e.:
+        - For each argument, sketch the argument's gist in one or two grammatically correct sentences, staying close to the original wording.
+        - In addition, provide a short caption that flashlights the argument's key idea (2-4 words). 
+        - Use the following format:
             ```
-            - title: "very short title (2-4 words)"
-              gist: "the argument's gist in 1-2 short sentences (less than {MAX_LEN_GIST} chars)."
+            - gist: "state here the argument's gist in 1-2 concise sentences (in total less than {MAX_LEN_GIST} chars)."
+              title: "argument's title (2-4 words)"
             ```
         - Avoid repeating one and the same argument in different words.
         - You don't have to distinguish between pro and con arguments.
@@ -232,13 +234,13 @@ def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  #
             if marker == "\n```":
                 break
             else:
-                "title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and STOPS_AT(TITLE, "\n") and len(TITLE) < MAX_LEN_TITLE
+                "gist: \"[GIST]" where STOPS_AT(GIST, "\"") and STOPS_AT(GIST, "\n") and len(GIST) < MAX_LEN_GIST
+                if not GIST.endswith('\"'):
+                    "\" "
+                "\n  title: \"[TITLE]" where STOPS_AT(TITLE, "\"") and STOPS_AT(TITLE, "\n") and len(TITLE) < MAX_LEN_TITLE
                 if not TITLE.endswith('\"'):
                     "\" "
                 title = TITLE.strip(' \"\n')
-                "\n  gist: \"[GIST]" where STOPS_AT(GIST, "\"") and STOPS_AT(GIST, "\n") and len(GIST) < MAX_LEN_GIST
-                if not GIST.endswith('\"'):
-                    "\" "
                 gist = trunk_to_sentence(GIST.strip(' \"\n'))
                 reasons.append(Claim(label=title, text=gist))
         return reasons
