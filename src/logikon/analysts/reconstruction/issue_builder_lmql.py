@@ -29,6 +29,8 @@ flowchart TD
 """
 from __future__ import annotations
 
+from typing import Any, Optional
+
 import re
 
 import lmql
@@ -131,19 +133,33 @@ class IssueBuilderLMQL(LMQLAnalyst):
     __pdescription__ = "Issue or decision problem addressed in the deliberation"
     __product__ = "issue"
 
-    def _key_issue(self, prompt, completion):  # TODO: add type hints
+    def _key_issue(self, prompt: str, completion: str) -> list[dict[str, Any]]:
         """Internal (class-method) wrapper for lmql.query function."""
-        return key_issue(
+        results = key_issue(
             prompt=prompt,
             completion=completion,
             prmpt_data=self._prompt_template.to_dict(),
             model=self._model,
             **self._generation_kwargs,
         )
+        if not all(isinstance(result, lmql.LMQLResult) for result in results):
+            raise ValueError(f"Results are not of type lmql.LMQLResult. Got {results}.")
+        issue_drafts = [
+            {
+                "text": result.variables.get("ISSUE", "").strip("\n "),
+                "label": LABELS[enum],
+            }
+            for enum, result in enumerate(results)
+        ]
+        return issue_drafts
 
-    def _rate_issue_drafts(self, alternatives, questions, prompt, completion):  # TODO: add type hints
-        """Internal (class-method) wrapper for lmql.query function."""
-        return rate_issue_drafts(
+    def _rate_issue_drafts(self, alternatives: list[dict[str, Any]], questions: list[str], prompt: str, completion: str) -> Optional[str]:
+        """Internal (class-method) wrapper for lmql.query function.
+        
+        Returns:
+            str: label of best alternative
+        """
+        result = rate_issue_drafts(
             alternatives=alternatives,
             questions=questions,
             prompt=prompt,
@@ -152,6 +168,10 @@ class IssueBuilderLMQL(LMQLAnalyst):
             model=self._model,
             **self._generation_kwargs,
         )
+        if not isinstance(result, lmql.LMQLResult):
+            raise ValueError(f"Results are not of type lmql.LMQLResult. Got {result}.")
+        label = result.variables.get("FINAL_ANSWER")
+        return label
 
     def _analyze(self, analysis_state: AnalysisState):
         """Extract central issue of text (prompt/completion)."""
@@ -163,34 +183,27 @@ class IssueBuilderLMQL(LMQLAnalyst):
             )
 
         # draft summarizations
-        results = self._key_issue(
+        issue_drafts = self._key_issue(
             prompt=prompt,
             completion=completion,
         )
-        # TODO: move LMQL logic in query function / wrapper
-        if not all(isinstance(result, lmql.LMQLResult) for result in results):
-            raise ValueError(f"Results are not of type lmql.LMQLResult. Got {results}.")
-        issue_drafts = [
-            {
-                "text": result.variables.get("ISSUE", "").strip("\n "),
-                "label": LABELS[enum],
-            }
-            for enum, result in enumerate(results)
-        ]
         self.logger.debug(f"Drafts: {issue_drafts}")
 
         # rate summarizations and choose best
-        result = self._rate_issue_drafts(
+        label = self._rate_issue_drafts(
             alternatives=issue_drafts,
             questions=QUESTIONS_EVAL,
             prompt=prompt,
             completion=completion,
         )
-        label = result.variables.get("FINAL_ANSWER")
         issue = next((draft["text"] for draft in issue_drafts if draft["label"] == label), None)
 
         if issue is None:
-            self.logger.warning("Failed to elicit issue (issue is None).")
+            if issue_drafts:
+                self.logger.warning("Failed to rate issue drafts, picking first alternative.")
+                issue = issue_drafts[0]["text"]
+            else:
+                self.logger.warning("Failed to elicit issue (issue is None).")
 
         artifact = Artifact(
             id=self.get_product(),
