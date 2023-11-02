@@ -348,7 +348,7 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
         while len(roots)<MAX_N_ROOTS and unused_reasons:
             if marker == "\n```":
                 break
-            elif marker == "- ":  # new root
+            elif marker == "\n- ":  # new root
                 "root: \"([TITLE]" where STOPS_AT(TITLE, ")") and STOPS_AT(TITLE, ":") and len(TITLE)<MAX_LEN_TITLE
                 if TITLE.endswith(")"):
                     ":"
