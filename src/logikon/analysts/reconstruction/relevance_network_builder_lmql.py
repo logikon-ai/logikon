@@ -210,7 +210,7 @@ def unpack_reason(reason_data: dict, issue: str, prmpt_data: dict) -> List[Claim
 
         Please, process the above inputs and unpack the individual reasons contained in the argumentation.{prmpt.user_end}
         {prmpt.ass_start}
-        The argumentation makes the following basic reasons:
+        The argumentation contains the following basic reasons:
 
         ```yaml
         argumentation:
