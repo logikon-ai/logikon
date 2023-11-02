@@ -354,16 +354,16 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
                     ":"
                 elif not TITLE.endswith(":"):
                     "):"
-                "[CLAIM]" where STOPS_AT(CLAIM, "\"") and STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
-                if not CLAIM.endswith("\""):
-                    "\""
+                "[CLAIM]" where STOPS_AT(CLAIM, '\"') and STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
+                if not CLAIM.endswith('\"'):
+                    '\"'
                 root = RootClaim(label=TITLE.strip('): '), text=CLAIM.strip('\n\"'))
                 "  pros:"
                 while unused_reasons:
                     "[MARKER]" where MARKER in ["\n  cons:", "\n  - "]
                     marker = MARKER
                     if marker == "\n  - ":  # new pro
-                        "\"[[[REASON_TITLE]]]\"" where REASON_TITLE in [reason.label for reason in unused_reasons]
+                        '\"[[[REASON_TITLE]]]\"' where REASON_TITLE in [reason.label for reason in unused_reasons]
                         selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
                         root.pros.append(selected_reason)
                         unused_reasons.remove(selected_reason)
@@ -374,7 +374,7 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
                     "[MARKER]" where MARKER in ["\n```", "\n- ", "\n  - "]
                     marker = MARKER
                     if marker == "\n  - ":  # new con
-                        "\"[[[REASON_TITLE]]]\"" where REASON_TITLE in [reason.label for reason in unused_reasons]
+                        '\"[[[REASON_TITLE]]]\"' where REASON_TITLE in [reason.label for reason in unused_reasons]
                         selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
                         root.cons.append(selected_reason)
                         unused_reasons.remove(selected_reason)
