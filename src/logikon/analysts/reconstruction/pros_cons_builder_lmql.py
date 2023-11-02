@@ -508,6 +508,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             )
         except TimeoutError:
             self.logger.warning("LMQL query _mine_reasons timed out.")
+            signal.alarm(0)
             return []
         finally:
             signal.alarm(0)
@@ -526,6 +527,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             )
         except TimeoutError:
             self.logger.warning("LMQL query build_pros_and_cons timed out.")
+            signal.alarm(0)
             return ProsConsList(roots=[]), []
         finally:
             signal.alarm(0)
@@ -552,6 +554,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             )
         except TimeoutError:
             self.logger.warning("LMQL query add_unused_reasons timed out.")
+            signal.alarm(0)
             return ProsConsList(roots=[]), []
         finally:
             signal.alarm(0)
