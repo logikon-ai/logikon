@@ -436,11 +436,15 @@ def add_unused_reasons(
             if marker == "```":
                 break
             elif marker == "- ":  # new root
-                "root: \"([TITLE]:" where STOPS_AT(TITLE, ")") and len(TITLE)<MAX_LEN_TITLE
+                "root: \"([TITLE]" where STOPS_AT(TITLE, ")") and STOPS_AT(TITLE, ":") and len(TITLE)<MAX_LEN_TITLE
+                if TITLE.endswith(")"):
+                    ":"
+                elif not TITLE.endswith(":"):
+                    "):"
                 "[CLAIM]" where STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
                 if not CLAIM.endswith("\n"):
                     "\n"
-                root = RootClaim(label=TITLE.strip(')'), text=CLAIM.strip('\n\"'))
+                root = RootClaim(label=TITLE.strip('): '), text=CLAIM.strip('\n\"'))
                 "  pros:\n"
                 while unused_reasons:
                     "[MARKER]" where MARKER in ["  cons:\n", "  - "]
