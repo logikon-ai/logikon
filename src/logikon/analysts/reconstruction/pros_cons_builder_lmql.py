@@ -383,8 +383,7 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
 
                 roots.append(root)
             else:
-                "{marker}"
-                break
+                " +{marker}+ "
 
         return ProsConsList(roots=roots, options=options), unused_reasons
 
