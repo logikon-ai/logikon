@@ -497,7 +497,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         #signal.signal(signal.SIGALRM, self._timeout_handler)
         #try:
         signal.alarm(self._lmql_query_timeout)
-        return mine_reasons(
+        reasons: List[Claim] = mine_reasons(
             prompt,
             completion,
             issue,
@@ -505,6 +505,11 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             model=self._model,
             **self._generation_kwargs,
         )
+        # postprocess reasons
+        for reason in reasons:
+            reason.label = reason.label.strip(" \"\n")
+            reason.text = trunk_to_sentence(reason.text.strip(" \"\n"))
+        return reasons
         #except TimeoutError:
         #    self.logger.warning("LMQL query _mine_reasons timed out.")
         #    signal.alarm(0)
