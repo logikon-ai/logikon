@@ -62,7 +62,6 @@ _PROMPT_TEMPLATE_REGISTRY = {
 }
 
 
-# TODO: disallow chatml prompt template; enforce llama!
 
 def get_prompt_template(tmpl_key: str | None = None) -> PromptTemplate:
     """Returns prompt template to use with lmql queries"""
@@ -73,5 +72,11 @@ def get_prompt_template(tmpl_key: str | None = None) -> PromptTemplate:
             f"Invalid prompt template key: {tmpl_key}, using default template {_DEFAULT_KEY}."
         )
         tmpl_key = _DEFAULT_KEY
+    if tmpl_key != _DEFAULT_KEY:
+        logging.getLogger("prompt_templates_registry").warning(
+            f"Found non-default config template key {tmpl_key}. Prompt templates other than default (llama) "
+            f"risk to disrupt lmql query provcessing and are hence prohibited until this issue is fixed."
+            f"Will use default pronpt template {_DEFAULT_KEY} instead."
+        )
 
     return _PROMPT_TEMPLATE_REGISTRY[tmpl_key]

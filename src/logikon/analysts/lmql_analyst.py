@@ -73,6 +73,11 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
             # try to parse prompt template
             try:
                 prompt_template = PromptTemplate.from_dict(prompt_template)
+                self.logger.warning(
+                    f"Found custom prompt template in config. Note that ill-designed prompt templates "
+                    f"may fatally disrupt processing of lmql queries. Test custom templates thoroughly. "
+                    f"Use at your own risk."
+                )
             except Exception as e:
                 self.logger.warning(f"Failed to parse prompt template: {e}. Will use defaul prompt template.")
                 prompt_template = get_prompt_template()
