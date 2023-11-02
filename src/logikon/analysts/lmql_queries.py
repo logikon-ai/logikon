@@ -158,7 +158,7 @@ def most_disconfirmed(argument_data: dict, claims_data: list, prmpt_data: dict):
         """
         for label, claim in zip(labels, claims):
             text = claim.text
-            text = text[0].lower() + text[1:]
+            text = text[0].lower() + text[1:] if text else text
             "({label}) \"It is not the case that {text}\"\n"
         """
         Just answer with ({'/'.join(labels)}). You'll be asked to justify your answer later on.{prmpt.user_end}
