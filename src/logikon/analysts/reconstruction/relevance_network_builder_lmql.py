@@ -351,7 +351,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
             model=self._model,
             **self._generation_kwargs,
         )
-        #self.logger.debug(f"Eliciting valence with lmql query: '{lmql_result.prompt}'")
+        # self.logger.debug(f"Eliciting valence with lmql query: '{lmql_result.prompt}'")
         if valence is None:
             valence = lmql_queries.label_to_valence(lmql_result.variables[lmql_result.distribution_variable])
         prob_1 = next(

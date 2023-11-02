@@ -263,8 +263,8 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
         <issue>{issue}</issue>
 
         What are the basic options available to an agent who needs to address this issue?
-        
-        Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}        
+
+        Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
         {prmpt.ass_start}
         The options available to an agent who faces the above issue are (one per line):
 
@@ -283,7 +283,9 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
                     "\n"
                 options.append(OPTION.strip("\n "))
         if marker != "</options>":
-            "</options>"
+            "</options> "
+        else:
+            " "
         """
         {prmpt.ass_end}
         {prmpt.user_start}
