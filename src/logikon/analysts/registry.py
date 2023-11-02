@@ -15,6 +15,7 @@ from logikon.analysts.score.argmap_graph_scores import (
     ArgMapGraphAvgKatzCScorer,
     ArgMapGraphSizeScorer,
     ArgMapRootCountScorer,
+    MeanReasonStrengthScorer,
 )
 from logikon.analysts.score.balance_scores import (
     MeanRootSupportScorer,
@@ -41,6 +42,7 @@ _ANALYST_REGISTRY: Mapping[str, List[type[Analyst]]] = {
     "mean_root_support": [MeanRootSupportScorer],
     "mean_absolute_root_support": [MeanAbsRootSupportScorer],
     "global_balance": [GlobalBalanceScorer],
+    "mean_reason_strength": [MeanReasonStrengthScorer],
 }
 
 

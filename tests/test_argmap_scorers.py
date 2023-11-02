@@ -5,6 +5,7 @@ from logikon.analysts.score.argmap_graph_scores import (
     ArgMapGraphAttackRatioScorer,
     ArgMapGraphAvgKatzCScorer,
     ArgMapGraphSizeScorer,
+    MeanReasonStrengthScorer,
 )
 from logikon.analysts.base import ScoreAnalystConfig
 
@@ -21,8 +22,8 @@ def nx_map1() -> nx.DiGraph:
             {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
         ],
         "links": [
-            {"valence": "pro", "source": "n1", "target": "n0"},
-            {"valence": "con", "source": "n2", "target": "n0"},
+            {"valence": "pro", "source": "n1", "target": "n0", "weight": 0.4},
+            {"valence": "con", "source": "n2", "target": "n0", "weight": 0.8},
         ],
     }
     nx_graph = nx.node_link_graph(data)
@@ -41,9 +42,9 @@ def nx_map2() -> nx.DiGraph:
             {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
         ],
         "links": [
-            {"valence": "pro", "source": "n1", "target": "n0"},
-            {"valence": "con", "source": "n2", "target": "n0"},
-            {"valence": "con", "source": "n2", "target": "n1"},
+            {"valence": "pro", "source": "n1", "target": "n0", "weight": 0.25},
+            {"valence": "con", "source": "n2", "target": "n0", "weight": 0.75},
+            {"valence": "con", "source": "n2", "target": "n1", "weight": 0.5},
         ],
     }
     nx_graph = nx.node_link_graph(data)
@@ -74,3 +75,11 @@ def test_argmap_attackratio_scorer01(nx_map1, nx_map2):
 
     assert score1 == 1 / 2
     assert score2 == 2 / 3
+
+def test_meanreasonstrength_scorer01(nx_map1, nx_map2):
+    scorer = MeanReasonStrengthScorer(ScoreAnalystConfig())
+    score1, _, _ = scorer._calculate_score(nx_map1)
+    score2, _, _ = scorer._calculate_score(nx_map2)
+
+    assert abs(score1 - .6) < 1e-6
+    assert abs(score2 - .5) < 1e-6

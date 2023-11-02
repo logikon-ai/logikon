@@ -96,3 +96,17 @@ class ArgMapGraphAttackRatioScorer(AbstractGraphScorer):
             attack_ratio = 0
 
         return attack_ratio, "", None
+
+
+class MeanReasonStrengthScorer(AbstractGraphScorer):
+    __pdescription__ = "Mean strength (absolute weight) of support and attack reasons (cons) in the fuzzy argmap"
+    __product__ = "mean_reason_strength"
+
+    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
+        edge_data = digraph.edges.data("weight", 1)
+        if edge_data:
+            mean_weight = np.mean([w for _, _, w in edge_data])
+        else:
+            mean_weight = 0
+
+        return mean_weight, "", None
