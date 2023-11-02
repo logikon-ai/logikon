@@ -131,6 +131,8 @@ def trunk_to_sentence(text: str) -> str:
     """Truncates text by cutting off incomplete sentences."""
     text = text.strip(" \'\n")
     if text[-1] not in [".", "!", "?"]:
+        # remove preceding marks
+        text = text.strip(".!? ")
         # split text at any of ".", "!", "?"
         splits = re.split(r"([.!?])", text)
         text = "".join(splits[:-1]) if len(splits) > 1 else text
