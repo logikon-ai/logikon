@@ -389,7 +389,7 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
 
     '''
 
-
+# TODO: use same query logic as above!
 @lmql.query
 def add_unused_reasons(
     reasons_data: list, issue: str, pros_and_cons_data: dict, unused_reasons_data: list, prmpt_data: dict

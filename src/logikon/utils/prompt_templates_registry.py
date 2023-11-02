@@ -62,6 +62,8 @@ _PROMPT_TEMPLATE_REGISTRY = {
 }
 
 
+# TODO: disallow chatml prompt template; enforce llama!
+
 def get_prompt_template(tmpl_key: str | None = None) -> PromptTemplate:
     """Returns prompt template to use with lmql queries"""
     if tmpl_key is None:
