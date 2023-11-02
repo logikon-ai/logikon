@@ -129,6 +129,9 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
     def _to_html(self, tree_data: list[dict], color_map: dict, issue: str, legend: str) -> str:
         """builds html sunburst from tree data"""
 
+        if not tree_data:
+            return ""
+
         fig = px.sunburst(
             tree_data,
             ids='id',
