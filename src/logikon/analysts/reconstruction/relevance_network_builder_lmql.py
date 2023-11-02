@@ -200,6 +200,7 @@ def unpack_reason(reason_data: dict, issue: str, prmpt_data: dict) -> List[Claim
             ```
         - The individual reasons you extract may mutually support each other, or represent independent reasons for one and the same conclusion; yet such argumentative relations need not be recorded (at this point).
         - If the argumentation gist contains a single reason, just include that very reason in your list.
+        - Feel free to improve (e.g., shorten) the title(s).
         - Avoid repeating one and the same reason in different words.
         - IMPORTANT: Stay faithful to the gist! Don't invent your own reasons. Don't uncover implicit assumptions. Only provide reasons which are explicitly contained in the gist.
         - Use yaml syntax and "```" code fences to structure your answer.
