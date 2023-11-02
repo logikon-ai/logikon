@@ -360,7 +360,7 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
                 if not CLAIM.endswith('\"'):
                     "\" "
                 root = RootClaim(label=TITLE.strip('): '), text=CLAIM.strip('\n\"'))
-                "  pros:"
+                "\n  pros:"
                 while unused_reasons:
                     "[MARKER]" where MARKER in ["\n  cons:", "\n  - "]
                     marker = MARKER
@@ -448,7 +448,7 @@ def add_unused_reasons(
                 if not CLAIM.endswith('\"'):
                     "\" "
                 root = RootClaim(label=TITLE.strip('): '), text=CLAIM.strip('\n\"'))
-                "  pros:"
+                "\n  pros:"
                 while unused_reasons:
                     "[MARKER]" where MARKER in ["\n  cons:", "\n  - "]
                     marker = MARKER
