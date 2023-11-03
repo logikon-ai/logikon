@@ -6,11 +6,9 @@ import copy
 
 from logikon.analysts.director import Director
 from logikon.schemas.configs import ScoreConfig
-from logikon.schemas.results import AnalysisState, Artifact, INPUT_KWS
-from logikon.analysts.interface import Analyst
+from logikon.schemas.results import AnalysisState, Artifact, Score, INPUT_KWS
 
 
-# TODO: test and use this class
 class ScoreResult(Dict):
     """Result object of score function."""
 
@@ -25,17 +23,16 @@ class ScoreResult(Dict):
         for artifact_r in self._state.artifacts:
             self[artifact_r.id] = artifact_r
 
-        # add data/value of directly requested metrics and artifacts as attributes
-        for metric in self._config.metrics:
-            if isinstance(metric, str):
-                setattr(self, metric, self[metric])
-            elif issubclass(metric, Analyst):
-                setattr(self, metric.get_product(), self[metric.get_product()].value)
-        for artifact in self._config.artifacts:
-            if isinstance(artifact, str):
-                setattr(self, artifact, self[artifact])
-            elif issubclass(artifact, Analyst):
-                setattr(self, artifact.get_product(), self[artifact.get_product()].data)
+    def value(self, product_id: str) -> Optional[float]:
+        """Get the value/data of a score/artifact."""
+        product = self.get(product_id)
+        if product is None:
+            return None
+        if isinstance(product, Artifact):
+            return product.data
+        elif isinstance(product, Score):
+            return product.value
+
 
 
 def score(
