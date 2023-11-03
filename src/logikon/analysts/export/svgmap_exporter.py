@@ -87,8 +87,8 @@ class SVGMapExporter(AbstractArtifactAnalyst):
                 template = self._NODE_TEMPLATE
 
             nodedata["label"] = template.format(
-                text=text,
-                label=label,
+                text=text if text else "NO TEXT",
+                label=label if label else "NO LABEL",
                 bgcolor="lightblue",
             )
             nodedata.pop("text")
