@@ -398,12 +398,11 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
 
 @lmql.query
 def add_unused_reasons(
-    reasons_data: list, issue: str, formatted_proscons: str, unused_reasons_data: list, prmpt_data: dict
+    reasons_data: list, issue: str, formatted_proscons: str, formatted_unused_reasons: str, prmpt_data: dict
 ):
     '''lmql
     argmax(chunksize=6)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
-        prev_unused_reasons = [Claim(**ureason_data) for ureason_data in unused_reasons_data]
         prmpt = PromptTemplate(**prmpt_data)
         """
         {prmpt.sys_start}
@@ -419,11 +418,9 @@ def add_unused_reasons(
         ### User
 
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
-        """
-        for ureason in prev_unused_reasons:
-            f_ureason = format_reason(ureason, 50)
-            "{f_ureason}"
-        """
+
+        {formatted_unused_reasons}     
+
         Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?{prmpt.user_end}
         {prmpt.ass_start}
         ```yaml
@@ -553,6 +550,9 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             proscons=pros_and_cons,
             extra_reasons=unused_reasons,
         )
+        formatted_unused_reasons: str = "\n".join(
+            [format_reason(reason, 50) for reason in unused_reasons]
+        )
         signal.signal(signal.SIGALRM, self._timeout_handler)
         try:
             signal.alarm(self._lmql_query_timeout)
@@ -560,7 +560,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 reasons_data,
                 issue,
                 formatted_proscons,
-                unused_reasons_data=[r.dict() for r in unused_reasons],
+                formatted_unused_reasons,
                 prmpt_data=self._prompt_template.to_dict(),
                 model=self._model,
                 **self._generation_kwargs,
