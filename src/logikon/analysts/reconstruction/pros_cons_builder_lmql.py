@@ -403,7 +403,7 @@ def add_unused_reasons(
     '''lmql
     argmax(chunksize=6)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
-        unused_reasons = [Claim(**ureason_data) for ureason_data in unused_reasons_data]
+        prev_unused_reasons = [Claim(**ureason_data) for ureason_data in unused_reasons_data]
         prmpt = PromptTemplate(**prmpt_data)
         """
         {prmpt.sys_start}
@@ -420,7 +420,7 @@ def add_unused_reasons(
 
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
         """
-        for ureason in unused_reasons:
+        for ureason in prev_unused_reasons:
             f_ureason = format_reason(ureason, 50)
             "{f_ureason}"
         """
