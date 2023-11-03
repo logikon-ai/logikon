@@ -182,6 +182,8 @@ def format_examples() -> str:
 
 ### LMQL QUERIES ###
 
+# TODO: refactor LMQL queries, especially build_pros_and_cons and add_unused_reasons
+
 
 @lmql.query
 def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  # type: ignore
