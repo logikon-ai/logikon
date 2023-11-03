@@ -13,7 +13,7 @@ from logikon.utils.prompt_templates_registry import PromptTemplate
 
 def system_prompt() -> str:
     """Returns the bare system prompt used in all lmql queries"""
-    system_prompt = "You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible."
+    system_prompt = "You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible. Be concise."
     return system_prompt
 
 
