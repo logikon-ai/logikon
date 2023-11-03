@@ -15,6 +15,7 @@ class ScoreResult(Dict):
     """Result object of score function."""
 
     def __init__(self, config: ScoreConfig, state: AnalysisState):
+        super().__init__()
         self._config = config
         self._state = state
 
@@ -41,7 +42,7 @@ def score(
     prompt: Optional[str] = None,
     completion: Optional[str] = None,
     config: Optional[Union[ScoreConfig, str]] = None,
-) -> Optional[AnalysisState]:
+) -> Optional[ScoreResult]:
     """Score the completion."""
 
     if config is None:
@@ -70,9 +71,11 @@ def score(
     # Dynamically create analyst pipeline based on config
     pipeline, _ = Director().create(config)
     if not pipeline:
-        return AnalysisState()
+        return None
 
     # Analyze the completion
-    analysis_results = pipeline(inputs=config.inputs)
+    analysis_state = pipeline(inputs=config.inputs)
 
-    return analysis_results
+    score_result = ScoreResult(config=config, state=analysis_state)
+
+    return score_result
