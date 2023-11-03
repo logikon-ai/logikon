@@ -817,6 +817,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
         # add unused reasons
         if unused_reasons:
+            self.logger.debug(f"Incomplete pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
             self.logger.debug(f"Unused reasons: {pprint.pformat(unused_reasons)}")
             pros_and_cons, unused_reasons = self._add_unused_reasons(
                 reasons_data=[r.dict() for r in reasons],
