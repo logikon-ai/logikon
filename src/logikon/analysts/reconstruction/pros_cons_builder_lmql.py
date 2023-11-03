@@ -544,13 +544,13 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         reasons_data: list[dict],
         issue: str,
         pros_and_cons: ProsConsList,
-        unused_reasons_data: list,
+        unused_reasons: List[Claim],
     ) -> Tuple[ProsConsList, List[Claim]]:
         """Internal wrapper (class-method) for lmql.query function."""
         formatted_proscons: str = format_proscons(
             issue=issue,
             proscons=pros_and_cons,
-            extra_reasons=[Claim(**ureason_data) for ureason_data in unused_reasons_data],
+            extra_reasons=unused_reasons,
         )
         signal.signal(signal.SIGALRM, self._timeout_handler)
         try:
@@ -559,7 +559,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 reasons_data,
                 issue,
                 formatted_proscons,
-                unused_reasons_data,
+                unused_reasons_data=[r.dict() for r in unused_reasons],
                 prmpt_data=self._prompt_template.to_dict(),
                 model=self._model,
                 **self._generation_kwargs,
@@ -819,7 +819,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 reasons_data=[r.dict() for r in reasons],
                 issue=issue,
                 pros_and_cons=pros_and_cons,
-                unused_reasons_data=[r.dict() for r in unused_reasons],
+                unused_reasons=unused_reasons,
             )
             if unused_reasons:
                 self.logger.info(f"Failed to integrate the following reasons: {pprint.pformat(unused_reasons)}")
