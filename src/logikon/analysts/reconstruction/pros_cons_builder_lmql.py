@@ -421,8 +421,7 @@ def add_unused_reasons(
 
         {formatted_unused_reasons}     
 
-        Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?
-        Repeat (and improve) entire root claims (title and text), too. {prmpt.user_end}
+        Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?{prmpt.user_end}
         {prmpt.ass_start}
         ```yaml
         reasons:
