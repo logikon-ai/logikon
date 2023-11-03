@@ -19,23 +19,22 @@ class ScoreResult(Dict):
         self._state = state
 
         # reference score and artifacts objects by id in dict
-        for score in self._state.scores:
-            self[score.id] = score
-        for artifact in self._state.artifacts:
-            self[artifact.id] = artifact
+        for score_r in self._state.scores:
+            self[score_r.id] = score_r
+        for artifact_r in self._state.artifacts:
+            self[artifact_r.id] = artifact_r
 
         # add data/value of directly requested metrics and artifacts as attributes
         for metric in self._config.metrics:
             if isinstance(metric, str):
                 setattr(self, metric, self[metric])
-            elif isinstance(metric, Type[Analyst]):
+            elif issubclass(metric, Analyst):
                 setattr(self, metric.get_product(), self[metric.get_product()].value)
         for artifact in self._config.artifacts:
             if isinstance(artifact, str):
                 setattr(self, artifact, self[artifact])
-            elif isinstance(artifact, Type[Analyst]):
+            elif issubclass(artifact, Analyst):
                 setattr(self, artifact.get_product(), self[artifact.get_product()].data)
-        
 
 
 def score(

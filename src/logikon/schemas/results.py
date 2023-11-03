@@ -52,4 +52,3 @@ class AnalysisState(BaseModel):
         if completion is not None and not isinstance(completion, str):
             raise ValueError(f"Data type of input artifact prompt is {type(completion)}, expected string.")
         return prompt, completion
-
