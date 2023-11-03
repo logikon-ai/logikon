@@ -402,7 +402,6 @@ def add_unused_reasons(
     argmax(chunksize=6)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
         unused_reasons = [Claim(**ureason_data) for ureason_data in unused_reasons_data]
-        pros_and_cons = ProsConsList(**pros_and_cons_data)
         prmpt = PromptTemplate(**prmpt_data)
         """
         {prmpt.sys_start}
@@ -475,7 +474,7 @@ def add_unused_reasons(
 
                 roots.append(root)
 
-        return ProsConsList(roots=roots, options=pros_and_cons.options), unused_reasons
+        return ProsConsList(roots=roots), unused_reasons
 
     '''
 
@@ -555,7 +554,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         signal.signal(signal.SIGALRM, self._timeout_handler)
         try:
             signal.alarm(self._lmql_query_timeout)
-            return add_unused_reasons(
+            revised_pros_and_cons, unused_reasons = add_unused_reasons(
                 reasons_data,
                 issue,
                 formatted_proscons,
@@ -564,6 +563,8 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
                 model=self._model,
                 **self._generation_kwargs,
             )
+            revised_pros_and_cons.options = pros_and_cons.options
+            return revised_pros_and_cons, unused_reasons
         except TimeoutError:
             self.logger.warning("LMQL query add_unused_reasons timed out.")
             # signal.alarm(0)
