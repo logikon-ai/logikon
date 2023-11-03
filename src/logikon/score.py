@@ -15,20 +15,26 @@ class ScoreResult(Dict):
     """Result object of score function."""
 
     def __init__(self, config: ScoreConfig, state: AnalysisState):
-        for score in state.scores:
+        self._config = config
+        self._state = state
+
+        # reference score and artifacts objects by id in dict
+        for score in self._state.scores:
             self[score.id] = score
-        for artifact in state.artifacts:
+        for artifact in self._state.artifacts:
             self[artifact.id] = artifact
-        for metric in config.metrics:
+
+        # add data/value of directly requested metrics and artifacts as attributes
+        for metric in self._config.metrics:
             if isinstance(metric, str):
                 setattr(self, metric, self[metric])
             elif isinstance(metric, Type[Analyst]):
-                setattr(self, metric.get_product(), self[metric.get_product()])
-        for artifact in config.artifacts:
+                setattr(self, metric.get_product(), self[metric.get_product()].value)
+        for artifact in self._config.artifacts:
             if isinstance(artifact, str):
                 setattr(self, artifact, self[artifact])
             elif isinstance(artifact, Type[Analyst]):
-                setattr(self, artifact.get_product(), self[artifact.get_product()])
+                setattr(self, artifact.get_product(), self[artifact.get_product()].data)
         
 
 
