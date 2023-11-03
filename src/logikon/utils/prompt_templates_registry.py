@@ -62,7 +62,6 @@ _PROMPT_TEMPLATE_REGISTRY = {
 }
 
 
-
 def get_prompt_template(tmpl_key: str | None = None) -> PromptTemplate:
     """Returns prompt template to use with lmql queries"""
     if tmpl_key is None:

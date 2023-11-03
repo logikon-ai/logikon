@@ -153,9 +153,11 @@ class IssueBuilderLMQL(LMQLAnalyst):
         ]
         return issue_drafts
 
-    def _rate_issue_drafts(self, alternatives: list[dict[str, Any]], questions: list[str], prompt: str, completion: str) -> Optional[str]:
+    def _rate_issue_drafts(
+        self, alternatives: list[dict[str, Any]], questions: list[str], prompt: str, completion: str
+    ) -> Optional[str]:
         """Internal (class-method) wrapper for lmql.query function.
-        
+
         Returns:
             str: label of best alternative
         """

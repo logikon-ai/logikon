@@ -76,10 +76,11 @@ def test_argmap_attackratio_scorer01(nx_map1, nx_map2):
     assert score1 == 1 / 2
     assert score2 == 2 / 3
 
+
 def test_meanreasonstrength_scorer01(nx_map1, nx_map2):
     scorer = MeanReasonStrengthScorer(ScoreAnalystConfig())
     score1, _, _ = scorer._calculate_score(nx_map1)
     score2, _, _ = scorer._calculate_score(nx_map2)
 
-    assert abs(score1 - .6) < 1e-6
-    assert abs(score2 - .5) < 1e-6
+    assert abs(score1 - 0.6) < 1e-6
+    assert abs(score2 - 0.5) < 1e-6

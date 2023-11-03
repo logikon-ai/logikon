@@ -211,7 +211,7 @@ def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  #
 
         - Go through the text from beginning to end and extract all arguments in the order of appearance.
         - For each argument, sketch the argument's gist in one or two grammatically correct sentences, staying close to the original wording.
-        - In addition, provide a short caption that flashlights the argument's key idea (2-4 words). 
+        - In addition, provide a short caption that flashlights the argument's key idea (2-4 words).
         - Use the following format:
             ```
             - gist: "state here the argument's gist in 1-2 concise sentences (in total less than {MAX_LEN_GIST} chars)."
@@ -393,6 +393,7 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
 
     '''
 
+
 @lmql.query
 def add_unused_reasons(
     reasons_data: list, issue: str, pros_and_cons_data: dict, unused_reasons_data: list, prmpt_data: dict
@@ -515,7 +516,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             return reasons
         except TimeoutError:
             self.logger.warning("LMQL query _mine_reasons timed out.")
-            #signal.alarm(0)
+            # signal.alarm(0)
             return []
         finally:
             signal.alarm(0)
@@ -534,7 +535,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             )
         except TimeoutError:
             self.logger.warning("LMQL query build_pros_and_cons timed out.")
-            #signal.alarm(0)
+            # signal.alarm(0)
             return ProsConsList(roots=[]), []
         finally:
             signal.alarm(0)
@@ -561,7 +562,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             )
         except TimeoutError:
             self.logger.warning("LMQL query add_unused_reasons timed out.")
-            #signal.alarm(0)
+            # signal.alarm(0)
             return ProsConsList(roots=[]), []
         finally:
             signal.alarm(0)
