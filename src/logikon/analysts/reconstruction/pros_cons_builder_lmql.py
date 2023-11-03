@@ -396,14 +396,13 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
 
 @lmql.query
 def add_unused_reasons(
-    reasons_data: list, issue: str, pros_and_cons_data: dict, unused_reasons_data: list, prmpt_data: dict
+    reasons_data: list, issue: str, formatted_proscons: str, unused_reasons_data: list, prmpt_data: dict
 ):
     '''lmql
     argmax(chunksize=6)
         reasons = [Claim(**reason_data) for reason_data in reasons_data]
         unused_reasons = [Claim(**ureason_data) for ureason_data in unused_reasons_data]
         pros_and_cons = ProsConsList(**pros_and_cons_data)
-        formatted_pcl = format_proscons(issue, pros_and_cons, unused_reasons)
         prmpt = PromptTemplate(**prmpt_data)
         """
         {prmpt.sys_start}
@@ -414,7 +413,7 @@ def add_unused_reasons(
 
         ### Assistant
 
-        {formatted_pcl}
+        {formatted_proscons}
 
         ### User
 
@@ -544,17 +543,22 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         self,
         reasons_data: list[dict],
         issue: str,
-        pros_and_cons_data: dict,
+        pros_and_cons: ProsConsList,
         unused_reasons_data: list,
     ) -> Tuple[ProsConsList, List[Claim]]:
         """Internal wrapper (class-method) for lmql.query function."""
+        formatted_proscons: str = format_proscons(
+            issue=issue,
+            proscons=pros_and_cons,
+            extra_reasons=[Claim(**ureason_data) for ureason_data in unused_reasons_data],
+        )
         signal.signal(signal.SIGALRM, self._timeout_handler)
         try:
             signal.alarm(self._lmql_query_timeout)
             return add_unused_reasons(
                 reasons_data,
                 issue,
-                pros_and_cons_data,
+                formatted_proscons,
                 unused_reasons_data,
                 prmpt_data=self._prompt_template.to_dict(),
                 model=self._model,
@@ -814,7 +818,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             pros_and_cons, unused_reasons = self._add_unused_reasons(
                 reasons_data=[r.dict() for r in reasons],
                 issue=issue,
-                pros_and_cons_data=pros_and_cons.dict(),
+                pros_and_cons=pros_and_cons,
                 unused_reasons_data=[r.dict() for r in unused_reasons],
             )
             if unused_reasons:
