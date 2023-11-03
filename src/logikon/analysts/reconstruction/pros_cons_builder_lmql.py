@@ -139,8 +139,11 @@ def trunk_to_sentence(text: str) -> str:
     return text
 
 
-def format_reason(reason: Claim, max_len: int = -1) -> str:
-    label_text = f"[{reason.label}]: {reason.text}"
+def format_reason(reason: Claim, max_len: int = -1, label_only: bool = False) -> str:
+    if label_only:
+        label_text = f"[{reason.label}]"
+    else:
+        label_text = f"[{reason.label}]: {reason.text}"
     if max_len > 0 and len(label_text) > max_len:
         label_text = label_text[:max_len] + "..."
     return f"- \"{label_text}\"\n"
@@ -551,7 +554,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             extra_reasons=unused_reasons,
         )
         formatted_unused_reasons: str = "".join(
-            [format_reason(reason, 50) for reason in unused_reasons]
+            [format_reason(reason, 50, True) for reason in unused_reasons]
         )
         signal.signal(signal.SIGALRM, self._timeout_handler)
         try:
