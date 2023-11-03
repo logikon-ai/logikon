@@ -150,7 +150,7 @@ def format_proscons(issue: str, proscons: ProsConsList, extra_reasons: list = []
     formatted = "```yaml\n"
     # reasons block
     formatted += "reasons:\n"
-    reasons = extra_reasons
+    reasons = copy.deepcopy(extra_reasons)
     for root in proscons.roots:
         reasons.extend(root.pros)
         reasons.extend(root.cons)
@@ -550,7 +550,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             proscons=pros_and_cons,
             extra_reasons=unused_reasons,
         )
-        formatted_unused_reasons: str = "\n".join(
+        formatted_unused_reasons: str = "".join(
             [format_reason(reason, 50) for reason in unused_reasons]
         )
         signal.signal(signal.SIGALRM, self._timeout_handler)
