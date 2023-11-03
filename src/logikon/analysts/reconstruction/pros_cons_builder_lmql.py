@@ -433,7 +433,7 @@ def add_unused_reasons(
             f_reason = format_reason(reason)
             "{f_reason}"
         "issue: \"{issue}\"\n"
-        "pros_and_cons:\n"
+        "pros_and_cons:"
         unused_reasons = copy.deepcopy(reasons)
         roots = []
         "[MARKER]" where MARKER in ["\n```", "\n- "]
