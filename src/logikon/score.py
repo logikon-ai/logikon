@@ -1,12 +1,35 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Type
 
 import copy
 
 from logikon.analysts.director import Director
 from logikon.schemas.configs import ScoreConfig
 from logikon.schemas.results import AnalysisState, Artifact, INPUT_KWS
+from logikon.analysts.interface import Analyst
+
+
+# TODO: test and use this class
+class ScoreResult(Dict):
+    """Result object of score function."""
+
+    def __init__(self, config: ScoreConfig, state: AnalysisState):
+        for score in state.scores:
+            self[score.id] = score
+        for artifact in state.artifacts:
+            self[artifact.id] = artifact
+        for metric in config.metrics:
+            if isinstance(metric, str):
+                setattr(self, metric, self[metric])
+            elif isinstance(metric, Type[Analyst]):
+                setattr(self, metric.get_product(), self[metric.get_product()])
+        for artifact in config.artifacts:
+            if isinstance(artifact, str):
+                setattr(self, artifact, self[artifact])
+            elif isinstance(artifact, Type[Analyst]):
+                setattr(self, artifact.get_product(), self[artifact.get_product()])
+        
 
 
 def score(
