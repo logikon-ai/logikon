@@ -23,7 +23,7 @@ class ScoreResult(Dict):
         for artifact_r in self._state.artifacts:
             self[artifact_r.id] = artifact_r
 
-    def value(self, product_id: str) -> Optional[float]:
+    def value(self, product_id: str) -> Optional[Union[float, str, Any]]:
         """Get the value/data of a score/artifact."""
         product = self.get(product_id)
         if product is None:
@@ -32,7 +32,7 @@ class ScoreResult(Dict):
             return product.data
         elif isinstance(product, Score):
             return product.value
-
+        return None
 
 
 def score(
