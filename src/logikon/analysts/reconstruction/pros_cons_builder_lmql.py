@@ -149,6 +149,11 @@ def format_reason(reason: Claim, max_len: int = -1, label_only: bool = False) ->
     return f"- \"{label_text}\"\n"
 
 
+def format_reasons(reasons: List[Claim], **kwargs) -> str:
+    formatted = "".join([format_reason(reason, **kwargs) for reason in reasons])
+    return formatted
+
+
 def format_proscons(issue: str, proscons: ProsConsList, extra_reasons: list = []) -> str:
     formatted = "```yaml\n"
     # reasons block
@@ -183,6 +188,104 @@ def format_examples() -> str:
     return formatted_s
 
 
+def format_options(options: List[str]) -> str:
+    formatted = "\n".join([f"- {o}" for o in options])
+    return formatted
+
+
+### PROMPT TEMPLATES ###
+
+
+def pros_and_cons_preamble(reasons: list[Claim], issue: str, options: list[str], prmpt: PromptTemplate) -> str:
+    "Prompt preamble (template) for building pros and cons list."
+    return f"""
+    {prmpt.sys_start}
+    {lmql_queries.system_prompt()}{prmpt.sys_end}
+
+    {prmpt.user_start}
+    Assignment: Organize an unstructured set of reasons as a pros & cons list.
+
+    Let's begin by thinking through the basic issue addressed by the reasons:
+
+    <issue>{issue}</issue>
+
+    What are the basic options available to an agent who needs to address this issue?
+
+    Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
+    {prmpt.ass_start}
+    The options available to an agent who faces the above issue are (one per line):
+
+    <options>
+    {format_options(options)}
+    <options/>
+    {prmpt.ass_end}
+    {prmpt.user_start}
+    Thanks, let's keep that in mind.
+
+    Let us now come back to the main assignment: constructing a pros & cons list from a set of reasons.
+
+    You'll be given a set of reasons, which you're supposed to organize as a pros and cons list. To do so, you have to find a fitting target claim (root statement) the reasons are arguing for (pros) or against (cons).
+
+    Use the following inputs (a list of reasons that address an issue) to solve your assignment.
+
+    <inputs>
+    <issue>{issue}</issue>
+    <reasons>
+    {format_reasons(reasons)}
+    </reasons>
+    </inputs>
+
+    Let me show you a few examples to illustrate the task / intended output:
+
+    {format_examples()}
+
+    Please consider carefully the following further, more specific instructions:
+
+    * Be bold: Your root claim(s) should be simple and unequivocal, and correspond to the basic options you have identified above.
+    * No reasoning: Your root claim(s) must not contain any reasoning (or comments, or explanations).
+    * Keep it short: Try to identify a single root claim. Add further root claims only if necessary (e.g., if reasons address three alternative decision options).
+    * Recall options: Use the options you've identified above to construct the pros and cons list.
+    * Be exhaustive: All reasons must figure in your pros and cons list.
+    * !!Re-organize!!: Don't stick to the order of the original reason list.
+
+    Moreover:
+
+    * Use simple and plain language.
+    * If you identify multiple root claims, make sure they are mutually exclusive alternatives.
+    * Avoid repeating one and the same root claim in different words.
+    * Use yaml syntax and "```" code fences to structure your answer.{prmpt.user_end}
+    {prmpt.ass_start}
+    Let me recall the basic options before producing the pros and cons list:
+    {format_options(options)}
+    """
+
+
+def add_reasons_preamble(
+    formatted_proscons: str, formatted_unused_reasons: str, options: list[str], prmpt: PromptTemplate
+) -> str:
+    "Prompt preamble (template) for adding unused reasons to pros and cons list."
+    return f"""
+    {prmpt.sys_start}
+    {lmql_queries.system_prompt()}{prmpt.sys_end}
+
+    {prmpt.user_start}
+    Assignment: Organize the aforementioned unstructured set of reasons as a pros & cons list.
+
+    ### Assistant
+
+    {formatted_proscons}
+
+    ### User
+
+    Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
+
+    {formatted_unused_reasons}
+
+    Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?{prmpt.user_end}
+    {prmpt.ass_start}
+    """
+
+
 ### LMQL QUERIES ###
 
 # TODO: refactor LMQL queries, especially build_pros_and_cons and add_unused_reasons
@@ -190,7 +293,7 @@ def format_examples() -> str:
 
 
 @lmql.query
-def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  # type: ignore
+def mine_reasons(prompt: str, completion: str, issue: str, prmpt_data: dict) -> List[Claim]:  # type: ignore
     '''lmql
     sample(temperature=.4, chunksize=10)
         prmpt = PromptTemplate(**prmpt_data)
@@ -256,19 +359,18 @@ def mine_reasons(prompt, completion, issue, prmpt_data: dict) -> List[Claim]:  #
 
 
 @lmql.query
-def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
+def describe_options(issue: str, prmpt_data: dict):
     '''lmql
     sample(temperature=.4, chunksize=6)
-        reasons = [Claim(**reason_data) for reason_data in reasons_data]
         prmpt = PromptTemplate(**prmpt_data)
         """
         {prmpt.sys_start}
         {lmql_queries.system_prompt()}{prmpt.sys_end}
 
         {prmpt.user_start}
-        Assignment: Organize an unstructured set of reasons as a pros & cons list.
+        Assignment: Identify the basic options available to an agent who faces a given issue.
 
-        Let's begin by thinking through the basic issue addressed by the reasons:
+        Let's suppose somewhen has to make up his or her mind about the following issue:
 
         <issue>{issue}</issue>
 
@@ -281,68 +383,29 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
         <options>
         """
         options = []
-        markero = ""
+        marker = ""
         while len(options)<MAX_N_ROOTS:
-            "[MARKERO]" where MARKERO in ["</options>", "- "]
-            markero = MARKERO
-            if markero == "</options>":
+            "[MARKERO]" where MARKER in ["</options>", "- "]
+            marker = MARKER
+            if marker == "</options>":
                 break
             else:
                 "[OPTION]" where STOPS_AT(OPTION, "\n") and len(OPTION) < MAX_LEN_TITLE
                 if not OPTION.endswith("\n"):
                     "\n"
                 options.append(OPTION.strip("\n "))
-        if markero != "</options>":
-            "</options> "
-        else:
-            " "
+        return options
+    '''
+
+
+@lmql.query
+def build_pros_and_cons(reasons_data: list, issue: str, options: list[str], prompt_preamble: str, prmpt_data: dict):
+    '''lmql
+    sample(temperature=.4, chunksize=6)
+        reasons = [Claim(**reason_data) for reason_data in reasons_data]
+        prmpt = PromptTemplate(**prmpt_data)
         """
-        {prmpt.ass_end}
-        {prmpt.user_start}
-        Thanks, let's keep that in mind.
-
-        Let us now come back to the main assignment: constructing a pros & cons list from a set of reasons.
-
-        You'll be given a set of reasons, which you're supposed to organize as a pros and cons list. To do so, you have to find a fitting target claim (root statement) the reasons are arguing for (pros) or against (cons).
-
-        Use the following inputs (a list of reasons that address an issue) to solve your assignment.
-
-        <inputs>
-        <issue>{issue}</issue>
-        <reasons>
-        """
-        for reason in reasons:
-            f_reason = format_reason(reason, 50)
-            "{f_reason}"
-        """</reasons>
-        </inputs>
-
-        Let me show you a few examples to illustrate the task / intended output:
-
-        {format_examples()}
-
-        Please consider carefully the following further, more specific instructions:
-
-        * Be bold: Your root claim(s) should be simple and unequivocal, and correspond to the basic options you have identified above.
-        * No reasoning: Your root claim(s) must not contain any reasoning (or comments, or explanations).
-        * Keep it short: Try to identify a single root claim. Add further root claims only if necessary (e.g., if reasons address three alternative decision options).
-        * Recall options: Use the options you've identified above to construct the pros and cons list.
-        * Be exhaustive: All reasons must figure in your pros and cons list.
-        * !!Re-organize!!: Don't stick to the order of the original reason list.
-
-        Moreover:
-
-        * Use simple and plain language.
-        * If you identify multiple root claims, make sure they are mutually exclusive alternatives.
-        * Avoid repeating one and the same root claim in different words.
-        * Use yaml syntax and "```" code fences to structure your answer.{prmpt.user_end}
-        {prmpt.ass_start}
-        Let me recall the basic options before producing the pros and cons list:
-        """
-        for option in options:
-            "- {option}\n"
-        """
-
+        {prompt_preamble}
         ```yaml
         reasons:
         """
@@ -400,86 +463,231 @@ def build_pros_and_cons(reasons_data: list, issue: str, prmpt_data: dict):
     '''
 
 
-@lmql.query
-def add_unused_reasons(
-    reasons_data: list, issue: str, formatted_proscons: str, formatted_unused_reasons: str, prmpt_data: dict
-):
-    '''lmql
-    argmax(chunksize=6)
-        reasons = [Claim(**reason_data) for reason_data in reasons_data]
-        prmpt = PromptTemplate(**prmpt_data)
-        """
-        {prmpt.sys_start}
-        {lmql_queries.system_prompt()}{prmpt.sys_end}
+# @lmql.query
+# def build_pros_and_cons2(reasons_data: list, issue: str, prmpt_data: dict):
+#    '''lmql
+#    sample(temperature=.4, chunksize=6)
+#        reasons = [Claim(**reason_data) for reason_data in reasons_data]
+#        prmpt = PromptTemplate(**prmpt_data)
+#        """
+#        {prmpt.sys_start}
+#        {lmql_queries.system_prompt()}{prmpt.sys_end}
+#
+#        {prmpt.user_start}
+#        Assignment: Organize an unstructured set of reasons as a pros & cons list.
+#
+#        Let's begin by thinking through the basic issue addressed by the reasons:
+#
+#        <issue>{issue}</issue>
+#
+#        What are the basic options available to an agent who needs to address this issue?
+#
+#        Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
+#        {prmpt.ass_start}
+#        The options available to an agent who faces the above issue are (one per line):
+#
+#        <options>
+#        """
+#        options = []
+#        markero = ""
+#        while len(options)<MAX_N_ROOTS:
+#            "[MARKERO]" where MARKERO in ["</options>", "- "]
+#            markero = MARKERO
+#            if markero == "</options>":
+#                break
+#            else:
+#                "[OPTION]" where STOPS_AT(OPTION, "\n") and len(OPTION) < MAX_LEN_TITLE
+#                if not OPTION.endswith("\n"):
+#                    "\n"
+#                options.append(OPTION.strip("\n "))
+#        if markero != "</options>":
+#            "</options> "
+#        else:
+#            " "
+#        """
+#        {prmpt.ass_end}
+#        {prmpt.user_start}
+#        Thanks, let's keep that in mind.
+#
+#        Let us now come back to the main assignment: constructing a pros & cons list from a set of reasons.
+#
+#        You'll be given a set of reasons, which you're supposed to organize as a pros and cons list. To do so, you have to find a fitting target claim (root statement) the reasons are arguing for (pros) or against (cons).
+#
+#        Use the following inputs (a list of reasons that address an issue) to solve your assignment.
+#
+#        <inputs>
+#        <issue>{issue}</issue>
+#        <reasons>
+#        """
+#        for reason in reasons:
+#            f_reason = format_reason(reason, 50)
+#            "{f_reason}"
+#        """</reasons>
+#        </inputs>
+#
+#        Let me show you a few examples to illustrate the task / intended output:
+#
+#        {format_examples()}
+#
+#        Please consider carefully the following further, more specific instructions:
+#
+#        * Be bold: Your root claim(s) should be simple and unequivocal, and correspond to the basic options you have identified above.
+#        * No reasoning: Your root claim(s) must not contain any reasoning (or comments, or explanations).
+#        * Keep it short: Try to identify a single root claim. Add further root claims only if necessary (e.g., if reasons address three alternative decision options).
+#        * Recall options: Use the options you've identified above to construct the pros and cons list.
+#        * Be exhaustive: All reasons must figure in your pros and cons list.
+#        * !!Re-organize!!: Don't stick to the order of the original reason list.
+#
+#        Moreover:
+#
+#        * Use simple and plain language.
+#        * If you identify multiple root claims, make sure they are mutually exclusive alternatives.
+#        * Avoid repeating one and the same root claim in different words.
+#        * Use yaml syntax and "```" code fences to structure your answer.{prmpt.user_end}
+#        {prmpt.ass_start}
+#        Let me recall the basic options before producing the pros and cons list:
+#        """
+#        for option in options:
+#            "- {option}\n"
+#        """
+#
+#        ```yaml
+#        reasons:
+#        """
+#        for reason in reasons:
+#            f_reason = format_reason(reason)
+#            "{f_reason}"
+#        "issue: \"{issue}\"\n"
+#        "pros_and_cons:"
+#        unused_reasons = copy.deepcopy(reasons)
+#        roots = []
+#        "[MARKER]" where MARKER in ["\n```", "\n- "]
+#        marker = MARKER
+#        while len(roots)<MAX_N_ROOTS and unused_reasons:
+#            if marker == "\n```":
+#                break
+#            elif marker == "\n- ":  # new root
+#                "root: \"([TITLE]" where STOPS_AT(TITLE, ")") and STOPS_AT(TITLE, ":") and len(TITLE)<MAX_LEN_TITLE
+#                if TITLE.endswith(")"):
+#                    ":"
+#                elif not TITLE.endswith(":"):
+#                    "):"
+#                "[CLAIM]" where STOPS_AT(CLAIM, '\"') and STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
+#                if not CLAIM.endswith('\"'):
+#                    "\" "
+#                root = RootClaim(label=TITLE.strip('): '), text=CLAIM.strip('\n\" '))
+#                "\n  pros:"
+#                while unused_reasons:
+#                    "[MARKER]" where MARKER in ["\n  cons:", "\n  - "]
+#                    marker = MARKER
+#                    if marker == "\n  - ":  # new pro
+#                        "\"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
+#                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+#                        root.pros.append(selected_reason)
+#                        unused_reasons.remove(selected_reason)
+#                    else:
+#                        break
+#                # cons
+#                while unused_reasons:
+#                    "[MARKER]" where MARKER in ["\n```", "\n- ", "\n  - "]
+#                    marker = MARKER
+#                    if marker == "\n  - ":  # new con
+#                        "\"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
+#                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+#                        root.cons.append(selected_reason)
+#                        unused_reasons.remove(selected_reason)
+#                    else:
+#                        break
+#
+#                roots.append(root)
+#            else:
+#                break  # invalid marker!
+#
+#        return ProsConsList(roots=roots, options=options), unused_reasons
+#
+#    '''
 
-        {prmpt.user_start}
-        Assignment: Organize the aforementioned unstructured set of reasons as a pros & cons list.
 
-        ### Assistant
-
-        {formatted_proscons}
-
-        ### User
-
-        Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
-
-        {formatted_unused_reasons}
-
-        Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?{prmpt.user_end}
-        {prmpt.ass_start}
-        ```yaml
-        reasons:
-        """
-        for reason in reasons:
-            f_reason = format_reason(reason)
-            "{f_reason}"
-        "issue: \"{issue}\"\n"
-        "pros_and_cons:"
-        unused_reasons = copy.deepcopy(reasons)
-        roots = []
-        "[MARKER]" where MARKER in ["\n```", "\n- "]
-        marker = MARKER
-        while len(roots)<MAX_N_ROOTS and unused_reasons:
-            if marker == "\n```":
-                break
-            elif marker == "\n- ":  # new root
-                "root: \"([TITLE]" where STOPS_AT(TITLE, ")") and STOPS_AT(TITLE, ":") and len(TITLE)<MAX_LEN_TITLE
-                if TITLE.endswith(")"):
-                    ":"
-                elif not TITLE.endswith(":"):
-                    "):"
-                "[CLAIM]" where STOPS_AT(CLAIM, '\"') and STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
-                if not CLAIM.endswith('\"'):
-                    "\" "
-                root = RootClaim(label=TITLE.strip('): '), text=CLAIM.strip('\n\" '))
-                "\n  pros:"
-                while unused_reasons:
-                    "[MARKER]" where MARKER in ["\n  cons:", "\n  - "]
-                    marker = MARKER
-                    if marker == "\n  - ":  # new pro
-                        "\"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
-                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                        root.pros.append(selected_reason)
-                        unused_reasons.remove(selected_reason)
-                    else:
-                        break
-                # cons
-                while unused_reasons:
-                    "[MARKER]" where MARKER in ["\n```", "\n- ", "\n  - "]
-                    marker = MARKER
-                    if marker == "\n  - ":  # new con
-                        "\"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
-                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
-                        root.cons.append(selected_reason)
-                        unused_reasons.remove(selected_reason)
-                    else:
-                        break
-
-                roots.append(root)
-
-        return ProsConsList(roots=roots), unused_reasons
-
-    '''
+# @lmql.query
+# def add_unused_reasons(
+#    reasons_data: list, issue: str, formatted_proscons: str, formatted_unused_reasons: str, prmpt_data: dict
+# ):
+#    '''lmql
+#    argmax(chunksize=6)
+#        reasons = [Claim(**reason_data) for reason_data in reasons_data]
+#        prmpt = PromptTemplate(**prmpt_data)
+#        """
+#        {prmpt.sys_start}
+#        {lmql_queries.system_prompt()}{prmpt.sys_end}
+#
+#        {prmpt.user_start}
+#        Assignment: Organize the aforementioned unstructured set of reasons as a pros & cons list.
+#
+#        ### Assistant
+#
+#        {formatted_proscons}
+#
+#        ### User
+#
+#        Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
+#
+#        {formatted_unused_reasons}
+#
+#        Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?{prmpt.user_end}
+#        {prmpt.ass_start}
+#        ```yaml
+#        reasons:
+#        """
+#        for reason in reasons:
+#            f_reason = format_reason(reason)
+#            "{f_reason}"
+#        "issue: \"{issue}\"\n"
+#        "pros_and_cons:"
+#        unused_reasons = copy.deepcopy(reasons)
+#        roots = []
+#        "[MARKER]" where MARKER in ["\n```", "\n- "]
+#        marker = MARKER
+#        while len(roots)<MAX_N_ROOTS and unused_reasons:
+#            if marker == "\n```":
+#                break
+#            elif marker == "\n- ":  # new root
+#                "root: \"([TITLE]" where STOPS_AT(TITLE, ")") and STOPS_AT(TITLE, ":") and len(TITLE)<MAX_LEN_TITLE
+#                if TITLE.endswith(")"):
+#                    ":"
+#                elif not TITLE.endswith(":"):
+#                    "):"
+#                "[CLAIM]" where STOPS_AT(CLAIM, '\"') and STOPS_AT(CLAIM, "\n") and len(CLAIM)<MAX_LEN_ROOTCLAIM
+#                if not CLAIM.endswith('\"'):
+#                    "\" "
+#                root = RootClaim(label=TITLE.strip('): '), text=CLAIM.strip('\n\" '))
+#                "\n  pros:"
+#                while unused_reasons:
+#                    "[MARKER]" where MARKER in ["\n  cons:", "\n  - "]
+#                    marker = MARKER
+#                    if marker == "\n  - ":  # new pro
+#                        "\"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
+#                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+#                        root.pros.append(selected_reason)
+#                        unused_reasons.remove(selected_reason)
+#                    else:
+#                        break
+#                # cons
+#                while unused_reasons:
+#                    "[MARKER]" where MARKER in ["\n```", "\n- ", "\n  - "]
+#                    marker = MARKER
+#                    if marker == "\n  - ":  # new con
+#                        "\"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
+#                        selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
+#                        root.cons.append(selected_reason)
+#                        unused_reasons.remove(selected_reason)
+#                    else:
+#                        break
+#
+#                roots.append(root)
+#
+#        return ProsConsList(roots=roots), unused_reasons
+#
+#    '''
 
 
 class ProsConsBuilderLMQL(LMQLAnalyst):
@@ -497,9 +705,9 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
     def _mine_reasons(self, prompt, completion, issue) -> List[Claim]:
         """Internal wrapper (class-method) for lmql.query function."""
         reasons: List[Claim] = mine_reasons(
-            prompt,
-            completion,
-            issue,
+            prompt=prompt,
+            completion=completion,
+            issue=issue,
             prmpt_data=self._prompt_template.to_dict(),
             model=self._model,
             **self._generation_kwargs,
@@ -511,11 +719,33 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         return reasons
 
     @LMQLAnalyst.timeout
-    def _build_pros_and_cons(self, reasons_data: list[dict], issue: str) -> Tuple[ProsConsList, List[Claim]]:
+    def _describe_options(self, issue) -> List[str]:
         """Internal wrapper (class-method) for lmql.query function."""
+        options: List[str] = describe_options(
+            issue=issue,
+            prmpt_data=self._prompt_template.to_dict(),
+            model=self._model,
+            **self._generation_kwargs,
+        )
+        return options
+
+    @LMQLAnalyst.timeout
+    def _build_pros_and_cons(
+        self, reasons_data: list[dict], issue: str, options: list[str]
+    ) -> Tuple[ProsConsList, List[Claim]]:
+        """Internal wrapper (class-method) for lmql.query function."""
+        preamble = pros_and_cons_preamble(
+            reasons=[Claim(**r) for r in reasons_data],
+            issue=issue,
+            options=options,
+            prmpt=self._prompt_template,
+        )
+
         return build_pros_and_cons(
-            reasons_data,
-            issue,
+            reasons_data=reasons_data,
+            issue=issue,
+            options=options,
+            prompt_preamble=preamble,
             prmpt_data=self._prompt_template.to_dict(),
             model=self._model,
             **self._generation_kwargs,
@@ -526,6 +756,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         self,
         reasons_data: list[dict],
         issue: str,
+        options: list[str],
         pros_and_cons: ProsConsList,
         unused_reasons: List[Claim],
     ) -> Tuple[ProsConsList, List[Claim]]:
@@ -535,19 +766,23 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             proscons=pros_and_cons,
             extra_reasons=unused_reasons,
         )
-        formatted_unused_reasons: str = "".join([format_reason(reason, 50, True) for reason in unused_reasons])
+        formatted_unused_reasons: str = format_reasons(unused_reasons)
+        preamble = add_reasons_preamble(
+            formatted_proscons=formatted_proscons,
+            formatted_unused_reasons=formatted_unused_reasons,
+            options=options,
+            prmpt=self._prompt_template,
+        )
 
-        revised_pros_and_cons, unused_reasons = add_unused_reasons(
-            reasons_data,
-            issue,
-            formatted_proscons,
-            formatted_unused_reasons,
+        return build_pros_and_cons(
+            reasons_data=reasons_data,
+            issue=issue,
+            options=options,
+            prompt_preamble=preamble,
             prmpt_data=self._prompt_template.to_dict(),
             model=self._model,
             **self._generation_kwargs,
         )
-        revised_pros_and_cons.options = pros_and_cons.options
-        return revised_pros_and_cons, unused_reasons
 
     def _ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
         """Revises labels of reasons to ensure uniqueness
@@ -766,8 +1001,9 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         Proceeds as follows:
 
         1. Mine (i.e., extract) all individual reasons from prompt/completion text
-        2. Organize reasons into pros and cons list
-        3. Double-check and revise pros and cons list
+        2. Identify basic options
+        3. Organize reasons into pros and cons list
+        4. Double-check and revise pros and cons list
 
         """
 
@@ -786,10 +1022,19 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
         reasons = self._ensure_unique_labels(reasons)
         self.logger.debug(f"Mined reasons: {pprint.pformat(reasons)}")
 
+        # identify basic options
+        options = self._describe_options(issue=issue)
+        self.logger.debug(f"Identified options: {pprint.pformat(options)}")
+
         # build pros and cons list
-        pros_and_cons, unused_reasons = self._build_pros_and_cons(reasons_data=[r.dict() for r in reasons], issue=issue)
+        pros_and_cons, unused_reasons = self._build_pros_and_cons(
+            reasons_data=[r.dict() for r in reasons],
+            issue=issue,
+            options=options,
+        )
         if not isinstance(pros_and_cons, ProsConsList):
             raise ValueError(f"Pros and cons list is not of type ProsConsList. Got {pros_and_cons}.")
+
         # add unused reasons
         if unused_reasons:
             self.logger.debug(f"Incomplete pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
@@ -797,11 +1042,13 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             pros_and_cons, unused_reasons = self._add_unused_reasons(
                 reasons_data=[r.dict() for r in reasons],
                 issue=issue,
+                options=options,
                 pros_and_cons=pros_and_cons,
                 unused_reasons=unused_reasons,
             )
             if unused_reasons:
                 self.logger.info(f"Failed to integrate the following reasons: {pprint.pformat(unused_reasons)}")
+
         # TODO: consider drafting alternative pros&cons lists and choosing best
         self.logger.debug(f"Built pros and cons list: {pprint.pformat(pros_and_cons.dict())}")
 
