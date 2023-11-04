@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from typing import Optional, Type
+import logging
+from functools import wraps
+import signal
 
 import lmql
 
@@ -74,9 +77,9 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
             try:
                 prompt_template = PromptTemplate.from_dict(prompt_template)
                 self.logger.warning(
-                    f"Found custom prompt template in config. Note that ill-designed prompt templates "
-                    f"may fatally disrupt processing of lmql queries. Test custom templates thoroughly. "
-                    f"Use at your own risk."
+                    "Found custom prompt template in config. Note that ill-designed prompt templates "
+                    "may fatally disrupt processing of lmql queries. Test custom templates thoroughly. "
+                    "Use at your own risk."
                 )
             except Exception as e:
                 self.logger.warning(f"Failed to parse prompt template: {e}. Will use defaul prompt template.")
@@ -91,3 +94,24 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
         self._generation_kwargs = config.generation_kwargs if config.generation_kwargs is not None else {}
         self._prompt_template = prompt_template
         self._lmql_query_timeout = config.lmql_query_timeout
+
+    @staticmethod
+    def timeout(func):
+        """Timeout decorator for LMQLAnalyst methods."""
+
+        def _timeout_handler(signum, frame):
+            raise TimeoutError("LMQL query timed out.")
+
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            signal.signal(signal.SIGALRM, _timeout_handler)
+            try:
+                signal.alarm(self._lmql_query_timeout)
+                return func(self, *args, **kwargs)
+            except TimeoutError:
+                logging.getLogger().warning("LMQL query %s timed out.", func.__name__)
+                return None
+            finally:
+                signal.alarm(0)
+
+        return wrapper

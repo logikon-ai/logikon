@@ -423,7 +423,7 @@ def add_unused_reasons(
 
         Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
 
-        {formatted_unused_reasons}     
+        {formatted_unused_reasons}
 
         Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?{prmpt.user_end}
         {prmpt.ass_start}
@@ -493,54 +493,35 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
     __product__ = "proscons"
     __requirements__ = ["issue"]
 
-    # timeout handler
-    def _timeout_handler(self, signum, frame):
-        raise TimeoutError("LMQL query timed out.")
-
+    @LMQLAnalyst.timeout
     def _mine_reasons(self, prompt, completion, issue) -> List[Claim]:
         """Internal wrapper (class-method) for lmql.query function."""
-        signal.signal(signal.SIGALRM, self._timeout_handler)
-        try:
-            signal.alarm(self._lmql_query_timeout)
-            reasons: List[Claim] = mine_reasons(
-                prompt,
-                completion,
-                issue,
-                prmpt_data=self._prompt_template.to_dict(),
-                model=self._model,
-                **self._generation_kwargs,
-            )
-            # postprocess reasons
-            for reason in reasons:
-                reason.label = reason.label.strip(" \"\n")
-                reason.text = trunk_to_sentence(reason.text.strip(" \"\n"))
-            return reasons
-        except TimeoutError:
-            self.logger.warning("LMQL query _mine_reasons timed out.")
-            # signal.alarm(0)
-            return []
-        finally:
-            signal.alarm(0)
+        reasons: List[Claim] = mine_reasons(
+            prompt,
+            completion,
+            issue,
+            prmpt_data=self._prompt_template.to_dict(),
+            model=self._model,
+            **self._generation_kwargs,
+        )
+        # postprocess reasons
+        for reason in reasons:
+            reason.label = reason.label.strip(" \"\n")
+            reason.text = trunk_to_sentence(reason.text.strip(" \"\n"))
+        return reasons
 
+    @LMQLAnalyst.timeout
     def _build_pros_and_cons(self, reasons_data: list[dict], issue: str) -> Tuple[ProsConsList, List[Claim]]:
         """Internal wrapper (class-method) for lmql.query function."""
-        signal.signal(signal.SIGALRM, self._timeout_handler)
-        try:
-            signal.alarm(self._lmql_query_timeout)
-            return build_pros_and_cons(
-                reasons_data,
-                issue,
-                prmpt_data=self._prompt_template.to_dict(),
-                model=self._model,
-                **self._generation_kwargs,
-            )
-        except TimeoutError:
-            self.logger.warning("LMQL query build_pros_and_cons timed out.")
-            # signal.alarm(0)
-            return ProsConsList(roots=[]), []
-        finally:
-            signal.alarm(0)
+        return build_pros_and_cons(
+            reasons_data,
+            issue,
+            prmpt_data=self._prompt_template.to_dict(),
+            model=self._model,
+            **self._generation_kwargs,
+        )
 
+    @LMQLAnalyst.timeout
     def _add_unused_reasons(
         self,
         reasons_data: list[dict],
@@ -554,29 +535,19 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             proscons=pros_and_cons,
             extra_reasons=unused_reasons,
         )
-        formatted_unused_reasons: str = "".join(
-            [format_reason(reason, 50, True) for reason in unused_reasons]
+        formatted_unused_reasons: str = "".join([format_reason(reason, 50, True) for reason in unused_reasons])
+
+        revised_pros_and_cons, unused_reasons = add_unused_reasons(
+            reasons_data,
+            issue,
+            formatted_proscons,
+            formatted_unused_reasons,
+            prmpt_data=self._prompt_template.to_dict(),
+            model=self._model,
+            **self._generation_kwargs,
         )
-        signal.signal(signal.SIGALRM, self._timeout_handler)
-        try:
-            signal.alarm(self._lmql_query_timeout)
-            revised_pros_and_cons, unused_reasons = add_unused_reasons(
-                reasons_data,
-                issue,
-                formatted_proscons,
-                formatted_unused_reasons,
-                prmpt_data=self._prompt_template.to_dict(),
-                model=self._model,
-                **self._generation_kwargs,
-            )
-            revised_pros_and_cons.options = pros_and_cons.options
-            return revised_pros_and_cons, unused_reasons
-        except TimeoutError:
-            self.logger.warning("LMQL query add_unused_reasons timed out.")
-            # signal.alarm(0)
-            return ProsConsList(roots=[]), []
-        finally:
-            signal.alarm(0)
+        revised_pros_and_cons.options = pros_and_cons.options
+        return revised_pros_and_cons, unused_reasons
 
     def _ensure_unique_labels(self, reasons: List[Claim]) -> List[Claim]:
         """Revises labels of reasons to ensure uniqueness
