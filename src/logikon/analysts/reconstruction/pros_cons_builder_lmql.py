@@ -290,6 +290,7 @@ Can you please carefully check the above pros & cons list, correct any errors an
 
 # TODO: Check redundancy of mined reason claims
 # TODO: Check if every root claim has a text, if not, provide one.
+# TODO: Revise and improve root claims in pros cons list
 
 
 @lmql.query
