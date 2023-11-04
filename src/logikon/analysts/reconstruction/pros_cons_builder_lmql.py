@@ -199,91 +199,91 @@ def format_options(options: List[str]) -> str:
 def pros_and_cons_preamble(reasons: list[Claim], issue: str, options: list[str], prmpt: PromptTemplate) -> str:
     "Prompt preamble (template) for building pros and cons list."
     return f"""
-    {prmpt.sys_start}
-    {lmql_queries.system_prompt()}{prmpt.sys_end}
+{prmpt.sys_start}
+{lmql_queries.system_prompt()}{prmpt.sys_end}
 
-    {prmpt.user_start}
-    Assignment: Organize an unstructured set of reasons as a pros & cons list.
+{prmpt.user_start}
+Assignment: Organize an unstructured set of reasons as a pros & cons list.
 
-    Let's begin by thinking through the basic issue addressed by the reasons:
+Let's begin by thinking through the basic issue addressed by the reasons:
 
-    <issue>{issue}</issue>
+<issue>{issue}</issue>
 
-    What are the basic options available to an agent who needs to address this issue?
+What are the basic options available to an agent who needs to address this issue?
 
-    Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
-    {prmpt.ass_start}
-    The options available to an agent who faces the above issue are (one per line):
+Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
+{prmpt.ass_start}
+The options available to an agent who faces the above issue are (one per line):
 
-    <options>
-    {format_options(options)}
-    <options/>
-    {prmpt.ass_end}
-    {prmpt.user_start}
-    Thanks, let's keep that in mind.
+<options>
+{format_options(options)}
+<options/>
+{prmpt.ass_end}
+{prmpt.user_start}
+Thanks, let's keep that in mind.
 
-    Let us now come back to the main assignment: constructing a pros & cons list from a set of reasons.
+Let us now come back to the main assignment: constructing a pros & cons list from a set of reasons.
 
-    You'll be given a set of reasons, which you're supposed to organize as a pros and cons list. To do so, you have to find a fitting target claim (root statement) the reasons are arguing for (pros) or against (cons).
+You'll be given a set of reasons, which you're supposed to organize as a pros and cons list. To do so, you have to find a fitting target claim (root statement) the reasons are arguing for (pros) or against (cons).
 
-    Use the following inputs (a list of reasons that address an issue) to solve your assignment.
+Use the following inputs (a list of reasons that address an issue) to solve your assignment.
 
-    <inputs>
-    <issue>{issue}</issue>
-    <reasons>
-    {format_reasons(reasons)}
-    </reasons>
-    </inputs>
+<inputs>
+<issue>{issue}</issue>
+<reasons>
+{format_reasons(reasons)}
+</reasons>
+</inputs>
 
-    Let me show you a few examples to illustrate the task / intended output:
+Let me show you a few examples to illustrate the task / intended output:
 
-    {format_examples()}
+{format_examples()}
 
-    Please consider carefully the following further, more specific instructions:
+Please consider carefully the following further, more specific instructions:
 
-    * Be bold: Your root claim(s) should be simple and unequivocal, and correspond to the basic options you have identified above.
-    * No reasoning: Your root claim(s) must not contain any reasoning (or comments, or explanations).
-    * Keep it short: Try to identify a single root claim. Add further root claims only if necessary (e.g., if reasons address three alternative decision options).
-    * Recall options: Use the options you've identified above to construct the pros and cons list.
-    * Be exhaustive: All reasons must figure in your pros and cons list.
-    * !!Re-organize!!: Don't stick to the order of the original reason list.
+* Be bold: Your root claim(s) should be simple and unequivocal, and correspond to the basic options you have identified above.
+* No reasoning: Your root claim(s) must not contain any reasoning (or comments, or explanations).
+* Keep it short: Try to identify a single root claim. Add further root claims only if necessary (e.g., if reasons address three alternative decision options).
+* Recall options: Use the options you've identified above to construct the pros and cons list.
+* Be exhaustive: All reasons must figure in your pros and cons list.
+* !!Re-organize!!: Don't stick to the order of the original reason list.
 
-    Moreover:
+Moreover:
 
-    * Use simple and plain language.
-    * If you identify multiple root claims, make sure they are mutually exclusive alternatives.
-    * Avoid repeating one and the same root claim in different words.
-    * Use yaml syntax and "```" code fences to structure your answer.{prmpt.user_end}
-    {prmpt.ass_start}
-    Let me recall the basic options before producing the pros and cons list:
-    {format_options(options)}
-    """
+* Use simple and plain language.
+* If you identify multiple root claims, make sure they are mutually exclusive alternatives.
+* Avoid repeating one and the same root claim in different words.
+* Use yaml syntax and "```" code fences to structure your answer.{prmpt.user_end}
+{prmpt.ass_start}
+Let me recall the basic options before producing the pros and cons list:
+{format_options(options)}
+"""
 
 
 def add_reasons_preamble(
     formatted_proscons: str, formatted_unused_reasons: str, options: list[str], prmpt: PromptTemplate
 ) -> str:
-    "Prompt preamble (template) for adding unused reasons to pros and cons list."
+    """Prompt preamble (template) for adding unused reasons to pros and cons list."""
     return f"""
-    {prmpt.sys_start}
-    {lmql_queries.system_prompt()}{prmpt.sys_end}
+{prmpt.sys_start}
+{lmql_queries.system_prompt()}{prmpt.sys_end}
 
-    {prmpt.user_start}
-    Assignment: Organize the aforementioned unstructured set of reasons as a pros & cons list.
+{prmpt.user_start}
+Assignment: Organize the aforementioned unstructured set of reasons as a pros & cons list.
 
-    ### Assistant
+### Assistant
 
-    {formatted_proscons}
+{formatted_proscons}
 
-    ### User
+### User
 
-    Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
+Thanks! However, I've realized that the following reasons haven't been integrated in the pros & cons list, yet:
 
-    {formatted_unused_reasons}
+{formatted_unused_reasons}
 
-    Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?{prmpt.user_end}
-    {prmpt.ass_start}
-    """
+Can you please carefully check the above pros & cons list, correct any errors and add the missing reasons?{prmpt.user_end}
+{prmpt.ass_start}
+"""
 
 
 ### LMQL QUERIES ###
