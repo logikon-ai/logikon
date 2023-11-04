@@ -288,7 +288,7 @@ Can you please carefully check the above pros & cons list, correct any errors an
 
 ### LMQL QUERIES ###
 
-# TODO: refactor LMQL queries, especially build_pros_and_cons and add_unused_reasons
+# TODO: Check redundancy of mined reason claims
 # TODO: Check if every root claim has a text, if not, provide one.
 
 
