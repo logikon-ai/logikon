@@ -385,7 +385,7 @@ def describe_options(issue: str, prmpt_data: dict):
         options = []
         marker = ""
         while len(options)<MAX_N_ROOTS:
-            "[MARKERO]" where MARKER in ["</options>", "- "]
+            "[MARKER]" where MARKER in ["</options>", "- "]
             marker = MARKER
             if marker == "</options>":
                 break
