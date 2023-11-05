@@ -371,11 +371,11 @@ def describe_options(issue: str, prmpt_data: dict):
         {prmpt.user_start}
         Assignment: Identify the basic options available to an agent who faces a given issue.
 
-        Let's suppose somewhen has to make up his or her mind about the following issue:
+        Let's suppose some agent has to make up his mind about the following issue:
 
         <issue>{issue}</issue>
 
-        What are the basic options available to an agent who needs to address this issue?
+        What are the basic (decision) options available to the agent?
 
         Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
         {prmpt.ass_start}
