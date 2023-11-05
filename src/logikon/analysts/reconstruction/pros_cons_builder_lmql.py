@@ -457,7 +457,7 @@ def build_pros_and_cons(reasons_data: list, issue: str, options: list[str], prom
                 roots.append(root)
             else:
                 break  # invalid marker!
-                
+
 
         return ProsConsList(roots=roots, options=options), unused_reasons
 
