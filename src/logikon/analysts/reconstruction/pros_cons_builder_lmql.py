@@ -371,11 +371,21 @@ def describe_options(issue: str, prmpt_data: dict):
         {prmpt.user_start}
         Assignment: Build a pros & cons list for a given issue.
 
-        Let's begin by thinking through the basic issue for which we're going to build a pros and cons list:
+        **Plan**
+        Step 1: State the central issue.
+        Step 2: Identify the basic options available to an agent who faces the issue.
+        Step 3: Construct a pros & cons list for the issue.
+        
 
-        <issue>{issue}</issue>
+        **Step 1**
+        Let's begin by stating our central issue clearly and concisely:{prmpt.user_end}
+        {prmpt.ass_start}
 
-        What are the basic options available to an agent who needs to address this issue?
+        <issue>{issue}</issue> {prmpt.ass_end}
+
+        {prmpt.user_start}
+        **Step 2**
+        What are the basic options available to an agent who needs to address the above issue?
 
         Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
         {prmpt.ass_start}
