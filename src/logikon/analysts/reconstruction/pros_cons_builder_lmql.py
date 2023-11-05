@@ -389,9 +389,9 @@ def describe_options(issue: str, prmpt_data: dict):
         **Step 2**
         What are the basic options available to an agent who needs to address the above issue?
 
-        Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
+        Keep your answer short: Sketch each option in 2-6 words only. State one option per line. Prefer imperative mood. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
         {prmpt.ass_start}
-        The options available to an agent who faces the above issue are (one per line):
+        The options available to an agent who faces the above issue are (one per line, 2-6 words each):
 
         <options>
         """
