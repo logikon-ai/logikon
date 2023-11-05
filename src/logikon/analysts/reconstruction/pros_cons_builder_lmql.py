@@ -381,7 +381,9 @@ def describe_options(issue: str, prmpt_data: dict):
         Let's begin by stating our central issue clearly and concisely:{prmpt.user_end}
         {prmpt.ass_start}
 
-        <issue>{issue}</issue> {prmpt.ass_end}
+        <issue>
+        {issue}
+        </issue> {prmpt.ass_end}
 
         {prmpt.user_start}
         **Step 2**
