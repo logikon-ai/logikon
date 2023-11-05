@@ -774,6 +774,7 @@ class ProsConsBuilderLMQL(LMQLAnalyst):
             options=options,
             prmpt=self._prompt_template,
         )
+        self.logger.debug(f"Prompt preamble:\n{preamble}")
 
         return build_pros_and_cons(
             reasons_data=reasons_data,
