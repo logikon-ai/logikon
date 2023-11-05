@@ -369,13 +369,13 @@ def describe_options(issue: str, prmpt_data: dict):
         {lmql_queries.system_prompt()}{prmpt.sys_end}
 
         {prmpt.user_start}
-        Assignment: Identify the basic options available to an agent who faces a given issue.
+        Assignment: Build a pros & cons list for a given issue.
 
-        Let's suppose some agent has to make up his mind about the following issue:
+        Let's begin by thinking through the basic issue for which we're going to build a pros and cons list:
 
         <issue>{issue}</issue>
 
-        What are the basic (decision) options available to the agent?
+        What are the basic options available to an agent who needs to address this issue?
 
         Keep your answer short: Sketch each option in 3-6 words only. State one option per line. Enclose your bullet list with "<options>"/"</options>" tags.{prmpt.user_end}
         {prmpt.ass_start}
