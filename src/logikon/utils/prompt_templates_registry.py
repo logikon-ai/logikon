@@ -74,8 +74,7 @@ def get_prompt_template(tmpl_key: str | None = None) -> PromptTemplate:
     if tmpl_key != _DEFAULT_KEY:
         logging.getLogger("prompt_templates_registry").warning(
             f"Found non-default config template key {tmpl_key}. Prompt templates other than default (llama) "
-            f"risk to disrupt lmql query provcessing and are hence prohibited until this issue is fixed."
-            f"Will use default pronpt template {_DEFAULT_KEY} instead."
+            f"risk to disrupt lmql query processing. Please test carefully."
         )
 
     return _PROMPT_TEMPLATE_REGISTRY[tmpl_key]
