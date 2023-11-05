@@ -4,20 +4,14 @@
 flowchart TD
     p["`pros cons list`"]
     i["`issue`"]
-    ur("unpack reason
-    :>pros cons list`")
-    pu["`pros cons unpacked`"]
-    rore("`adjacent root-reason
-    :>_links_`")
-    rwre("`any reason-reason
-    :>:links_`")
-    links["`links (unweighted)`"]
-    mcqu1("`support or attack?
-    :>_prob1_`")
-    prune("`prune`")
-    mcqu2("`sup/att or neutral?
-    :>_prob2_`")
-    wlinks["`weighted links (p1*p2)`"]
+    ur("unpack reason")
+    pu["`pros cons unpacked (nodes)`"]
+    rore("`add root-reason links`")
+    rwre("`add reason-reason links`")
+    links["`relevence network (unweighted links)`"]
+    mcqu1("elicit valence & weight")
+    prune("`rm multi-links`")
+    wlinks["`relevence network (weighted links)`"]
     subgraph artifact
     ad["`data`"]
     am["`metadata`"]
@@ -27,7 +21,7 @@ flowchart TD
     ur --> pu 
     pu--> rore --> links
     pu--> rwre --> links
-    links --> mcqu1 --> mcqu2 --> prune --> wlinks --> ad
+    links --> mcqu1 --> prune --> wlinks --> ad
     ur --> am
 ```
 

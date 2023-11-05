@@ -1,8 +1,11 @@
 """Module with analyst for reducing fuzzy nx graph to deterministic nx graph.
 
-1. Find an optimal branching of the fuzzy nx graph
-2. Determine minimum weight of attack / support edges in branching
-3. Add all other attack / support edges with weight above respective minimum from fuzzy graph  to deterministic graph
+The analyst proceeds as follows:
+
+1. Add an intra-root pseudo edge
+2. Find an optimal branching of the fuzzy nx graph
+3. Remove pseudo edges from branching
+4. Add all other attack / support edges with weight above threshold weight
 
 """
 
@@ -186,10 +189,10 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
 
         Proceeds as follows:
 
-        1. Add intra-root pseudo edges
+        1. Add intra-root pseudo edge
         2. Find an optimal branching of the fuzzy nx graph
         3. Remove pseudo edges from branching
-        4. Determine minimum weight of attack / support edges in branching and add all other attack / support edges with weight above respective minimum
+        4. Add all other attack / support edges with weight above threshold weight
 
         """
 

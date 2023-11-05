@@ -5,30 +5,28 @@ flowchart TD
     p["`prompt`"]
     c["`completion`"]
     i["`issue`"]
+    o["`options`"]
     r["`reasons (unstructured)`"]
     pcl["`pros cons list`"]
     ur["`reasons (unused)`"]
-    rm("`reason mining
-    :>_reasons_`")
-    pco("`pros cons organizing
-    :>_pros cons list_`")
-    add("`add unused reasons
-    :>_pros cons list_`")
-    cr("`check and revise
-    :>_pros cons list_`")
+    rm("`reason mining`")
+    pco("`pros cons organizing`")
+    add("`add unused reasons`")
+    cr("`check and revise`")
     subgraph artifact
     ad["`data`"]
     am["`metadata`"]
     end
+    i --> rm
     p --> rm
     c --> rm
-    i --> rm
-    rm --> r --> am
+    i --> o --> pco
     i --> pco
-    r --> pco --> add --> pco
+    r --> pco --> add
     i --> cr
-    pco --> cr --> pcl --> ad
-    pco --> ur --> am
+    add --> cr --> pcl --> ad
+    add --> ur --> am
+    rm --> r --> am
 ```
 
 """

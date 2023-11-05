@@ -4,15 +4,13 @@
 flowchart TD
     p["`prompt`"]
     c["`completion`"]
-    di("`state issue
-    :>_issue draft_`")
+    di("`identify issue`")
     i1["`issue draft-1`"]
     i2["`issue draft-2`"]
     in["`issue draft-n`"]
     q["`eval criteria`"]
     i["`issue`"]
-    rs("`rate and select
-    :>_reasons_`")
+    rs("`rate and select`")
     subgraph artifact
     ad["`data`"]
     am["`metadata`"]
