@@ -433,10 +433,10 @@ def build_pros_and_cons(reasons_data: list, issue: str, options: list[str], prom
                 root = RootClaim(label=TITLE.strip('): '), text=CLAIM.strip('\n\" '))
                 "\n  pros:"
                 while unused_reasons:
-                    "[MARKER]" where MARKER in ["\n  cons:", "\n  - "]
+                    "[MARKER]" where MARKER in ["\n  cons:", "\n  -"]
                     marker = MARKER
-                    if marker == "\n  - ":  # new pro
-                        "\"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
+                    if marker == "\n  -":  # new pro
+                        " \"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
                         selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
                         root.pros.append(selected_reason)
                         unused_reasons.remove(selected_reason)
@@ -444,10 +444,10 @@ def build_pros_and_cons(reasons_data: list, issue: str, options: list[str], prom
                         break
                 # cons
                 while unused_reasons:
-                    "[MARKER]" where MARKER in ["\n```", "\n- ", "\n  - "]
+                    "[MARKER]" where MARKER in ["\n```", "\n- ", "\n  -"]
                     marker = MARKER
-                    if marker == "\n  - ":  # new con
-                        "\"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
+                    if marker == "\n  -":  # new con
+                        " \"[[[REASON_TITLE]]]\" " where REASON_TITLE in [reason.label for reason in unused_reasons]
                         selected_reason = next(reason for reason in unused_reasons if reason.label == REASON_TITLE)
                         root.cons.append(selected_reason)
                         unused_reasons.remove(selected_reason)
@@ -457,9 +457,6 @@ def build_pros_and_cons(reasons_data: list, issue: str, options: list[str], prom
                 roots.append(root)
             else:
                 break  # invalid marker!
-
-            "[MARKER]" where MARKER in ["\n```", "\n- "]
-            marker = MARKER
                 
 
         return ProsConsList(roots=roots, options=options), unused_reasons
