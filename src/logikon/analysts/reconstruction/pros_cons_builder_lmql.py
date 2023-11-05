@@ -414,11 +414,10 @@ def build_pros_and_cons(reasons_data: list, issue: str, options: list[str], prom
             f_reason = format_reason(reason)
             "{f_reason}"
         "issue: \"{issue}\"\n"
-        "pros_and_cons:"
         unused_reasons = copy.deepcopy(reasons)
         roots = []
-        "[MARKER]" where MARKER in ["\n```", "\n- "]
-        marker = MARKER
+        marker = "\n- "
+        "pros_and_cons:{marker}"
         while len(roots)<MAX_N_ROOTS and unused_reasons:
             if marker == "\n```":
                 break
@@ -458,6 +457,10 @@ def build_pros_and_cons(reasons_data: list, issue: str, options: list[str], prom
                 roots.append(root)
             else:
                 break  # invalid marker!
+
+            "[MARKER]" where MARKER in ["\n```", "\n- "]
+            marker = MARKER
+                
 
         return ProsConsList(roots=roots, options=options), unused_reasons
 
