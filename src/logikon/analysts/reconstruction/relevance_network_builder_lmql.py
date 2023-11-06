@@ -525,7 +525,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
         # create fuzzy argmap from fuzzy pros and cons list (reason-root edges)
         relevance_network = FuzzyArgMap()
-        for root in tqdm.tqdm(pros_and_cons.roots):
+        for root in tqdm.tqdm(pros_and_cons.roots, desc="Reason-root edges"):
             target_node = self._add_node(relevance_network, root, type=am.CENTRAL_CLAIM)
             for pro in root.pros:
                 source_node = self._add_node(relevance_network, pro, type=am.REASON)
@@ -540,7 +540,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
         # TODO: improve naive sampling
         # add fuzzy reason-reason edges
-        for target_node in tqdm.tqdm(relevance_network.nodelist):
+        for target_node in tqdm.tqdm(relevance_network.nodelist, desc="Reason-reason edges"):
             if target_node.nodeType == am.CENTRAL_CLAIM:
                 continue
 
