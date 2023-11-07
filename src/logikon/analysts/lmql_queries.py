@@ -2,23 +2,24 @@
 
 
 from __future__ import annotations
-from typing import List, Dict, Tuple
 
 import lmql
 
-from logikon.schemas.pros_cons import Claim
 import logikon.schemas.argument_mapping as am
-from logikon.utils.prompt_templates_registry import PromptTemplate
+from logikon.schemas.pros_cons import Claim  # noqa: F401
+from logikon.utils.prompt_templates_registry import PromptTemplate  # noqa: F401
 
 
 def system_prompt() -> str:
     """Returns the bare system prompt used in all lmql queries"""
-    system_prompt = "You are a helpful, honest and knowledgeable AI assistant with expertise in critical thinking and argumentation analysis. Always answer as helpfully as possible. Be concise."
+    system_prompt = "You are a helpful, honest and knowledgeable AI assistant with expertise "
+    "in critical thinking and argumentation analysis. Always answer as helpfully as possible. "
+    "Be concise."
     return system_prompt
 
 
 @lmql.query
-def supports_q(argument_data: dict, claim_data: dict, prmpt_data: dict):
+def supports_q(argument_data: dict, claim_data: dict, prmpt_data: dict):  # noqa: ARG001
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
@@ -46,7 +47,8 @@ def supports_q(argument_data: dict, claim_data: dict, prmpt_data: dict):
         (A) Yes, the argument supports the claim.
         (B) No, the argument does not support the claim.
 
-        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on.{prmpt.user_end}
+        Just answer with "(A)" or "(B)". No explanations or comments.
+        You'll be asked to justify your answer later on.{prmpt.user_end}
         {prmpt.ass_start}
         Answer: ([LABEL]"""
     distribution
@@ -55,7 +57,7 @@ def supports_q(argument_data: dict, claim_data: dict, prmpt_data: dict):
 
 
 @lmql.query
-def attacks_q(argument_data: dict, claim_data: dict, prmpt_data: dict):
+def attacks_q(argument_data: dict, claim_data: dict, prmpt_data: dict):  # noqa: ARG001
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
@@ -83,7 +85,8 @@ def attacks_q(argument_data: dict, claim_data: dict, prmpt_data: dict):
         (A) Yes, the argument disconfirms the claim.
         (B) No, the argument does not disconfirm the claim.
 
-        Just answer with "(A)" or "(B)". No explanations or comments. You'll be asked to justify your answer later on.{prmpt.user_end}
+        Just answer with "(A)" or "(B)". No explanations or comments.
+        You'll be asked to justify your answer later on.{prmpt.user_end}
         {prmpt.ass_start}
         Answer: ([LABEL]"""
     distribution
@@ -92,7 +95,7 @@ def attacks_q(argument_data: dict, claim_data: dict, prmpt_data: dict):
 
 
 @lmql.query
-def most_confirmed(argument_data: dict, claims_data: list, prmpt_data: dict):
+def most_confirmed(argument_data: dict, claims_data: list, prmpt_data: dict):  # noqa: ARG001
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
@@ -129,7 +132,7 @@ def most_confirmed(argument_data: dict, claims_data: list, prmpt_data: dict):
 
 
 @lmql.query
-def most_disconfirmed(argument_data: dict, claims_data: list, prmpt_data: dict):
+def most_disconfirmed(argument_data: dict, claims_data: list, prmpt_data: dict):  # noqa: ARG001
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
@@ -176,13 +179,16 @@ def most_disconfirmed(argument_data: dict, claims_data: list, prmpt_data: dict):
 # W. Spohn, The Laws of Belief, OUP 2012, pp. 32ff.
 #
 @lmql.query
-def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict):
+def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict):  # noqa: ARG001
     '''lmql
     argmax(chunksize=1)
         argument = Claim(**argument_data)
         claim = Claim(**claim_data)
         prmpt = PromptTemplate(**prmpt_data)
-        issue_text = f"The following claim and consideration are drawn from a balanced debate, containing an equal share of pros and cons, about this issue: {issue}\n" if issue else ""
+        issue_text = (
+            f"The following claim and consideration are drawn from a balanced debate, "
+            f"containing an equal share of pros and cons, about this issue: {issue}\n"
+        ) if issue else ""
         """
         {prmpt.sys_start}
         {system_prompt()}{prmpt.sys_end}
@@ -224,7 +230,7 @@ def valence(argument_data: dict, claim_data: dict, issue: str, prmpt_data: dict)
     '''
 
 
-def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str, float]]:
+def get_distribution(result: lmql.LMQLResult) -> list[tuple[str, float]]:
     """Extracts the distribution from an LMQL result
 
     Args:
@@ -237,23 +243,26 @@ def get_distribution(result: lmql.LMQLResult) -> List[Tuple[str, float]]:
         List[Tuple[str,float]]: Discrete distribution over labels (label, probability)
     """
     try:
-        return result.variables[f'P({result.distribution_variable})']
-    except:
-        raise ValueError(f"Failed to extract distribution from LMQL result: {result}")
+        return result.variables[f"P({result.distribution_variable})"]
+    except Exception as err:
+        msg = f"Failed to extract distribution from LMQL result: {result}"
+        raise ValueError(msg) from err
 
 
 def label_to_idx(label):
     try:
         idx = "ABCDEFGHIJ".index(label)
-    except ValueError:
-        raise ValueError(f"Unknown label {label}")
+    except ValueError as err:
+        msg = f"Unknown label {label}"
+        raise ValueError(msg) from err
     return idx
 
 
 def label_to_claim(label, claims):
     idx = label_to_idx(label)
     if idx >= len(claims):
-        raise ValueError(f"Too few claims for {label}")
+        msg = f"Too few claims for {label}"
+        raise ValueError(msg)
     return claims[idx]
 
 
@@ -263,4 +272,5 @@ def label_to_valence(label):
     elif label == "B":
         return am.ATTACK
     else:
-        raise ValueError(f"Unknown label {label}")
+        msg = f"Unknown label {label}"
+        raise ValueError(msg)

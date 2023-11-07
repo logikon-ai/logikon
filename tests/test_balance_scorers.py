@@ -52,6 +52,29 @@ def nx_map2() -> nx.DiGraph:
     return nx_graph
 
 
+@pytest.fixture(name="nx_map3")
+def nx_map3() -> nx.DiGraph:
+    data = {
+        "directed": True,
+        "multigraph": False,
+        "graph": {},
+        "nodes": [
+            {"text": "claim 0", "label": "claim0", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n00"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "claim 2", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n1"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": am.REASON, "id": "n2"},
+            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n3"},
+        ],
+        "links": [
+            {"valence": am.SUPPORT, "source": "n2", "target": "n0", "weight": 0.5},
+            {"valence": am.ATTACK, "source": "n3", "target": "n0", "weight": 0.5},
+            {"valence": am.ATTACK, "source": "n3", "target": "n1", "weight": 0.5},
+        ],
+    }
+    nx_graph = nx.node_link_graph(data)
+    return nx_graph
+
+
 def test_mean_scorer01(nx_map1):
     scorer = MeanRootSupportScorer(ScoreAnalystConfig())
     score, comment, meta = scorer._calculate_score(nx_map1)
@@ -64,6 +87,15 @@ def test_mean_scorer01(nx_map1):
 def test_mean_scorer02(nx_map2):
     scorer = MeanRootSupportScorer(ScoreAnalystConfig())
     score, comment, meta = scorer._calculate_score(nx_map2)
+
+    assert score == -0.25
+    assert comment == ""
+    assert meta is None
+
+
+def test_mean_scorer03(nx_map3):
+    scorer = MeanRootSupportScorer(ScoreAnalystConfig())
+    score, comment, meta = scorer._calculate_score(nx_map3)
 
     assert score == -0.25
     assert comment == ""

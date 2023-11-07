@@ -373,7 +373,7 @@ def describe_options(issue: str, prmpt_data: dict):
         Step 1: State the central issue.
         Step 2: Identify the basic options available to an agent who faces the issue.
         Step 3: Construct a pros & cons list for the issue.
-        
+
 
         **Step 1**
         Let's begin by stating our central issue clearly and concisely:{prmpt.user_end}

@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from typing import Mapping, List, Type
+from typing import Mapping
 
-from logikon.analysts.base import Analyst, AbstractScoreAnalyst, AbstractArtifactAnalyst
+from logikon.analysts.base import AbstractArtifactAnalyst, AbstractScoreAnalyst, Analyst
+from logikon.analysts.export.htmlsunburst_exporter import HTMLSunburstExporter
 from logikon.analysts.export.networkx_exporter import RelevanceNetworkNXExporter
 from logikon.analysts.export.svgmap_exporter import SVGMapExporter
-from logikon.analysts.export.htmlsunburst_exporter import HTMLSunburstExporter
+from logikon.analysts.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
 from logikon.analysts.reconstruction.issue_builder_lmql import IssueBuilderLMQL
 from logikon.analysts.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
 from logikon.analysts.reconstruction.relevance_network_builder_lmql import RelevanceNetworkBuilderLMQL
-from logikon.analysts.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
 from logikon.analysts.score.argmap_graph_scores import (
     ArgMapGraphAttackRatioScorer,
     ArgMapGraphAvgKatzCScorer,
@@ -18,16 +18,16 @@ from logikon.analysts.score.argmap_graph_scores import (
     MeanReasonStrengthScorer,
 )
 from logikon.analysts.score.balance_scores import (
-    MeanRootSupportScorer,
-    MeanAbsRootSupportScorer,
     GlobalBalanceScorer,
+    MeanAbsRootSupportScorer,
+    MeanRootSupportScorer,
 )
 
 # TODO: set up a product registry for storing product_kw/product_cls mapping
 
 
 # First class is treated as default analyst
-_ANALYST_REGISTRY: Mapping[str, List[type[Analyst]]] = {
+_ANALYST_REGISTRY: Mapping[str, list[type[Analyst]]] = {
     "issue": [IssueBuilderLMQL],
     "proscons": [ProsConsBuilderLMQL],
     "relevance_network": [RelevanceNetworkBuilderLMQL],
@@ -46,16 +46,26 @@ _ANALYST_REGISTRY: Mapping[str, List[type[Analyst]]] = {
 }
 
 
-def get_analyst_registry() -> Mapping[str, List[type[Analyst]]]:
+def get_analyst_registry() -> Mapping[str, list[type[Analyst]]]:
     """Get the analyst registry."""
     # sanity checks
     for keyword, analysts in _ANALYST_REGISTRY.items():
-        assert analysts
-        assert all(issubclass(d, Analyst) for d in analysts)
-        assert all(d.get_product() == keyword for d in analysts)
+        if not analysts:
+            msg = f"No analysts registered for {keyword}."
+            raise ValueError(msg)
+        if not all(issubclass(d, Analyst) for d in analysts):
+            msg = f"Not all analysts registered for {keyword} are subclasses of Analyst."
+            raise ValueError(msg)
+        if not all(d.get_product() == keyword for d in analysts):
+            msg = f"Not all analysts registered for {keyword} have the correct product type."
+            raise ValueError(msg)
         if issubclass(analysts[0], AbstractArtifactAnalyst):
-            assert all(issubclass(d, AbstractArtifactAnalyst) for d in analysts)
+            if not all(issubclass(d, AbstractArtifactAnalyst) for d in analysts):
+                msg = f"Not all analysts registered for {keyword} are subclasses of AbstractArtifactAnalyst."
+                raise ValueError(msg)
         if issubclass(analysts[0], AbstractScoreAnalyst):
-            assert all(issubclass(d, AbstractScoreAnalyst) for d in analysts)
+            if not all(issubclass(d, AbstractScoreAnalyst) for d in analysts):
+                msg = f"Not all analysts registered for {keyword} are subclasses of AbstractScoreAnalyst."
+                raise ValueError(msg)
 
     return _ANALYST_REGISTRY

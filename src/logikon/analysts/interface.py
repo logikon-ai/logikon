@@ -1,7 +1,7 @@
 # interface.py
 
 from abc import ABC, abstractmethod
-from typing import List, Union, Type
+from typing import List, Type, Union
 
 from pydantic import BaseModel
 

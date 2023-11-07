@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import logging
-from typing import List, Optional, Callable, Tuple, Mapping, Type, Iterable
-
 import copy
 import functools as ft
+import logging
+from typing import Callable, Iterable, Mapping
 
 from logikon.analysts.interface import Analyst
 from logikon.analysts.registry import get_analyst_registry
@@ -17,9 +16,12 @@ class Director:
 
     @staticmethod
     def run_pipeline(
-        chain: Iterable[Analyst], inputs: List[Artifact] = [], analysis_state: Optional[AnalysisState] = None
+        chain: Iterable[Analyst], inputs: list[Artifact] | None = None, analysis_state: AnalysisState | None = None
     ):
-        """runs analyst pipeline"""
+        """runs analysts pipeline"""
+
+        if inputs is None:
+            inputs = []
 
         if analysis_state is None:
             # if not provided, initialize empty analysis_state
@@ -30,16 +32,20 @@ class Director:
         # check whether input ids are unique
         for input_artifact in inputs:
             if [a.id for a in inputs].count(input_artifact.id) > 1:
-                raise ValueError(
-                    f"Found several input artifacts with id {input_artifact.id}. Input ids are required to be unique."
+                msg = (
+                    f"Found several input artifacts with id {input_artifact.id}. "
+                    f"Input ids are required to be unique."
                 )
+                raise ValueError(msg)
 
         # add inputs to analysis_state
         for input_artifact in inputs:
             if input_artifact.id in state.inputs:
-                raise ValueError(
-                    f"Duplicate input artifact id {input_artifact.id} found in analysis_state.inputs and inputs. Ids must be unique."
+                msg = (
+                    f"Duplicate input artifact id {input_artifact.id} found in analysis_state. "
+                    f"Ids must be unique."
                 )
+                raise ValueError(msg)
             state.inputs.append(input_artifact)
 
         # iterate over analysts
@@ -48,7 +54,7 @@ class Director:
 
         return state
 
-    def _run_consistency_checks(self, config: ScoreConfig, input_ids: List[str], registry: Mapping):
+    def _run_consistency_checks(self, config: ScoreConfig, input_ids: list[str], registry: Mapping):
         """consistency check for current configuration
 
         Args:
@@ -74,18 +80,19 @@ class Director:
         for key in config.metrics + config.artifacts:
             if isinstance(key, str):
                 if key in input_ids:
-                    raise ValueError(
-                        f"Inconsistent configuration. {key} provided as input but also as metric / artifact."
-                    )
+                    msg = f"Inconsistent configuration. {key} provided as input but also as metric / artifact."
+                    raise ValueError(msg)
             elif issubclass(key, Analyst):
                 if key.get_product() in input_ids:
-                    raise ValueError(
-                        f"Inconsistent configuration. {key.get_product()} provided as input but also as metric / artifact."
+                    msg = (
+                        f"Inconsistent configuration. "
+                        f"{key.get_product()} provided as input but also as metric / artifact."
                     )
+                    raise ValueError(msg)
 
     def _collect_analysts(
-        self, config: ScoreConfig, input_ids: List[str], registry: Mapping[str, List[type[Analyst]]]
-    ) -> List[type[Analyst]]:
+        self, config: ScoreConfig, input_ids: list[str], registry: Mapping[str, list[type[Analyst]]]
+    ) -> list[type[Analyst]]:
         """collect all analysts required for running current configuration
 
         Args:
@@ -95,7 +102,7 @@ class Director:
         """
 
         # Create list of analysts classes from config and registry
-        analyst_classes: List[Type[Analyst]] = []
+        analyst_classes: list[type[Analyst]] = []
         for key in config.metrics + config.artifacts:
             if isinstance(key, str):
                 analyst_cls = registry[key][0]  # first analyst class in registry list is default
@@ -119,14 +126,14 @@ class Director:
                         break
                     if len([rs for rs in requirements if set(rs).issubset(products | set(input_ids))]) > 1:
                         self.logger.warning(
-                            f"Analyst {analyst_cls} has multiple requirement sets that are satisfied; this may lead to unexpected "
-                            "analyst chaining and final results. Please consider defining a more comprehensive and unambiguous score config."
+                            f"Analyst {analyst_cls} has multiple requirement sets that are satisfied; "
+                            "this may lead to unexpected analyst chaining and final results. "
+                            "Please consider defining a more comprehensive and unambiguous score config."
                         )
-                else:
-                    if not set(requirements).issubset(products):
-                        requirements_satisfied = False
-                        missing_products = set(requirements) - products
-                        break
+                elif not set(requirements).issubset(products):
+                    requirements_satisfied = False
+                    missing_products = set(requirements) - products
+                    break
 
             requirements_satisfied = not missing_products
 
@@ -139,7 +146,7 @@ class Director:
 
         return analyst_classes
 
-    def _initialize_analysts(self, config: ScoreConfig, analyst_classes: List[Type[Analyst]]) -> List[Analyst]:
+    def _initialize_analysts(self, config: ScoreConfig, analyst_classes: list[type[Analyst]]) -> list[Analyst]:
         """initialize all analysts with config
 
         Args:
@@ -155,7 +162,7 @@ class Director:
 
         return analysts
 
-    def _build_chain(self, analysts: List[Analyst], input_ids: List[str]) -> List[Analyst]:
+    def _build_chain(self, analysts: list[Analyst], input_ids: list[str]) -> list[Analyst]:
         """builds analyst chain respecting requirements
 
         Args:
@@ -180,12 +187,15 @@ class Director:
                     added_any = True
             if not added_any:
                 analysts_left = [analyst.get_product() for analyst in analysts]
-                msg = f"Could not create analyst chain. Failed to satisfy any of the following analysts' requirements: {analysts_left}"
+                msg = (
+                    f"Could not create analyst chain. Failed to satisfy any of "
+                    f"the following analysts' requirements: {analysts_left}"
+                )
                 raise ValueError(msg)
 
         return chain
 
-    def create(self, config: ScoreConfig) -> Tuple[Optional[Callable], Optional[List[Analyst]]]:
+    def create(self, config: ScoreConfig) -> tuple[Callable | None, list[Analyst] | None]:
         """Create a analyst pipeline based on a config."""
 
         registry = get_analyst_registry()

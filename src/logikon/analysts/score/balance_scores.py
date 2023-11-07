@@ -14,7 +14,7 @@ argumentation networks with multiple root claims.
 A fuzzy argument map is a *weighted* DAG $G=<N,E,W>$.
 Negative weights represent attack relations, positive weights support relations.
 
-A "root node" is any node with out-degree 0. (In graph-theory, these "root nodes" 
+A "root node" is any node with out-degree 0. (In graph-theory, these "root nodes"
 are sinks.) The set of root nodes is denoted $N^r$, and the set non-root nodes is
 referred to as $N^*$:=$N \setminus N^r$.
 
@@ -27,7 +27,7 @@ $n$ wrt. $t$ is the average weight of all paths from $t$ to $n$:
 
 MRS(n,t) := $\frac{1}{|P_{n,t}|} \sum_{p \in P_{n,t}} \product_{e \in p} w(e)$
 
-where $w(e)$ is the weight of edge $e$, if $|P_{n,t}|$>0. If $|P_{n,t}|$=0, then 
+where $w(e)$ is the weight of edge $e$, if $|P_{n,t}|$>0. If $|P_{n,t}|$=0, then
 
 MRS(n,t) := 0.
 
@@ -55,8 +55,8 @@ of all roots $t$:
 
 AARS(G) := $\frac{1}{|N^r|} \sum_{t \in N^r} |RS(t)|$
 
-AARS measures to which extent a fuzzy argument map is locally balanced. 
-Local imbalances (e.g., proponderance of pros for first root and 
+AARS measures to which extent a fuzzy argument map is locally balanced.
+Local imbalances (e.g., proponderance of pros for first root and
 proponderance of cons for second root) are not cancelled out.
 
 ## Global balance
@@ -75,19 +75,15 @@ argmap as
 
 GB(G) := AARS'(G)
 
-"""
+"""  # noqa: W605
 
 from __future__ import annotations
 
-from typing import Optional, Union
-
-import copy
 import networkx as nx
 import numpy as np
 
-from logikon.analysts.score.argmap_graph_scores import AbstractGraphScorer
-from logikon.schemas.results import AnalysisState, Score
 import logikon.schemas.argument_mapping as am
+from logikon.analysts.score.argmap_graph_scores import AbstractGraphScorer
 
 
 class AbstractBalanceScorer(AbstractGraphScorer):
@@ -112,8 +108,8 @@ class AbstractBalanceScorer(AbstractGraphScorer):
         return central_nodes
 
     def _get_marginal_root_support(
-        self, digraph_r: nx.DiGraph, central_nodes: list, default: Optional[float] = None
-    ) -> dict[str, dict[str, Optional[float]]]:
+        self, digraph_r: nx.DiGraph, central_nodes: list, default: float | None = None
+    ) -> dict[str, dict[str, float | None]]:
         """Calculates MRS and stores values in data
 
         Args:
@@ -123,7 +119,7 @@ class AbstractBalanceScorer(AbstractGraphScorer):
         Returns:
             dict[str, dict[str, float | None]]: dict of MRS values mrs[root][node]
         """
-        mrs: dict[str, dict[str, Optional[float]]] = {}
+        mrs: dict[str, dict[str, float | None]] = {}
 
         for t in central_nodes:
             mrs[t] = {}
@@ -141,7 +137,7 @@ class MeanRootSupportScorer(AbstractBalanceScorer):
     __pdescription__ = "The mean root support in the argument map (global balance score)"
     __product__ = "mean_root_support"
 
-    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
+    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
         """Calculate mean root support"""
         digraph_r = self._preprocess_graph(digraph)
 
@@ -152,7 +148,13 @@ class MeanRootSupportScorer(AbstractBalanceScorer):
 
         mrs = self._get_marginal_root_support(digraph_r, central_nodes)
 
-        mean_root_support = np.mean([np.mean([v for v in mrs[t].values() if v is not None]) for t in central_nodes])
+        root_supports = []
+        for t in central_nodes:
+            mrss = [v for v in mrs[t].values() if v is not None]
+            if mrss:
+                root_supports.append(np.mean(mrss))
+
+        mean_root_support = np.mean(root_supports) if root_supports else 0
 
         return float(mean_root_support), "", None
 
@@ -161,7 +163,7 @@ class MeanAbsRootSupportScorer(AbstractBalanceScorer):
     __pdescription__ = "The mean absolute root support in the argument map (local balance score)"
     __product__ = "mean_absolute_root_support"
 
-    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
+    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
         """Calculate mean absolute root support"""
         digraph_r = self._preprocess_graph(digraph)
 
@@ -172,9 +174,13 @@ class MeanAbsRootSupportScorer(AbstractBalanceScorer):
 
         mrs = self._get_marginal_root_support(digraph_r, central_nodes)
 
-        mean_absolute_root_support = np.mean(
-            [abs(np.mean([v for v in mrs[t].values() if v is not None])) for t in central_nodes]
-        )
+        root_supports = []
+        for t in central_nodes:
+            mrss = [v for v in mrs[t].values() if v is not None]
+            if mrss:
+                root_supports.append(np.mean(mrss))
+
+        mean_absolute_root_support = np.mean([abs(v) for v in root_supports]) if root_supports else 0
 
         return float(mean_absolute_root_support), "", None
 
@@ -185,10 +191,10 @@ class GlobalBalanceScorer(AbstractBalanceScorer):
     )
     __product__ = "global_balance"
 
-    def _get_mrs_star(self, mrs: dict[str, dict[str, Optional[float]]]) -> dict[str, dict[str, float]]:
+    def _get_mrs_star(self, mrs: dict[str, dict[str, float | None]]) -> dict[str, dict[str, float]]:
         """Calculates MRS' from MRS"""
         mrs_star: dict[str, dict[str, float]] = {}
-        nodes = list(list(mrs.values())[0].keys())
+        nodes = list(next(iter(mrs.values())).keys())
         mrs_node = {n: [mrs[t][n] for t in mrs if mrs[t][n] is not None] for n in nodes}
         for t in mrs:
             mrs_star[t] = {}
@@ -203,7 +209,7 @@ class GlobalBalanceScorer(AbstractBalanceScorer):
 
         return mrs_star
 
-    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
+    def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
         """Calculate global_balance"""
         digraph_r = self._preprocess_graph(digraph)
 

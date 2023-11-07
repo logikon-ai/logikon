@@ -2,16 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Optional, Type
 import logging
-from functools import wraps
 import signal
+from functools import wraps
 
 import lmql
 
-from logikon.utils.model_registry import get_registry_model, register_model
-from logikon.utils.prompt_templates_registry import get_prompt_template, PromptTemplate
 from logikon.analysts.base import AbstractArtifactAnalyst, ArtifcatAnalystConfig
+from logikon.utils.model_registry import get_registry_model, register_model
+from logikon.utils.prompt_templates_registry import PromptTemplate, get_prompt_template
 
 
 class LMQLAnalystConfig(ArtifcatAnalystConfig):
@@ -23,8 +22,8 @@ class LMQLAnalystConfig(ArtifcatAnalystConfig):
 
     expert_model: str
     llm_framework: str
-    expert_model_kwargs: Optional[dict] = None
-    generation_kwargs: Optional[dict] = None
+    expert_model_kwargs: dict | None = None
+    generation_kwargs: dict | None = None
     lmql_query_timeout: int = 300
 
 
@@ -35,7 +34,7 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
 
     """
 
-    __configclass__: Type[ArtifcatAnalystConfig] = LMQLAnalystConfig
+    __configclass__: type[ArtifcatAnalystConfig] = LMQLAnalystConfig
 
     def __init__(self, config: LMQLAnalystConfig):
         super().__init__(config)
@@ -64,13 +63,14 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
             register_model(model_id, model)
 
         if not isinstance(model, lmql.LLM):
-            raise ValueError(f"Model {model_id} is not an lmql model.")
+            msg = f"Model {model_id} is not an lmql model."
+            raise ValueError(msg)
 
         model_kwargs.pop("tokenizer", None)
 
         prompt_template = model_kwargs.pop("prompt_template", None)
         if prompt_template is None:
-            self.logger.info(f"No prompt template provided. Will use default prompt template.")
+            self.logger.info("No prompt template provided. Will use default prompt template.")
             prompt_template = get_prompt_template()
         elif isinstance(prompt_template, dict):
             # try to parse prompt template
@@ -87,7 +87,8 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
         elif isinstance(prompt_template, str):
             prompt_template = get_prompt_template(prompt_template)
         else:
-            raise ValueError(f"Invalid prompt template: {prompt_template}")
+            msg = f"Invalid prompt template: {prompt_template}"
+            raise ValueError(msg)
 
         self._model: lmql.LLM = model
         self._model_kwargs = model_kwargs
@@ -99,8 +100,9 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
     def timeout(func):
         """Timeout decorator for LMQLAnalyst methods."""
 
-        def _timeout_handler(signum, frame):
-            raise TimeoutError("LMQL query timed out.")
+        def _timeout_handler(signum, frame):  # noqa: ARG001
+            msg = "LMQL query timed out."
+            raise TimeoutError(msg)
 
         @wraps(func)
         def wrapper(self, *args, **kwargs):

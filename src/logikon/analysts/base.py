@@ -1,9 +1,9 @@
 import logging
 from abc import abstractmethod
-from typing import List, Optional, Union, Type
+from typing import ClassVar, Optional, Type, Union
 
-from logikon.schemas.results import AnalysisState
 from logikon.analysts.interface import Analyst, AnalystConfig
+from logikon.schemas.results import AnalysisState
 
 ARTIFACT = "ARTIFACT"
 SCORE = "SCORE"
@@ -15,7 +15,7 @@ class AbstractAnalyst(Analyst):
     """
 
     __product__: Optional[str] = None
-    __requirements__: list[Union[str, set]] = []
+    __requirements__: ClassVar[list[Union[str, set]]] = []
     __pdescription__: Optional[str] = None
     __configclass__: Optional[Type] = None
 
@@ -37,7 +37,8 @@ class AbstractAnalyst(Analyst):
     @classmethod
     def get_product(cls) -> str:
         if cls.__product__ is None:
-            raise ValueError(f"Product type not defined for {cls.__name__}.")
+            msg = f"Product type not defined for {cls.__name__}."
+            raise ValueError(msg)
         return cls.__product__
 
     @classmethod
@@ -47,16 +48,19 @@ class AbstractAnalyst(Analyst):
     @classmethod
     def get_description(cls) -> str:
         if cls.__pdescription__ is None:
-            raise ValueError(f"Product description not defined for {cls.__name__}.")
+            msg = f"Product description not defined for {cls.__name__}."
+            raise ValueError(msg)
         return cls.__pdescription__
 
     @classmethod
     def get_config_class(cls) -> Type:
         if cls.__configclass__ is None:
-            raise ValueError(f"Config class not defined for {cls.__name__}.")
+            msg = f"Config class not defined for {cls.__name__}."
+            raise ValueError(msg)
         # check if configclass is subclass of AnalystConfig
         if not issubclass(cls.__configclass__, AnalystConfig):
-            raise ValueError(f"Config class {cls.__name__} not derived from AnalystConfig.")
+            msg = f"Config class {cls.__configclass__.__name__} not derived from AnalystConfig."
+            raise ValueError(msg)
         return cls.__configclass__
 
     @property
