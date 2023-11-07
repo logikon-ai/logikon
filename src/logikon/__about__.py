@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2023-present Logikon AI
 #
 # SPDX-License-Identifier: MIT
-__version__ = "0.0.1-dev2"
+__version__ = "0.0.1-dev1"
 __logo__ = """
 ██╗      ██████╗  ██████╗ ██╗██╗  ██╗ ██████╗ ███╗   ██╗     █████╗ ██╗
 ██║     ██╔═══██╗██╔════╝ ██║██║ ██╔╝██╔═══██╗████╗  ██║    ██╔══██╗██║
