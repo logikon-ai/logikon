@@ -20,8 +20,8 @@ def nx_map1() -> nx.DiGraph:
             {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n2"},
         ],
         "links": [
-            {"valence": "pro", "source": "n1", "target": "n0", "weight": 0.5, am.IN_FOREST: True},
-            {"valence": "con", "source": "n2", "target": "n0", "weight": 0.5, am.IN_FOREST: True},
+            {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.5, am.IN_FOREST: True},
+            {"valence": am.ATTACK, "source": "n2", "target": "n0", "weight": 0.5, am.IN_FOREST: True},
         ],
     }
     nx_graph = nx.node_link_graph(data)
@@ -48,7 +48,7 @@ def nx_map2() -> nx.DiGraph:
             }
             for i in range(16)
         ],
-        "links": [{"valence": "pro", "source": f"n{i+1}", "target": f"n{i // 2}"} for i in range(15)],
+        "links": [{"valence": am.SUPPORT, "source": f"n{i+1}", "target": f"n{i // 2}"} for i in range(15)],
     }
     nx_graph = nx.node_link_graph(data)
     return nx_graph
@@ -84,7 +84,7 @@ def test_preprocessor01(nx_map1):
     assert nx_map_pp.edges.keys() == nx_map1.edges.keys()
 
     for _, linkdata in nx_map_pp.edges.items():
-        "color" in linkdata
+        assert "color" in linkdata
 
 
 def test_svg_exporter(nx_map1):

@@ -1,17 +1,16 @@
 import networkx as nx
 import pytest
 
+import logikon.schemas.argument_mapping as am
+from logikon.analysts.base import ArtifcatAnalystConfig
 from logikon.analysts.export.networkx_exporter import RelevanceNetworkNXExporter
 from logikon.schemas.argument_mapping import (
-    AnnotationSpan,
     ArgMapEdge,
     ArgMapNode,
-    InformalArgMap,
-    FuzzyArgMapEdge,
     FuzzyArgMap,
+    FuzzyArgMapEdge,
+    InformalArgMap,
 )
-from logikon.analysts.base import ArtifcatAnalystConfig
-import logikon.schemas.argument_mapping as am
 
 
 @pytest.fixture(name="argmap1")
@@ -22,8 +21,8 @@ def argmap1() -> InformalArgMap:
         ArgMapNode(id="n2", label="con3", text="con 3"),
     ]
     edgelist = [
-        ArgMapEdge(source="n1", target="n0", valence="pro"),
-        ArgMapEdge(source="n2", target="n0", valence="con"),
+        ArgMapEdge(source="n1", target="n0", valence=am.SUPPORT),
+        ArgMapEdge(source="n2", target="n0", valence=am.ATTACK),
     ]
     return InformalArgMap(nodelist=nodelist, edgelist=edgelist)
 

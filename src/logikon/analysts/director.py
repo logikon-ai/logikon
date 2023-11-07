@@ -42,8 +42,7 @@ class Director:
         for input_artifact in inputs:
             if input_artifact.id in state.inputs:
                 msg = (
-                    f"Duplicate input artifact id {input_artifact.id} found in analysis_state. "
-                    f"Ids must be unique."
+                    f"Duplicate input artifact id {input_artifact.id} found in analysis_state. " f"Ids must be unique."
                 )
                 raise ValueError(msg)
             state.inputs.append(input_artifact)

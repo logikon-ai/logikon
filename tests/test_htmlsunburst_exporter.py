@@ -1,11 +1,11 @@
+import os
+
 import networkx as nx
 import pytest
 
-import os
-
-from logikon.analysts.export.htmlsunburst_exporter import HTMLSunburstExporter
-from logikon.analysts.base import ArtifcatAnalystConfig
 import logikon.schemas.argument_mapping as am
+from logikon.analysts.base import ArtifcatAnalystConfig
+from logikon.analysts.export.htmlsunburst_exporter import HTMLSunburstExporter
 
 
 @pytest.fixture(name="nx_map1")
@@ -20,8 +20,8 @@ def nx_map1() -> nx.DiGraph:
             {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
         ],
         "links": [
-            {"valence": "pro", "source": "n1", "target": "n0"},
-            {"valence": "con", "source": "n2", "target": "n0"},
+            {"valence": am.SUPPORT, "source": "n1", "target": "n0"},
+            {"valence": am.ATTACK, "source": "n2", "target": "n0"},
         ],
     }
     nx_graph = nx.node_link_graph(data)

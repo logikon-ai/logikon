@@ -1,6 +1,7 @@
 import networkx as nx
 import pytest
 
+import logikon.schemas.argument_mapping as am
 from logikon.analysts.score.argmap_graph_scores import (
     ArgMapGraphAttackRatioScorer,
     ArgMapGraphAvgKatzCScorer,
@@ -22,8 +23,8 @@ def nx_map1() -> nx.DiGraph:
             {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
         ],
         "links": [
-            {"valence": "pro", "source": "n1", "target": "n0", "weight": 0.4},
-            {"valence": "con", "source": "n2", "target": "n0", "weight": 0.8},
+            {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.4},
+            {"valence": am.ATTACK, "source": "n2", "target": "n0", "weight": 0.8},
         ],
     }
     nx_graph = nx.node_link_graph(data)
@@ -42,9 +43,9 @@ def nx_map2() -> nx.DiGraph:
             {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
         ],
         "links": [
-            {"valence": "pro", "source": "n1", "target": "n0", "weight": 0.25},
-            {"valence": "con", "source": "n2", "target": "n0", "weight": 0.75},
-            {"valence": "con", "source": "n2", "target": "n1", "weight": 0.5},
+            {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.25},
+            {"valence": am.ATTACK, "source": "n2", "target": "n0", "weight": 0.75},
+            {"valence": am.ATTACK, "source": "n2", "target": "n1", "weight": 0.5},
         ],
     }
     nx_graph = nx.node_link_graph(data)

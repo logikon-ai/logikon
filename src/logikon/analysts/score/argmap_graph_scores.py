@@ -6,6 +6,7 @@ from typing import Optional, Union
 import networkx as nx
 import numpy as np
 
+import logikon.schemas.argument_mapping as am
 from logikon.analysts.base import AbstractScoreAnalyst
 from logikon.schemas.results import AnalysisState, Score
 
@@ -91,7 +92,7 @@ class ArgMapGraphAttackRatioScorer(AbstractGraphScorer):
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[Union[str, float], str, Optional[dict]]:
         edge_data = digraph.edges.data("valence")
         if edge_data:
-            attack_ratio = [val for _, _, val in edge_data].count("con") / len(edge_data)
+            attack_ratio = [val for _, _, val in edge_data].count(am.ATTACK) / len(edge_data)
         else:
             attack_ratio = 0
 
