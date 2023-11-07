@@ -1,11 +1,11 @@
+import os
+
 import networkx as nx
 import pytest
 
-import os
-
-from logikon.analysts.export.svgmap_exporter import SVGMapExporter
-from logikon.analysts.base import ArtifcatAnalystConfig
 import logikon.schemas.argument_mapping as am
+from logikon.analysts.base import ArtifcatAnalystConfig
+from logikon.analysts.export.svgmap_exporter import SVGMapExporter
 
 
 @pytest.fixture(name="nx_map1")
