@@ -7,7 +7,7 @@ import logging
 import pydantic
 
 
-class PromptTemplate(pydantic.BaseModel):
+class PromptTemplate(pydantic.BaseModel):  # pylint: disable=no-member
     """PromptTemplate
 
     Prompt template for LMQL queries.

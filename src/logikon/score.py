@@ -33,14 +33,39 @@ class ScoreResult(Dict):
         elif isinstance(product, Score):
             return product.value
         return None
+    
+    def scores(self) -> Score:
+        """Get all scores."""
+        for score_obj in self._state.scores:
+            yield score_obj
+
+    def artifacts(self) -> Artifact:
+        """Get all artifacts."""
+        for artifact in self._state.artifacts:
+            yield artifact
+
+    def get_score(self, score_id: str) -> Optional[Score]:
+        """Get score by id."""
+        score_obj = self.get(score_id)
+        if isinstance(score_obj, Score):
+            return score_obj
+        return None
+
+    def get_artifact(self, artifact_id: str) -> Optional[Artifact]:
+        """Get artifact by id."""
+        artifact = self.get(artifact_id)
+        if isinstance(artifact, Artifact):
+            return artifact
+        return None
 
 
+# TODO: Rename? score -> analyze?
 def score(
     prompt: Optional[str] = None,
     completion: Optional[str] = None,
     config: Optional[Union[ScoreConfig, str]] = None,
 ) -> Optional[ScoreResult]:
-    """Score the completion."""
+    """Analyze and score the completion."""
 
     if config is None:
         if prompt is None and completion is None:
