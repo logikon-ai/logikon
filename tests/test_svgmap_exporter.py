@@ -15,9 +15,9 @@ def nx_map1() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1\n", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": am.REASON, "id": "n1"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n2"},
+            {"text": "claim 1\n", "label": "claim1", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": am.REASON, "id": "n1"},
+            {"text": "con 3", "label": "con3", "annotations": [], "node_type": am.REASON, "id": "n2"},
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.5, am.IN_FOREST: True},
@@ -35,15 +35,15 @@ def nx_map2() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1\n", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
-            {"text": "claim 2\n", "label": "claim2", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n1"},
+            {"text": "claim 1\n", "label": "claim1", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "claim 2\n", "label": "claim2", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n1"},
         ]
         + [
             {
-                "text": 10 * (f"argument-{i} and "),
+                "text": 10 * f"argument-{i} and ",
                 "label": f"arg{i}",
                 "annotations": [],
-                "nodeType": am.REASON,
+                "node_type": am.REASON,
                 "id": f"n{2+i}",
             }
             for i in range(16)
@@ -61,9 +61,9 @@ def nx_map3() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": am.REASON, "id": "n1"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n2"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": am.REASON, "id": "n1"},
+            {"text": "con 3", "label": "con3", "annotations": [], "node_type": am.REASON, "id": "n2"},
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.25},
@@ -106,7 +106,7 @@ def test_svg_exporter_save(nx_map2):
     svgmap = svgmap_exporter._to_svg(nx_map2)
     assert isinstance(svgmap, str)
 
-    with open("test_graph1.svg", 'w') as f:
+    with open("test_graph1.svg", "w") as f:
         f.write(svgmap)
 
     assert os.path.isfile("test_graph1.svg")
@@ -118,7 +118,7 @@ def test_svg_exporter_weighted(nx_map3):
     svgmap = svgmap_exporter._to_svg(nx_map3)
     assert isinstance(svgmap, str)
 
-    with open("test_graph2.svg", 'w') as f:
+    with open("test_graph2.svg", "w") as f:
         f.write(svgmap)
 
     assert os.path.isfile("test_graph2.svg")

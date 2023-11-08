@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import copy
 import textwrap
-from typing import Dict, List, Optional, Tuple
+from typing import ClassVar
 
 import graphviz
-import seaborn as sns
-import networkx as nx
 import matplotlib.colors
+import networkx as nx
+import seaborn as sns
 from unidecode import unidecode
 
 import logikon
 import logikon.schemas.argument_mapping as am
 from logikon.analysts.base import AbstractArtifactAnalyst
-from logikon.schemas.results import Artifact, AnalysisState
+from logikon.schemas.results import AnalysisState, Artifact
 
 _ARROWWIDTH = "2"
 
@@ -30,20 +30,22 @@ class SVGMapExporter(AbstractArtifactAnalyst):
 
     __pdescription__ = "Exports a networkx graph as a graphviz argument map (svg)"
     __product__ = "svg_argmap"
-    __requirements__ = [
+    __requirements__: ClassVar[list[str | set]] = [
         {"fuzzy_argmap_nx"},
         {"networkx_graph"},
     ]  # alternative requirements sets, first set takes precedence when automatically building pipeline
 
-    # _NODE_TEMPLATE = """<
-    # <TABLE BORDER="0" COLOR="#444444" CELLPADDING="8" CELLSPACING="2"><TR><TD BORDER="0" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>[{label}]</B><br/>{text}</FONT></TD></TR></TABLE>
-    # >"""
-
     _NODE_TEMPLATE = """<
-    <TABLE BORDER="4" COLOR="{bgcolor}" CELLPADDING="2" CELLSPACING="2"  BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center"><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>{label}</B></FONT></TD></TR><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0">{text}</FONT></TD></TR></TABLE>
-    >"""
+    <TABLE BORDER="4" COLOR="{bgcolor}" CELLPADDING="2" CELLSPACING="2" BGCOLOR="{bgcolor}" STYLE="rounded" ALIGN="center">
+    <TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>{label}</B></FONT></TD></TR>
+    <TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0">{text}</FONT></TD></TR>
+    </TABLE>
+    >"""  # noqa: E501
     _CLAIM_NODE_TEMPLATE = """<
-    <TABLE BORDER="4" COLOR="{bgcolor}" CELLPADDING="2" CELLSPACING="2"  BGCOLOR="white" STYLE="rounded" ALIGN="center"><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>{label}</B></FONT></TD></TR><TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0">{text}</FONT></TD></TR></TABLE>
+    <TABLE BORDER="4" COLOR="{bgcolor}" CELLPADDING="2" CELLSPACING="2" BGCOLOR="white" STYLE="rounded" ALIGN="center">
+    <TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0"><B>{label}</B></FONT></TD></TR>
+    <TR><TD BORDER="0"><FONT FACE="Arial, Helvetica, sans-serif" POINT-SIZE="12.0">{text}</FONT></TD></TR>
+    </TABLE>
     >"""
 
     def __init__(self, config):
@@ -52,12 +54,15 @@ class SVGMapExporter(AbstractArtifactAnalyst):
         try:
             import subprocess
 
-            subprocess.run(["dot", "-V"])
-        except:
+            subprocess.run("command -v dot", shell=True, check=True)  # noqa: S607, S602
+        except Exception as err:
             self.logger.error("Graphviz command dot not found.")
-            raise ValueError(
-                "Graphviz dot command not found. To create SVG argument map, install graphviz on this system."
+            msg = (
+                "Graphviz dot command not found. To create SVG argument map, "
+                "install graphviz on this system. Or remove `svg_argmap` from "
+                "the analyst pipeline."
             )
+            raise ValueError(msg) from err
 
     def _preprocess_string(self, value: str) -> str:
         new_value = unidecode(value)
@@ -81,7 +86,7 @@ class SVGMapExporter(AbstractArtifactAnalyst):
             textlines = textwrap.wrap(nodedata["label"], width=25)
             label = "<BR/>".join(textlines)
 
-            if nodedata.get("nodeType") == am.CENTRAL_CLAIM:
+            if nodedata.get("node_type") == am.CENTRAL_CLAIM:
                 template = self._CLAIM_NODE_TEMPLATE
             else:
                 template = self._NODE_TEMPLATE
@@ -121,24 +126,24 @@ class SVGMapExporter(AbstractArtifactAnalyst):
         digraph = self._preprocess_graph(digraph)
 
         dot = graphviz.Digraph(
-            'logikon informal argument map',
-            comment=f'Created with `logikon` python module version {logikon.__version__}',
-            graph_attr=dict(
-                format="svg",
-                rankdir="BT",
-                ratio="compress",
-                orientation="portrait",
+            "logikon informal argument map",
+            comment=f"Created with `logikon` python module version {logikon.__version__}",
+            graph_attr={
+                "format": "svg",
+                "rankdir": "BT",
+                "ratio": "compress",
+                "orientation": "portrait",
                 # overlap="compress",
-            ),
+            },
         )
         # subgraph with central claims on same rank
-        with dot.subgraph(name='central_claims', graph_attr=dict(rank='sink')) as subgraph:
+        with dot.subgraph(name="central_claims", graph_attr={"rank": "sink"}) as subgraph:
             for node, nodedata in digraph.nodes.items():
-                if nodedata.get("nodeType") == am.CENTRAL_CLAIM:
+                if nodedata.get("node_type") == am.CENTRAL_CLAIM:
                     subgraph.node(str(node), **nodedata)
 
         for node, nodedata in digraph.nodes.items():
-            if nodedata.get("nodeType") != am.CENTRAL_CLAIM:
+            if nodedata.get("node_type") != am.CENTRAL_CLAIM:
                 dot.node(str(node), **nodedata)
 
         for edge, edgedata in digraph.edges.items():
@@ -152,7 +157,7 @@ class SVGMapExporter(AbstractArtifactAnalyst):
     def _analyze(self, analysis_state: AnalysisState):
         """Reconstruct reasoning as argmap."""
 
-        networkx_graph: Optional[nx.DiGraph] = next(
+        networkx_graph: nx.DiGraph | None = next(
             (artifact.data for artifact in analysis_state.artifacts if artifact.id == "fuzzy_argmap_nx"), None
         )
         if networkx_graph is None:

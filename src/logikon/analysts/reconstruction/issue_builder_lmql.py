@@ -27,16 +27,15 @@ flowchart TD
 """
 from __future__ import annotations
 
-from typing import Any, Optional
-
 import re
+from typing import Any
 
 import lmql
 
-import logikon.analysts.lmql_queries as lmql_queries
-from logikon.utils.prompt_templates_registry import PromptTemplate
+from logikon.analysts import lmql_queries  # noqa: F401
 from logikon.analysts.lmql_analyst import LMQLAnalyst
-from logikon.schemas.results import Artifact, AnalysisState
+from logikon.schemas.results import AnalysisState, Artifact
+from logikon.utils.prompt_templates_registry import PromptTemplate  # noqa: F401
 
 MAX_LEN_ISSUE = 80
 N_DRAFTS = 3
@@ -55,8 +54,9 @@ QUESTIONS_EVAL = [
 
 def strip_issue_tag(text: str) -> str:
     """Strip issue tag from text."""
-    text = text.strip("</ISSUE>")
     text = text.strip("\n ")
+    if text.endswith("</ISSUE>"):
+        text = text[: -len("</ISSUE>")].strip("\n ")
     if text[-1] not in [".", "!", "?"]:
         # split text at any of ".", "!", "?"
         splits = re.split(r"([.!?])", text)
@@ -65,7 +65,7 @@ def strip_issue_tag(text: str) -> str:
 
 
 @lmql.query
-def key_issue(prompt, completion, prmpt_data: dict):
+def key_issue(prompt, completion, prmpt_data: dict):  # noqa: ARG001
     '''lmql
     sample(n=3, temperature=.5, chunksize=4)
         prmpt = PromptTemplate(**prmpt_data)
@@ -93,7 +93,7 @@ def key_issue(prompt, completion, prmpt_data: dict):
 
 
 @lmql.query
-def rate_issue_drafts(alternatives, questions, prompt, completion, prmpt_data: dict):
+def rate_issue_drafts(alternatives, questions, prompt, completion, prmpt_data: dict):  # noqa: ARG001
     '''lmql
     argmax(chunksize=4)
         labels = [alternative.get('label') for alternative in alternatives]
@@ -106,18 +106,22 @@ def rate_issue_drafts(alternatives, questions, prompt, completion, prmpt_data: d
         "<TEXT>\n"
         "{prompt}{completion}\n"
         "</TEXT>\n\n"
-        "Consider the following alternatives, which attempt to summarize the central issue / basic decision discussed in the TEXT in a single sentence.\n\n"
+        "Consider the following alternatives, which attempt to summarize the central "
+        "issue / basic decision discussed in the TEXT in a single sentence.\n\n"
         "<ALTERNATIVES>\n"
         for alternative in alternatives:
             "({alternative.get('label')}) \"{alternative.get('text')}\"\n"
         "</ALTERNATIVES>\n\n"
-        "Compare and evaluate the different alternatives according to {len(alternatives)} relevant criteria which are put as questions. (At this point, just answer each question with {'/'.join(labels)}; you'll be asked to explain your answers later.)\n"
+        "Compare and evaluate the different alternatives according to {len(alternatives)} "
+        "relevant criteria which are put as questions. (At this point, just answer each "
+        "question with {'/'.join(labels)}; you'll be asked to explain your answers later.)\n"
         "Conclude with an aggregate assessment of the alternatives.{prmpt.user_end}"
         "{prmpt.ass_start}"
         for question in questions:
             "{question} \n"
             "Answer: ([ANSWER])\n\n" where ANSWER in set(labels)
-        "So, all in all and given the above assessments, the best summarization of the text's key issue is which alternative?\n"
+        "So, all in all and given the above assessments, the best summarization of the "
+        "text's key issue is which alternative?\n"
         "Answer: ([FINAL_ANSWER])" where FINAL_ANSWER in set(labels)
     '''
 
@@ -141,7 +145,8 @@ class IssueBuilderLMQL(LMQLAnalyst):
             **self._generation_kwargs,
         )
         if not all(isinstance(result, lmql.LMQLResult) for result in results):
-            raise ValueError(f"Results are not of type lmql.LMQLResult. Got {results}.")
+            msg = f"Results are not of type lmql.LMQLResult. Got {results}."
+            raise ValueError(msg)
         issue_drafts = [
             {
                 "text": result.variables.get("ISSUE", "").strip("\n "),
@@ -153,7 +158,7 @@ class IssueBuilderLMQL(LMQLAnalyst):
 
     def _rate_issue_drafts(
         self, alternatives: list[dict[str, Any]], questions: list[str], prompt: str, completion: str
-    ) -> Optional[str]:
+    ) -> str | None:
         """Internal (class-method) wrapper for lmql.query function.
 
         Returns:
@@ -169,7 +174,8 @@ class IssueBuilderLMQL(LMQLAnalyst):
             **self._generation_kwargs,
         )
         if not isinstance(result, lmql.LMQLResult):
-            raise ValueError(f"Results are not of type lmql.LMQLResult. Got {result}.")
+            msg = f"Results are not of type lmql.LMQLResult. Got {result}."
+            raise ValueError(msg)
         label = result.variables.get("FINAL_ANSWER")
         return label
 
@@ -178,9 +184,8 @@ class IssueBuilderLMQL(LMQLAnalyst):
 
         prompt, completion = analysis_state.get_prompt_completion()
         if prompt is None or completion is None:
-            raise ValueError(
-                f"Prompt or completion is None. {self.__class__} requires both prompt and completion to analyse."
-            )
+            msg = f"Prompt or completion is None. {self.__class__} requires both prompt and completion to analyse."
+            raise ValueError(msg)
 
         # draft summarizations
         issue_drafts = self._key_issue(

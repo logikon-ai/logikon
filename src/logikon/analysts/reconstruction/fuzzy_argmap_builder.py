@@ -10,18 +10,17 @@ The analyst proceeds as follows:
 """
 
 from __future__ import annotations
-from typing import Any
 
 import copy
 import uuid
+from typing import Any, ClassVar
 
 import networkx as nx
 import numpy as np
 
-from logikon.analysts.base import AbstractArtifactAnalyst
-from logikon.schemas.results import Artifact, AnalysisState
 import logikon.schemas.argument_mapping as am
-
+from logikon.analysts.base import AbstractArtifactAnalyst
+from logikon.schemas.results import AnalysisState, Artifact
 
 _FIX_WEIGHT_INTRA_ROOTS = 1.0  # weight of intra-root edges in relevance graphs
 _DEFAULT_WEIGHT = 0  # default weight for edges in relevance graphs
@@ -36,20 +35,22 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
     """
 
     __product__ = "fuzzy_argmap_nx"
-    __requirements__ = ["relevance_network_nx"]
+    __requirements__: ClassVar[list[str | set]] = ["relevance_network_nx"]
     __pdescription__ = "Informal argument map (nx graph) with weighted support and attack relations"
 
     def _sanity_checks(self, relevance_network: nx.DiGraph):
         """basic sanity checks"""
         if not isinstance(relevance_network, nx.DiGraph):
-            raise ValueError(f"Invalid relevance graph data. Expected nx.DiGraph, got {type(relevance_network)}.")
+            msg = f"Invalid relevance graph data. Expected nx.DiGraph, got {type(relevance_network)}."
+            raise ValueError(msg)
         for u, v, data in relevance_network.edges(data=True):
-            if 'weight' not in data:
+            if "weight" not in data:
                 self.logger.warning(f"Missing weight in edge {u} -> {v}. Using default value: {_DEFAULT_WEIGHT}.")
         for node, data in relevance_network.nodes.items():
-            if 'nodeType' not in data:
-                raise ValueError(f"Invalid relevance graph data. Missing nodeType in node {node}.")
-        root_nodes = [node for node, data in relevance_network.nodes.items() if data['nodeType'] == am.CENTRAL_CLAIM]
+            if "node_type" not in data:
+                msg = f"Invalid relevance graph data. Missing node_type in node {node}."
+                raise ValueError(msg)
+        root_nodes = [node for node, data in relevance_network.nodes.items() if data["node_type"] == am.CENTRAL_CLAIM]
         # check if there are any intra-root edges
         for node1 in root_nodes:
             for node2 in root_nodes:
@@ -73,20 +74,20 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
         Returns:
             nx.DiGraph: relevance network with added intra-root edges
         """
-        G = copy.deepcopy(relevance_network)
+        G = copy.deepcopy(relevance_network)  # noqa: N806
 
-        root_nodes = [node for node, data in G.nodes.items() if data['nodeType'] == am.CENTRAL_CLAIM]
+        root_nodes = [node for node, data in G.nodes.items() if data["node_type"] == am.CENTRAL_CLAIM]
 
         # add pseudo super-root
         pseudo_root = f"super-root-{uuid.uuid4()}"
-        G.add_node(pseudo_root, nodeType=am.CENTRAL_CLAIM, pseudo=True)
+        G.add_node(pseudo_root, node_type=am.CENTRAL_CLAIM, pseudo=True)
 
         # add pseudo edges
         for node in root_nodes:
             G.add_edge(node, pseudo_root, weight=_FIX_WEIGHT_INTRA_ROOTS, valence=am.SUPPORT, pseudo=True)
 
         # reverse edge direction (root_claims are technically sinks, not roots)
-        G = G.reverse(copy=True)
+        G = G.reverse(copy=True)  # noqa: N806
 
         return G
 
@@ -96,7 +97,7 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
         Args:
             fuzzy_argmap (nx.DiGraph): _description_
         """
-        G = fuzzy_argmap
+        G = fuzzy_argmap  # noqa: N806
 
         # add attributes to nodes
         for node, data in relevance_network.nodes.items():
@@ -104,18 +105,18 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
                 G.add_node(node, **data)
 
         # remove pseudo entities
-        pseudo_edges = [(u, v) for u, v, data in G.edges(data=True) if data.get('pseudo', False)]
+        pseudo_edges = [(u, v) for u, v, data in G.edges(data=True) if data.get("pseudo", False)]
         for u, v in pseudo_edges:
             G.remove_edge(u, v)
 
-        pseudo_nodes = [node for node, data in G.nodes.items() if data.get('pseudo', False)]
+        pseudo_nodes = [node for node, data in G.nodes.items() if data.get("pseudo", False)]
         if not pseudo_nodes:
             self.logger.warning("No pseudo nodes found while postprocessing fuzzy argmap.")
         for node in pseudo_nodes:
             G.remove_node(node)
 
         # reverse edges
-        G = G.reverse(copy=True)
+        G = G.reverse(copy=True)  # noqa: N806
 
         return G
 
@@ -139,14 +140,14 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
             self.logger.warning("Fuzzy argmap is not a branching. Cannot set attribute 'in_branching' for edges.")
 
         support_weights = [
-            data['weight']
+            data["weight"]
             for _, _, data in fuzzy_argmap.edges(data=True)
-            if data['valence'] == am.SUPPORT and not data.get('pseudo', False)
+            if data["valence"] == am.SUPPORT and not data.get("pseudo", False)
         ]
         attack_weights = [
-            data['weight']
+            data["weight"]
             for _, _, data in fuzzy_argmap.edges(data=True)
-            if data['valence'] == am.ATTACK and not data.get('pseudo', False)
+            if data["valence"] == am.ATTACK and not data.get("pseudo", False)
         ]
 
         thrsh_support_w = np.median(support_weights) if support_weights else None
@@ -160,17 +161,18 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
 
         edges_added = []
 
-        # TODO: if there are more than _MAX_OUT_DEGREE outgoing edges from a node, we should only add the _MAX_OUT_DEGREE edges with the highest weights
-        for u, v, data in relevance_network.edges(data=True):
+        # TODO: if there are more than _MAX_OUT_DEGREE outgoing edges from a node,
+        # we should only add the _MAX_OUT_DEGREE edges with the highest weights
+        for u, v, edgedata in relevance_network.edges(data=True):
             if fuzzy_argmap.has_edge(u, v) or fuzzy_argmap.has_edge(v, u):
                 continue
             # check out-degree
             if fuzzy_argmap.out_degree(u) >= _MAX_OUT_DEGREE:
                 continue
-            data = {**data, am.IN_FOREST: False} if is_forest else data
-            if data['valence'] == am.SUPPORT and thrsh_support_w is not None and data['weight'] > thrsh_support_w:
+            data = {**edgedata, am.IN_FOREST: False} if is_forest else edgedata
+            if data["valence"] == am.SUPPORT and thrsh_support_w is not None and data["weight"] > thrsh_support_w:
                 fuzzy_argmap.add_edge(u, v, **data)
-            elif data['valence'] == am.ATTACK and thrsh_attack_w is not None and data['weight'] > thrsh_attack_w:
+            elif data["valence"] == am.ATTACK and thrsh_attack_w is not None and data["weight"] > thrsh_attack_w:
                 fuzzy_argmap.add_edge(u, v, **data)
             edges_added.append((u, v))
 
@@ -207,7 +209,7 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
         relevance_network = self._preprocess_network(relevance_network)
 
         fuzzy_argmap = nx.maximum_branching(
-            relevance_network, attr='weight', default=_DEFAULT_WEIGHT, preserve_attrs=True, partition=None
+            relevance_network, attr="weight", default=_DEFAULT_WEIGHT, preserve_attrs=True, partition=None
         )
 
         edges_added = self._add_above_threshold_edges(fuzzy_argmap=fuzzy_argmap, relevance_network=relevance_network)

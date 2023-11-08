@@ -45,7 +45,7 @@ def test_nx_exporter2(reln1: FuzzyArgMap):
     nx_exporter = RelevanceNetworkNXExporter(ArtifcatAnalystConfig())
     nx_map = nx_exporter._to_nx(reln1.dict())
 
-    print(nx.node_link_data(nx_map))
+    print(nx.node_link_data(nx_map))  # noqa: T201
 
     assert isinstance(nx_map, nx.DiGraph)
 
@@ -57,6 +57,6 @@ def test_nx_exporter2(reln1: FuzzyArgMap):
         assert nodedata["label"] == original_node.label
         assert nodedata["text"] == original_node.text
 
-    for u, v, d in nx_map.edges(data=True):
+    for _, _, d in nx_map.edges(data=True):
         assert d["valence"] in [am.SUPPORT, am.ATTACK]
         assert d["weight"] in [0.4, 0.5]

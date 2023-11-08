@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
-
 from abc import abstractmethod
+from typing import ClassVar
 
 import networkx as nx
-from unidecode import unidecode
 
 from logikon.analysts.base import AbstractArtifactAnalyst
-from logikon.schemas.argument_mapping import InformalArgMap, FuzzyArgMap
-from logikon.schemas.results import Artifact, AnalysisState
+from logikon.schemas.argument_mapping import FuzzyArgMap
+from logikon.schemas.results import AnalysisState, Artifact
 
 
 class AbstractNetworkXExporter(AbstractArtifactAnalyst):
@@ -29,7 +27,8 @@ class AbstractNetworkXExporter(AbstractArtifactAnalyst):
         """builds nx graph from nodes-links argument map"""
 
         if "nodelist" not in argmap_data or "edgelist" not in argmap_data:
-            raise ValueError(f"Invalid argument map. Missing nodelist or edgelist: {argmap_data}")
+            msg = f"Invalid argument map. Missing nodelist or edgelist: {argmap_data}"
+            raise ValueError(msg)
         nodes = argmap_data["nodelist"]  # type: ignore
         links = argmap_data["edgelist"]  # type: ignore
 
@@ -52,15 +51,15 @@ class AbstractNetworkXExporter(AbstractArtifactAnalyst):
             argmap_data = next(
                 artifact.data for artifact in analysis_state.artifacts if artifact.id == self.get_requirements()[0]
             )
-        except StopIteration:
+        except StopIteration as err:
             msg = "Missing required artifact: informal_argmap"
-            raise ValueError(msg)
+            raise ValueError(msg) from err
 
         try:
             self.__input_class__(**argmap_data)
-        except:
+        except Exception as err:
             msg = f"Invalid argument map. Cannot parse data {argmap_data} as {self.__input_class__}"
-            raise ValueError(msg)
+            raise ValueError(msg) from err
 
         networkx_graph = self._to_nx(argmap_data)
 
@@ -102,7 +101,7 @@ class RelevanceNetworkNXExporter(AbstractNetworkXExporter):
 
     __pdescription__ = "Relevance network rendered as a networkx graph"
     __product__ = "relevance_network_nx"
-    __requirements__ = ["relevance_network"]
+    __requirements__: ClassVar[list[str | set]] = ["relevance_network"]
 
     @property
     def __input_class__(self) -> type:

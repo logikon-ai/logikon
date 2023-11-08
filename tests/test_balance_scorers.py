@@ -1,13 +1,13 @@
 import networkx as nx
 import pytest
 
-from logikon.analysts.score.balance_scores import (
-    MeanRootSupportScorer,
-    MeanAbsRootSupportScorer,
-    GlobalBalanceScorer,
-)
-from logikon.analysts.base import ScoreAnalystConfig
 import logikon.schemas.argument_mapping as am
+from logikon.analysts.base import ScoreAnalystConfig
+from logikon.analysts.score.balance_scores import (
+    GlobalBalanceScorer,
+    MeanAbsRootSupportScorer,
+    MeanRootSupportScorer,
+)
 
 
 @pytest.fixture(name="nx_map1")
@@ -17,9 +17,9 @@ def nx_map1() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": am.REASON, "id": "n1"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n2"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": am.REASON, "id": "n1"},
+            {"text": "con 3", "label": "con3", "annotations": [], "node_type": am.REASON, "id": "n2"},
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.5},
@@ -37,10 +37,10 @@ def nx_map2() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
-            {"text": "claim 2", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n1"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": am.REASON, "id": "n2"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n3"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "claim 2", "label": "claim1", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n1"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": am.REASON, "id": "n2"},
+            {"text": "con 3", "label": "con3", "annotations": [], "node_type": am.REASON, "id": "n3"},
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n2", "target": "n0", "weight": 0.5},
@@ -59,11 +59,11 @@ def nx_map3() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 0", "label": "claim0", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n00"},
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n0"},
-            {"text": "claim 2", "label": "claim1", "annotations": [], "nodeType": am.CENTRAL_CLAIM, "id": "n1"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": am.REASON, "id": "n2"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": am.REASON, "id": "n3"},
+            {"text": "claim 0", "label": "claim0", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n00"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n0"},
+            {"text": "claim 2", "label": "claim1", "annotations": [], "node_type": am.CENTRAL_CLAIM, "id": "n1"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": am.REASON, "id": "n2"},
+            {"text": "con 3", "label": "con3", "annotations": [], "node_type": am.REASON, "id": "n3"},
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n2", "target": "n0", "weight": 0.5},

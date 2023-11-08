@@ -1,12 +1,9 @@
-import networkx as nx
 import pytest
-
-import os
 
 import logikon.schemas.argument_mapping as am
 from logikon.analysts.reconstruction.relevance_network_builder_lmql import (
-    RelevanceNetworkBuilderLMQL,
     RelevanceNetworkBuilderConfig,
+    RelevanceNetworkBuilderLMQL,
 )
 
 
@@ -14,12 +11,12 @@ from logikon.analysts.reconstruction.relevance_network_builder_lmql import (
 def map1() -> am.FuzzyArgMap:
     map1 = am.FuzzyArgMap(
         nodelist=[
-            am.ArgMapNode(text="claim 0", label="claim0", annotations=[], nodeType=am.CENTRAL_CLAIM, id="n0"),
-            am.ArgMapNode(text="claim 1", label="claim1", annotations=[], nodeType=am.CENTRAL_CLAIM, id="n1"),
-            am.ArgMapNode(text="pro 0", label="pro2", annotations=[], nodeType=am.REASON, id="n2"),
-            am.ArgMapNode(text="pro 0", label="con3", annotations=[], nodeType=am.REASON, id="n3"),
-            am.ArgMapNode(text="con 1", label="con4", annotations=[], nodeType=am.REASON, id="n4"),
-            am.ArgMapNode(text="pro 1", label="pro4", annotations=[], nodeType=am.REASON, id="n5"),
+            am.ArgMapNode(text="claim 0", label="claim0", annotations=[], node_type=am.CENTRAL_CLAIM, id="n0"),
+            am.ArgMapNode(text="claim 1", label="claim1", annotations=[], node_type=am.CENTRAL_CLAIM, id="n1"),
+            am.ArgMapNode(text="pro 0", label="pro2", annotations=[], node_type=am.REASON, id="n2"),
+            am.ArgMapNode(text="pro 0", label="con3", annotations=[], node_type=am.REASON, id="n3"),
+            am.ArgMapNode(text="con 1", label="con4", annotations=[], node_type=am.REASON, id="n4"),
+            am.ArgMapNode(text="pro 1", label="pro4", annotations=[], node_type=am.REASON, id="n5"),
         ],
         edgelist=[
             am.FuzzyArgMapEdge(valence=am.SUPPORT, source="n3", target="n0", weight=0.5),

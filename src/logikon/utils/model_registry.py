@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-from typing import MutableMapping, Any
-
+from typing import Any, MutableMapping
 
 _model_registry: MutableMapping[str, Any] = {}
 
 
 def register_model(model_id: str, model: Any):
     if model_id in _model_registry:
-        raise ValueError(
-            f"Duplicate model id. Model of type {type(_model_registry[model_id])} already registered under id {model_id}."
+        msg = (
+            f"Duplicate model id. Model of type {type(_model_registry[model_id])} "
+            f"already registered under id {model_id}."
         )
+        raise ValueError(msg)
     _model_registry[model_id] = model
 
 

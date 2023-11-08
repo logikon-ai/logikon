@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List
-
 from pydantic import BaseModel
 
 CENTRAL_CLAIM = "central_claim"
@@ -19,11 +17,11 @@ class AnnotationSpan(BaseModel):
 
 
 class ArgMapNode(BaseModel):
-    id: str
+    id: str  # noqa: A003
     text: str
     label: str
     annotations: list[AnnotationSpan] = []
-    nodeType: str = REASON
+    node_type: str = REASON
 
 
 class ArgMapEdge(BaseModel):
@@ -50,9 +48,10 @@ class FuzzyArgMap(BaseModel):
         for node in self.nodelist:
             if node.id == node_id:
                 return node
-        raise ValueError(f"Node with id {node_id} not found.")
+        msg = f"Node with id {node_id} not found."
+        raise ValueError(msg)
 
     def get_node_type(self, node_id: str) -> str:
         """Get node type by node id."""
         node = self.get_node(node_id)
-        return node.nodeType
+        return node.node_type

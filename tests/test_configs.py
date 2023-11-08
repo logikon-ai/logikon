@@ -1,8 +1,8 @@
 # test score function
 
-from logikon.schemas.configs import ScoreConfig
-from logikon.analysts.registry import get_analyst_registry
 from logikon.analysts.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
+from logikon.analysts.registry import get_analyst_registry
+from logikon.schemas.configs import ScoreConfig
 
 
 def test_configs():
@@ -10,20 +10,20 @@ def test_configs():
     assert "proscons" in config.artifacts
 
     config = ScoreConfig(
-        global_kwargs=dict(
-            expert_model="text-ada-002",
-            llm_framework="OpenAI",
-        )
+        global_kwargs={
+            "expert_model": "text-ada-002",
+            "llm_framework": "OpenAI",
+        }
     )
     assert config.global_kwargs["expert_model"] == "text-ada-002"
 
 
 def test_config_overwrite_global():
     config = ScoreConfig(
-        global_kwargs=dict(
-            expert_model="text-ada-002",
-            llm_framework="OpenAI",
-        ),
+        global_kwargs={
+            "expert_model": "text-ada-002",
+            "llm_framework": "OpenAI",
+        },
         analyst_configs={
             "ProsConsBuilderLMQL": {"llm_framework": "transformers"},
         },

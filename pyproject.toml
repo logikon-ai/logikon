@@ -182,6 +182,9 @@ ban-relative-imports = "all"
 [tool.ruff.per-file-ignores]
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
+# LMQL queries may exceed the line length limit
+"src/logikon/analysts/reconstruction/pros_cons_builder_lmql.py" = ["E501"]
+"src/logikon/analysts/reconstruction/relevance_network_builder_lmql.py" = ["E501"]
 
 [tool.coverage.run]
 source_pkgs = ["logikon", "tests"]

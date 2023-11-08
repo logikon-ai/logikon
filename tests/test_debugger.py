@@ -1,15 +1,13 @@
 # test score function
-from typing import List, Type
-
-import pytest
+from typing import ClassVar, Type
 
 from logikon.analysts.base import (
     AbstractArtifactAnalyst,
     AbstractScoreAnalyst,
-    ScoreAnalystConfig,
     ArtifcatAnalystConfig,
+    ScoreAnalystConfig,
 )
-from logikon.schemas.results import Artifact, AnalysisState, Score, INPUT_KWS
+from logikon.schemas.results import INPUT_KWS, AnalysisState, Artifact, Score
 
 
 class DummyAnalystConfig(ArtifcatAnalystConfig):
@@ -44,7 +42,7 @@ class DummyAnalyst2(AbstractScoreAnalyst):
 
     __pdescription__ = "dummy_analyst2"
     __product__ = "dummy_metric2"
-    __requirements__ = ["dummy_artifact1"]
+    __requirements__: ClassVar[list[str | set]] = ["dummy_artifact1"]
     __configclass__: Type[ScoreAnalystConfig] = DummyAnalystConfig2
 
     def _analyze(self, analysis_state: AnalysisState):

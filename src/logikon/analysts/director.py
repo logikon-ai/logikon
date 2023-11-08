@@ -32,18 +32,13 @@ class Director:
         # check whether input ids are unique
         for input_artifact in inputs:
             if [a.id for a in inputs].count(input_artifact.id) > 1:
-                msg = (
-                    f"Found several input artifacts with id {input_artifact.id}. "
-                    f"Input ids are required to be unique."
-                )
+                msg = f"Found several input artifacts with id {input_artifact.id}. Input ids are required to be unique."
                 raise ValueError(msg)
 
         # add inputs to analysis_state
         for input_artifact in inputs:
             if input_artifact.id in state.inputs:
-                msg = (
-                    f"Duplicate input artifact id {input_artifact.id} found in analysis_state. " f"Ids must be unique."
-                )
+                msg = f"Duplicate input artifact id {input_artifact.id} found in analysis_state. Ids must be unique."
                 raise ValueError(msg)
             state.inputs.append(input_artifact)
 
@@ -84,7 +79,7 @@ class Director:
             elif issubclass(key, Analyst):
                 if key.get_product() in input_ids:
                     msg = (
-                        f"Inconsistent configuration. "
+                        "Inconsistent configuration. "
                         f"{key.get_product()} provided as input but also as metric / artifact."
                     )
                     raise ValueError(msg)
@@ -187,7 +182,7 @@ class Director:
             if not added_any:
                 analysts_left = [analyst.get_product() for analyst in analysts]
                 msg = (
-                    f"Could not create analyst chain. Failed to satisfy any of "
+                    "Could not create analyst chain. Failed to satisfy any of "
                     f"the following analysts' requirements: {analysts_left}"
                 )
                 raise ValueError(msg)

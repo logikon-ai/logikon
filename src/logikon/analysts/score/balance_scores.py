@@ -99,7 +99,7 @@ class AbstractBalanceScorer(AbstractGraphScorer):
 
     def _get_central_nodes(self, digraph_r: nx.DiGraph) -> list[str]:
         """Returns central nodes of graph"""
-        central_nodes = [n for n, data in digraph_r.nodes(data=True) if data.get("nodeType") == am.CENTRAL_CLAIM]
+        central_nodes = [n for n, data in digraph_r.nodes(data=True) if data.get("node_type") == am.CENTRAL_CLAIM]
         if not central_nodes:
             self.logger.warning("No central claims found, will use root nodes instead")
             central_nodes = [

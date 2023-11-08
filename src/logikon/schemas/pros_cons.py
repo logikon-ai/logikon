@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
-
 from pydantic import BaseModel
 
 
@@ -13,10 +11,10 @@ class Claim(BaseModel):
 
 
 class RootClaim(Claim):
-    pros: List[Claim] = []
-    cons: List[Claim] = []
+    pros: list[Claim] = []  # noqa: RUF012
+    cons: list[Claim] = []  # noqa: RUF012
 
 
 class ProsConsList(BaseModel):
-    roots: List[RootClaim] = []
-    options: Optional[List[str]] = []
+    roots: list[RootClaim] = []
+    options: list[str] | None = []

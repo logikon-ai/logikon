@@ -1,22 +1,18 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
-
 import copy
 import textwrap
-import uuid
+from typing import ClassVar
 
+import matplotlib.colors
+import networkx as nx
 import plotly.express as px
 import plotly.graph_objects as go
-import networkx as nx
-import matplotlib.colors
 import seaborn as sns
-from unidecode import unidecode
 
-import logikon
 import logikon.schemas.argument_mapping as am
 from logikon.analysts.base import AbstractArtifactAnalyst
-from logikon.schemas.results import Artifact, AnalysisState
+from logikon.schemas.results import AnalysisState, Artifact
 
 MAX_LABEL_LEN = 12
 WITH_LEGEND = False
@@ -34,7 +30,7 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
 
     __pdescription__ = "Exports a networkx graph as a HTML sunburst"
     __product__ = "html_sunburst"
-    __requirements__ = [
+    __requirements__: ClassVar[list[str | set]] = [
         {"fuzzy_argmap_nx", "issue"},
         {"networkx_graph", "issue"},
     ]  # alternative requirements sets, first set takes precedence when automatically building pipeline
@@ -61,12 +57,12 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
 
         return mbr
 
-    def _to_tree_data(self, digraph: nx.DiGraph, issue: str) -> tuple[list[dict], dict, str]:
+    def _to_tree_data(self, digraph: nx.DiGraph, issue: str) -> tuple[list[dict], dict, str]:  # noqa: ARG002
         """converts nx graph to tree data for sunburst"""
 
         tree_data = []
         color_map = {}
-        legend_lines: List[str] = []
+        legend_lines: list[str] = []
 
         # issue_id = str(uuid.uuid4())
         # tree_data.append(dict(
@@ -111,14 +107,14 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
                 value = 0
 
             tree_data.append(
-                dict(
-                    id=node,
-                    number=number,
-                    label=label,
-                    text=text,
-                    parent=parent,
-                    value=value,
-                )
+                {
+                    "id": node,
+                    "number": number,
+                    "label": label,
+                    "text": text,
+                    "parent": parent,
+                    "value": value,
+                }
             )
             color_map[node] = color
 
@@ -134,13 +130,13 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
 
         fig = px.sunburst(
             tree_data,
-            ids='id',
-            names='number',
-            hover_name='label',
-            hover_data={'text': True, 'value': False, 'parent': False, 'id': False, 'label': False, 'number': False},
-            parents='parent',
-            values='value',
-            color='id',
+            ids="id",
+            names="number",
+            hover_name="label",
+            hover_data={"text": True, "value": False, "parent": False, "id": False, "label": False, "number": False},
+            parents="parent",
+            values="value",
+            color="id",
             color_discrete_map=color_map,
             title=issue,
             width=800,
@@ -154,16 +150,16 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
                 annotations=[
                     go.layout.Annotation(
                         text=legend,
-                        align='left',
-                        valign='middle',
+                        align="left",
+                        valign="middle",
                         width=100,
                         height=640,
-                        xref='paper',
-                        yref='paper',
+                        xref="paper",
+                        yref="paper",
                         x=1.1,
                         y=0.5,
-                        bgcolor='white',
-                        bordercolor='black',
+                        bgcolor="white",
+                        bordercolor="black",
                         borderwidth=0,
                         showarrow=False,
                     )
@@ -179,7 +175,7 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
 
         issue = next(a.data for a in analysis_state.artifacts if a.id == "issue")
 
-        networkx_graph: Optional[nx.DiGraph] = next(
+        networkx_graph: nx.DiGraph | None = next(
             (artifact.data for artifact in analysis_state.artifacts if artifact.id == "fuzzy_argmap_nx"), None
         )
         if networkx_graph is None:

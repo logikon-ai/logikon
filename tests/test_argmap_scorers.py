@@ -2,13 +2,13 @@ import networkx as nx
 import pytest
 
 import logikon.schemas.argument_mapping as am
+from logikon.analysts.base import ScoreAnalystConfig
 from logikon.analysts.score.argmap_graph_scores import (
     ArgMapGraphAttackRatioScorer,
     ArgMapGraphAvgKatzCScorer,
     ArgMapGraphSizeScorer,
     MeanReasonStrengthScorer,
 )
-from logikon.analysts.base import ScoreAnalystConfig
 
 
 @pytest.fixture(name="nx_map1")
@@ -18,9 +18,9 @@ def nx_map1() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": "proposition", "id": "n0"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": "proposition", "id": "n1"},
+            {"text": "con 3", "label": "con3", "annotations": [], "node_type": "proposition", "id": "n2"},
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.4},
@@ -38,9 +38,9 @@ def nx_map2() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": "proposition", "id": "n0"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": "proposition", "id": "n1"},
+            {"text": "con 3", "label": "con3", "annotations": [], "node_type": "proposition", "id": "n2"},
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n1", "target": "n0", "weight": 0.25},

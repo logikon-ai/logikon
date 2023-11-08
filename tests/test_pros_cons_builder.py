@@ -1,12 +1,9 @@
 # test score function
-from typing import List, Optional
-
-import pytest
 
 from logikon.analysts.reconstruction.pros_cons_builder_lmql import (
     EXAMPLES_ISSUE_PROSCONS,
-    format_proscons,
     format_examples,
+    format_proscons,
 )
 
 
@@ -16,6 +13,6 @@ def test_examples():
     assert len(formatted) == 3
 
     formatted_examples = format_examples()
-    print(formatted_examples)
+    print(formatted_examples)  # noqa: T201
     assert formatted_examples.startswith("<example>")
     assert formatted_examples.endswith("</example>")

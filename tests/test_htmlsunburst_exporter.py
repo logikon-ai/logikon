@@ -15,9 +15,9 @@ def nx_map1() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
-            {"text": "con 3", "label": "con3", "annotations": [], "nodeType": "proposition", "id": "n2"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": "proposition", "id": "n0"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": "proposition", "id": "n1"},
+            {"text": "con 3", "label": "con3", "annotations": [], "node_type": "proposition", "id": "n2"},
         ],
         "links": [
             {"valence": am.SUPPORT, "source": "n1", "target": "n0"},
@@ -36,10 +36,10 @@ def nx_map2() -> nx.DiGraph:
         "graph": {},
         "nodes": [
             {
-                "text": 10 * (f"argument-{i} and "),
+                "text": 10 * f"argument-{i} and ",
                 "label": f"arg #{i} reason",
                 "annotations": [],
-                "nodeType": "proposition",
+                "node_type": "proposition",
                 "id": f"n{i}",
             }
             for i in range(20)
@@ -57,14 +57,14 @@ def nx_map3() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
-            {"text": "claim 2", "label": "claim2", "annotations": [], "nodeType": "proposition", "id": "n00"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": "proposition", "id": "n0"},
+            {"text": "claim 2", "label": "claim2", "annotations": [], "node_type": "proposition", "id": "n00"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": "proposition", "id": "n1"},
             {
                 "text": "con 3",
                 "label": "con reason 3 explained",
                 "annotations": [],
-                "nodeType": "proposition",
+                "node_type": "proposition",
                 "id": "n2",
             },
         ],
@@ -84,14 +84,14 @@ def nx_map4() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
-            {"text": "claim 2", "label": "claim2", "annotations": [], "nodeType": "proposition", "id": "n00"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": "proposition", "id": "n0"},
+            {"text": "claim 2", "label": "claim2", "annotations": [], "node_type": "proposition", "id": "n00"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": "proposition", "id": "n1"},
             {
                 "text": "con 3",
                 "label": "con reason 3 explained",
                 "annotations": [],
-                "nodeType": "proposition",
+                "node_type": "proposition",
                 "id": "n2",
             },
         ],
@@ -112,14 +112,14 @@ def nx_map5() -> nx.DiGraph:
         "multigraph": False,
         "graph": {},
         "nodes": [
-            {"text": "claim 1", "label": "claim1", "annotations": [], "nodeType": "proposition", "id": "n0"},
-            {"text": "claim 2", "label": "claim2", "annotations": [], "nodeType": "proposition", "id": "n00"},
-            {"text": "pro 2", "label": "pro2", "annotations": [], "nodeType": "proposition", "id": "n1"},
+            {"text": "claim 1", "label": "claim1", "annotations": [], "node_type": "proposition", "id": "n0"},
+            {"text": "claim 2", "label": "claim2", "annotations": [], "node_type": "proposition", "id": "n00"},
+            {"text": "pro 2", "label": "pro2", "annotations": [], "node_type": "proposition", "id": "n1"},
             {
                 "text": "con 3",
                 "label": "con reason 3 explained",
                 "annotations": [],
-                "nodeType": "proposition",
+                "node_type": "proposition",
                 "id": "n2",
             },
         ],
@@ -137,14 +137,14 @@ def test_html_exporter_save(nx_map2):
     config = ArtifcatAnalystConfig()
     htmlsunburst_exporter = HTMLSunburstExporter(config)
     tree_data, color_map, legend = htmlsunburst_exporter._to_tree_data(nx_map2, "Issue 1")
-    print(tree_data)
+    print(tree_data)  # noqa: T201
     htmlsunburst = htmlsunburst_exporter._to_html(tree_data, color_map, "Issue 2", legend)
 
     assert isinstance(htmlsunburst, str)
 
-    assert htmlsunburst.startswith('<html')
+    assert htmlsunburst.startswith("<html")
 
-    with open("test_sunburst1.html", 'w') as f:
+    with open("test_sunburst1.html", "w") as f:
         f.write(htmlsunburst)
 
     assert os.path.isfile("test_sunburst1.html")
@@ -158,7 +158,7 @@ def test_html_exporter_weighted1(nx_map3):
 
     assert isinstance(htmlsunburst, str)
 
-    with open("test_sunburst2.html", 'w') as f:
+    with open("test_sunburst2.html", "w") as f:
         f.write(htmlsunburst)
 
     assert os.path.isfile("test_sunburst2.html")
@@ -173,7 +173,7 @@ def test_html_exporter_weighted2(nx_map4):
 
     assert isinstance(htmlsunburst, str)
 
-    with open("test_sunburst3.html", 'w') as f:
+    with open("test_sunburst3.html", "w") as f:
         f.write(htmlsunburst)
 
     assert os.path.isfile("test_sunburst3.html")
@@ -188,7 +188,7 @@ def test_html_exporter_weighted3(nx_map5):
 
     assert isinstance(htmlsunburst, str)
 
-    with open("test_sunburst4.html", 'w') as f:
+    with open("test_sunburst4.html", "w") as f:
         f.write(htmlsunburst)
 
     assert os.path.isfile("test_sunburst4.html")

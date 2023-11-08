@@ -18,7 +18,7 @@ flowchart TD
     end
     p --> ur
     i --> ur
-    ur --> pu 
+    ur --> pu
     pu--> rore --> links
     pu--> rwre --> links
     links --> mcqu1 --> prune --> wlinks --> ad
@@ -28,26 +28,24 @@ flowchart TD
 """
 
 from __future__ import annotations
-from typing import List, Tuple, Optional, Dict, Type
 
 import copy
-import functools as ft
 import pprint
 import random
 import uuid
-import tqdm
+from typing import ClassVar
 
 import lmql
-
-from logikon.analysts.lmql_analyst import LMQLAnalyst, LMQLAnalystConfig
-from logikon.utils.prompt_templates_registry import PromptTemplate
-from logikon.analysts.base import ArtifcatAnalystConfig
-import logikon.analysts.lmql_queries as lmql_queries
-from logikon.schemas.results import Artifact, AnalysisState
-from logikon.schemas.pros_cons import ProsConsList, RootClaim, Claim
-from logikon.schemas.argument_mapping import FuzzyArgMap, FuzzyArgMapEdge, ArgMapNode
+import tqdm
 
 import logikon.schemas.argument_mapping as am
+from logikon.analysts import lmql_queries
+from logikon.analysts.base import ArtifcatAnalystConfig
+from logikon.analysts.lmql_analyst import LMQLAnalyst, LMQLAnalystConfig
+from logikon.schemas.argument_mapping import ArgMapNode, FuzzyArgMap, FuzzyArgMapEdge
+from logikon.schemas.pros_cons import Claim, ProsConsList
+from logikon.schemas.results import AnalysisState, Artifact
+from logikon.utils.prompt_templates_registry import PromptTemplate  # noqa: F401
 
 MAX_N_RELATIONS = 20
 MAX_LEN_TITLE = 32
@@ -62,7 +60,10 @@ EXAMPLES_UNPACKING = [
     {
         "issue": "Eating animals?",
         "title": "Climate impact",
-        "gist": "Animal farming contributes to climate change because it is extremely energy intensive and causes the degradation of natural carbon sinks through land use change.",
+        "gist": (
+            "Animal farming contributes to climate change because it is extremely energy intensive and causes the"
+            " degradation of natural carbon sinks through land use change."
+        ),
         "claims": [
             {
                 "title": "Climate impact",
@@ -92,7 +93,10 @@ EXAMPLES_UNPACKING = [
     {
         "issue": "Video games: good or bad?",
         "title": "Toxic communities",
-        "gist": "Many video gaming communities are widely regarded as toxic since online games create opportunities for players to stalk and abuse each other.",
+        "gist": (
+            "Many video gaming communities are widely regarded as toxic since online games create opportunities for"
+            " players to stalk and abuse each other."
+        ),
         "claims": [
             {
                 "title": "Toxic communities",
@@ -133,7 +137,7 @@ def format_example(example_data: dict) -> str:
     formatted += f"  gist: \"{example_data['gist']}\"\n"
     # claims block
     formatted += "reasons:\n"
-    for claim in example_data['claims']:
+    for claim in example_data["claims"]:
         formatted += f"  - title: \"{claim['title']}\"\n"
         formatted += f"    reason: \"{claim['claim']}\"\n"
     formatted += "```\n"
@@ -151,7 +155,7 @@ def format_examples() -> str:
 
 
 @lmql.query
-def unpack_reason(reason_data: dict, issue: str, prmpt_data: dict) -> List[Claim]:  # type: ignore
+def unpack_reason(reason_data: dict, issue: str, prmpt_data: dict) -> list[Claim]:  # type: ignore  # noqa: ARG001
     '''lmql
     sample(temperature=.3, chunksize=10)
         reason = Claim(**reason_data)
@@ -252,22 +256,23 @@ class RelevanceNetworkBuilderConfig(LMQLAnalystConfig):
 class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
     """RelevanceNetworkBuilderLMQL
 
-    This LMQLAnalyst is responsible for creating a relevance network, i.e. a (quasi-) complete fuzzy argmap, from a pros and cons list and a given issue.
+    This LMQLAnalyst is responsible for creating a relevance network,
+    i.e. a (quasi-) complete fuzzy argmap, from a pros and cons list and a given issue.
 
     """
 
     __product__ = "relevance_network"
-    __requirements__ = ["issue", "proscons"]
+    __requirements__: ClassVar[list[str | set]] = ["issue", "proscons"]
     __pdescription__ = (
         "Relevance network describing comprehensively the strengths of pairwise support and attack relations"
     )
-    __configclass__: Type[ArtifcatAnalystConfig] = RelevanceNetworkBuilderConfig
+    __configclass__: type[ArtifcatAnalystConfig] = RelevanceNetworkBuilderConfig
 
     def __init__(self, config: RelevanceNetworkBuilderConfig):
         super().__init__(config)
         self._keep_pcl_valences = config.keep_pcl_valences
 
-    def _unpack_reason(self, reason_data: dict, issue: str) -> List[Claim]:
+    def _unpack_reason(self, reason_data: dict, issue: str) -> list[Claim]:
         """Internal (class method) wrapper for lmql query function."""
         return unpack_reason(
             reason_data=reason_data,
@@ -279,7 +284,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
     def _unpack_reasons(
         self, pros_and_cons: ProsConsList, issue: str
-    ) -> Tuple[ProsConsList, List[Tuple[dict, List[dict]]]]:
+    ) -> tuple[ProsConsList, list[tuple[dict, list[dict]]]]:
         """Unpacks each individual reason in a pros and cons list
 
         Args:
@@ -321,8 +326,8 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
     # the following function calculates the strength of the argumentative relation between tow claims
     def _relation_strength(
-        self, source_node: ArgMapNode, target_node: ArgMapNode, valence: Optional[str] = None, issue: str = ""
-    ) -> Tuple[float, str]:
+        self, source_node: ArgMapNode, target_node: ArgMapNode, valence: str | None = None, issue: str = ""
+    ) -> tuple[float, str]:
         """Calculate the valence and strength of an argumentative relation
 
         Calculate the valence and strength of the argumentative relation between two
@@ -339,8 +344,8 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
         # step 1: valence probs
         lmql_result = lmql_queries.valence(
-            dict(label=source_node.label, text=source_node.text),
-            dict(label=target_node.label, text=target_node.text),
+            {"label": source_node.label, "text": source_node.text},
+            {"label": target_node.label, "text": target_node.text},
             issue=issue,
             prmpt_data=self._prompt_template.to_dict(),
             model=self._model,
@@ -358,8 +363,8 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         # step 2: strength probs
         query_fn = lmql_queries.supports_q if valence == am.SUPPORT else lmql_queries.attacks_q
         lmql_result = query_fn(
-            dict(label=source_node.label, text=source_node.text),
-            dict(label=target_node.label, text=target_node.text),
+            {"label": source_node.label, "text": source_node.text},
+            {"label": target_node.label, "text": target_node.text},
             prmpt_data=self._prompt_template.to_dict(),
             model=self._model,
             **self._generation_kwargs,
@@ -387,20 +392,16 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
             bool: true if two nodes are dialectically equivalent, false otherwise
         """
         # determine parent central claims of two nodes
-        node1_parents = set(
-            [
-                edge.target
-                for edge in relevance_network.edgelist
-                if edge.source == node1.id and relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
-            ]
-        )
-        node2_parents = set(
-            [
-                edge.target
-                for edge in relevance_network.edgelist
-                if edge.source == node2.id and relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
-            ]
-        )
+        node1_parents = {
+            edge.target
+            for edge in relevance_network.edgelist
+            if edge.source == node1.id and relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
+        }
+        node2_parents = {
+            edge.target
+            for edge in relevance_network.edgelist
+            if edge.source == node2.id and relevance_network.get_node_type(edge.target) == am.CENTRAL_CLAIM
+        }
 
         common_parents = node1_parents.intersection(node2_parents)
 
@@ -424,29 +425,25 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
             return equivalent
 
         # Case 2: there are no common parents
-        node1_valences = set(
-            [
-                edge.valence
-                for edge in relevance_network.edgelist
-                if edge.source == node1.id and edge.target in node1_parents
-            ]
-        )
-        node2_valences = set(
-            [
-                edge.valence
-                for edge in relevance_network.edgelist
-                if edge.source == node2.id and edge.target in node2_parents
-            ]
-        )
+        node1_valences = {
+            edge.valence
+            for edge in relevance_network.edgelist
+            if edge.source == node1.id and edge.target in node1_parents
+        }
+        node2_valences = {
+            edge.valence
+            for edge in relevance_network.edgelist
+            if edge.source == node2.id and edge.target in node2_parents
+        }
         equivalent = len(node1_valences.intersection(node2_valences)) == 0
 
         return equivalent
 
-    def _add_node(self, map: FuzzyArgMap, claim: Claim, type: str = am.REASON) -> ArgMapNode:
+    def _add_node(self, argmap: FuzzyArgMap, claim: Claim, node_type: str = am.REASON) -> ArgMapNode:
         """Add node to fuzzy argmap
 
         Args:
-            map (FuzzyArgMap): fuzzy argmap
+            argmap (FuzzyArgMap): fuzzy argmap
             claim (Claim): claim to be added
 
         Returns:
@@ -456,23 +453,23 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
             id=str(uuid.uuid4()),
             label=claim.label,
             text=claim.text,
-            nodeType=type,
+            node_type=node_type,
         )
-        map.nodelist.append(node)
+        argmap.nodelist.append(node)
         return node
 
     def _add_fuzzy_edge(
         self,
-        map: FuzzyArgMap,
+        argmap: FuzzyArgMap,
         source_node: ArgMapNode,
         target_node: ArgMapNode,
-        valence: Optional[str] = None,
+        valence: str | None = None,
         issue: str = "",
     ) -> FuzzyArgMapEdge:
         """Add fuzzy edge to fuzzy argmap
 
         Args:
-            map (FuzzyArgMap): fuzzy argmap
+            argmap (FuzzyArgMap): fuzzy argmap
             target_node (ArgMapNode): target node
             source_node (ArgMapNode): source node
             valence (str, optional): fixed valence to assume, automatically determines most likely val if None
@@ -485,7 +482,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         if valence is not None:
             val = valence
         edge = FuzzyArgMapEdge(source=source_node.id, target=target_node.id, valence=val, weight=w)
-        map.edgelist.append(edge)
+        argmap.edgelist.append(edge)
         return edge
 
     def _analyze(self, analysis_state: AnalysisState):
@@ -507,17 +504,18 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
 
         issue = next((a.data for a in analysis_state.artifacts if a.id == "issue"), None)
         if issue is None:
-            raise ValueError("Missing required artifact: issue. Available artifacts: " + str(analysis_state.artifacts))
+            msg = f"Missing required artifact: issue. Available artifacts: {analysis_state.artifacts!s}"
+            raise ValueError(msg)
 
         pros_and_cons_data = next((a.data for a in analysis_state.artifacts if a.id == "proscons"), None)
         if pros_and_cons_data is None:
-            raise ValueError(
-                "Missing required artifact: proscons. Available artifacts: " + str(analysis_state.artifacts)
-            )
+            msg = f"Missing required artifact: proscons. Available artifacts: {analysis_state.artifacts!s}"
+            raise ValueError(msg)
         try:
             pros_and_cons = ProsConsList(**pros_and_cons_data)
-        except:
-            raise ValueError(f"Failed to parse pros and cons list: {pros_and_cons_data}")
+        except Exception as err:
+            msg = f"Missing required artifact: issue. Available artifacts: {analysis_state.artifacts!s}"
+            raise ValueError(msg) from err
 
         # unpack individual reasons
         pros_and_cons, unpacking = self._unpack_reasons(pros_and_cons, issue)
@@ -526,14 +524,14 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         # create fuzzy argmap from fuzzy pros and cons list (reason-root edges)
         relevance_network = FuzzyArgMap()
         for root in tqdm.tqdm(pros_and_cons.roots, desc="Reason-root edges"):
-            target_node = self._add_node(relevance_network, root, type=am.CENTRAL_CLAIM)
+            target_node = self._add_node(relevance_network, root, node_type=am.CENTRAL_CLAIM)
             for pro in root.pros:
-                source_node = self._add_node(relevance_network, pro, type=am.REASON)
+                source_node = self._add_node(relevance_network, pro, node_type=am.REASON)
                 self._add_fuzzy_edge(
                     relevance_network, source_node=source_node, target_node=target_node, valence=am.SUPPORT, issue=issue
                 )
             for con in root.cons:
-                source_node = self._add_node(relevance_network, con, type=am.REASON)
+                source_node = self._add_node(relevance_network, con, node_type=am.REASON)
                 self._add_fuzzy_edge(
                     relevance_network, source_node=source_node, target_node=target_node, valence=am.ATTACK, issue=issue
                 )
@@ -541,11 +539,11 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
         # TODO: improve naive sampling
         # add fuzzy reason-reason edges
         for target_node in tqdm.tqdm(relevance_network.nodelist, desc="Reason-reason edges"):
-            if target_node.nodeType == am.CENTRAL_CLAIM:
+            if target_node.node_type == am.CENTRAL_CLAIM:
                 continue
 
             source_nodes = [
-                node for node in relevance_network.nodelist if node.id != target_node.id and node.nodeType == am.REASON
+                node for node in relevance_network.nodelist if node.id != target_node.id and node.node_type == am.REASON
             ]
             if len(source_nodes) > MAX_N_RELATIONS:
                 source_nodes = random.sample(source_nodes, MAX_N_RELATIONS)
@@ -574,7 +572,7 @@ class RelevanceNetworkBuilderLMQL(LMQLAnalyst):
             id=self.get_product(),
             description=self.get_description(),
             data=relevance_network_data,
-            metadata=dict(unpacking=unpacking),
+            metadata={"unpacking": unpacking},
         )
 
         analysis_state.artifacts.append(artifact)
