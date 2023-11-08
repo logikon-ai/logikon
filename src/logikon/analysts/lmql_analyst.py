@@ -42,6 +42,7 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
         model_id = config.expert_model
         model_kwargs = config.expert_model_kwargs if config.expert_model_kwargs is not None else {}
         model = get_registry_model(model_id)
+        prompt_template = model_kwargs.pop("prompt_template", None)
 
         if model is None:
             model_prefix = "local:" if "endpoint" not in model_kwargs else ""
@@ -68,7 +69,6 @@ class LMQLAnalyst(AbstractArtifactAnalyst):
 
         model_kwargs.pop("tokenizer", None)
 
-        prompt_template = model_kwargs.pop("prompt_template", None)
         if prompt_template is None:
             self.logger.info("No prompt template provided. Will use default prompt template.")
             prompt_template = get_prompt_template()
