@@ -4,6 +4,7 @@ import copy
 import logging
 from typing import Any, Mapping
 
+import yaml
 from pydantic import BaseModel
 
 from logikon.analysts.interface import Analyst, AnalystConfig
@@ -24,15 +25,39 @@ class ScoreConfig(BaseModel):
     """
 
     inputs: list[Artifact | Score] = []
-    metrics: list[str | type[Analyst]] = []
-    artifacts: list[str | type[Analyst]] = ["proscons"]
+    metrics: list[str | type[Analyst]] = ["argmap_size", "n_root_nodes", "global_balance"]
     report_to: list[str] = []
-    global_kwargs: dict[str, Any] = {}
+    global_kwargs: dict[str, Any] = {
+        "expert_model": "openai/gpt-3.5-turbo-instruct",
+        "llm_framework": "OpenAI",
+        "generation_kwargs": {"max_len": 3072},
+    }
     analyst_configs: dict[str | type[Analyst], dict[str, Any] | AnalystConfig] = {}
 
     def __init__(self, **data: Any):
         super().__init__(**data)
         self._check_unique_ids()
+
+    @staticmethod
+    def from_yaml(file_path: str) -> ScoreConfig:
+        """Creates ScoreConfig from yaml file."""
+        try:
+            with open(file_path) as stream:
+                config = yaml.safe_load(stream)
+        except FileNotFoundError as err:
+            msg = f"File {file_path} not found."
+            raise FileNotFoundError(msg) from err
+        except Exception as err:
+            msg = f"Error while loading yaml file {file_path}."
+            raise ValueError(msg) from err
+
+        try:
+            score_config = ScoreConfig(**config)
+        except Exception as err:
+            msg = f"Error while parsing file {file_path} as ScoreConfig."
+            raise ValueError(msg) from err
+
+        return score_config
 
     def _check_unique_ids(self):
         """Check if all inputs, metrics and artifacts have unique ids."""
