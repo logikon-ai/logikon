@@ -1,11 +1,18 @@
 
-<center>
-<h1><code>/\/</code> Logikon</h1>
-<h4>Analytics for LLM Reasoning Traces</h3>
-[Docs🚧] &nbsp; [<a href="./examples">Examples</a>]
-<p>
-</center>
+<div align="center">
 
+<img src="./docs/logo_logikon.png" alt="Outlines Logo" width=100></img>
+
+# Logikon
+
+Analytics for LLM Reasoning Traces.
+
+[Highlights](#highlights) •
+[Examples](#examples) •
+[Stay tuned](#stay-tuned-for) •
+Docs 🚧
+
+</div>
 
 
 **Logikon `/\/`** is a library for analyzing and scoring the quality of plain-text reasoning traces produced by LLMs (or humans). It reveals the argumentative structure of LLM outputs, visualizes reasoning complexity, and evaluates its quality.
@@ -18,6 +25,15 @@
 > [!WARNING]
 > **Logikon `/\/`** is currently in beta. The API is subject to change. Please be patient, and report any issues you encounter.
 
+# Installation
+
+```sh
+pip install git+https://github.com/logikon-ai/logikon@v0.0.1-dev1
+```
+
+See also [examples](./examples) for more details.
+
+# Highlights
 
 ### Analyze and score completions with one extra line of code
 
@@ -37,7 +53,6 @@ score = logikon.score(prompt=prompt, completion=completion)
 #  global_balance: -.23
 ```
 
-Under the hood, 
 
 ### Configure metrics, artifacts and debugging methods
 
@@ -59,9 +74,21 @@ score = logikon.score(config=config, prompt=prompt, completion=completion)
 ```
 
 
-### Installation and Quickstart
+# Examples
 
-See [examples](./examples).
+* Basic usage
+* ...
+
+See [examples folder](./examples) for details and more examples.
+
+
+
+# Stay tuned for
+
+* Integrations with MLOps tools [#2](https://github.com/logikon-ai/logikon/issues/2)
+* Model benchmarks and validation
+* More metrics and artifacts
+
 
 
 
