@@ -20,7 +20,7 @@ Docs 🚧
 
 **Logikon `/\/`** allows you to automatically supervise the AI agents in your advanced LLM apps. This can be used for debugging and monitoring your AI assistants, or for evaluating the quality of human–AI interaction.
 
-**Logikon `/\/`** is highly customizable and extensible. You can choose from a variety of metrics, artifacts, and evaluation methods, pick an expert LLM for logical analysis, and even build your own metrics on top of **logikon**'s artifacts.
+**Logikon `/\/`** is highly customizable and extensible. You can choose from a variety of metrics, artifacts, and evaluation methods, pick an expert LLM for logical analysis, and even build your own metrics on top of **Logikon**'s artifacts.
 
 
 > [!WARNING]
@@ -98,6 +98,7 @@ See [examples folder](./examples) for details and more.
 * Integrations with MLOps tools [#2](https://github.com/logikon-ai/logikon/issues/2)
 * Model benchmarks and validation
 * More metrics and artifacts
+* **Logikon** `/\/` cloud
 
 
 
