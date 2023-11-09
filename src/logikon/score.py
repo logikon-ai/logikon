@@ -55,6 +55,13 @@ class ScoreResult(Dict):
             return artifact
         return None
 
+    def info(self) -> str:
+        """Get info string for printing or logging"""
+        infos = []
+        for score in self.scores():
+            infos.append(f"{score.id} = {score.value}")
+        return "\n".join(infos)
+
 
 # TODO: Rename? score -> analyze?
 def score(
