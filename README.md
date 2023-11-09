@@ -8,6 +8,7 @@
 Analytics for LLM Reasoning Traces.
 
 [Highlights](#highlights) •
+[Analytics](#analytics) •
 [Examples](#examples) •
 [Stay tuned](#stay-tuned-for) •
 Docs 🚧
@@ -19,11 +20,11 @@ Docs 🚧
 
 **Logikon `/\/`** allows you to automatically supervise the AI agents in your advanced LLM apps. This can be used for debugging and monitoring your AI assistants, or for evaluating the quality of human–AI interaction.
 
-**Logikon `/\/`** is highly customizable and extensible. You can choose from a variety of metrics, artifacts, and methods, choose the expert LLM for logical analysis, and even build your own metrics on top of **logikon**'s artifacts.
+**Logikon `/\/`** is highly customizable and extensible. You can choose from a variety of metrics, artifacts, and evaluation methods, pick an expert LLM for logical analysis, and even build your own metrics on top of **logikon**'s artifacts.
 
 
 > [!WARNING]
-> **Logikon `/\/`** is currently in beta. The API is subject to change. Please be patient, and report any issues you encounter.
+> **Logikon `/\/`** is currently in early beta. The API is subject to change. Please be patient, and report any issues you encounter.
 
 # Installation
 
@@ -54,7 +55,7 @@ score = logikon.score(prompt=prompt, completion=completion)
 ```
 
 
-### Configure metrics, artifacts and debugging methods
+### Configure metrics, artifacts and evaluation methods
 
 ```python
 import logikon
@@ -73,6 +74,15 @@ config = logikon.ScoreConfig(
 score = logikon.score(config=config, prompt=prompt, completion=completion)
 ```
 
+# Analytics
+
+## Artifacts
+
+ToDo
+
+## Scores and Metrics
+
+ToDo
 
 # Examples
 
