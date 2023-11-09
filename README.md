@@ -99,7 +99,7 @@ See [examples folder](./examples) for details and more.
 * Integrations with MLOps tools [#2](https://github.com/logikon-ai/logikon/issues/2)
 * Model benchmarks and validation
 * More metrics and artifacts
-* **Logikon `/\/`** cloud
+* **Logikon `/\/`** Cloud
 
 
 
