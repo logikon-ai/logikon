@@ -7,7 +7,8 @@ from logikon.schemas.configs import ScoreConfig
 
 def test_configs():
     config = ScoreConfig()
-    assert "proscons" in config.artifacts
+    assert "argmap_size" in config.metrics
+    assert len(config.artifacts) == 0
 
     config = ScoreConfig(
         global_kwargs={

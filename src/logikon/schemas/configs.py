@@ -26,6 +26,7 @@ class ScoreConfig(BaseModel):
 
     inputs: list[Artifact | Score] = []
     metrics: list[str | type[Analyst]] = ["argmap_size", "n_root_nodes", "global_balance"]
+    artifacts: list[str | type[Analyst]] = []
     report_to: list[str] = []
     global_kwargs: dict[str, Any] = {
         "expert_model": "openai/gpt-3.5-turbo-instruct",
