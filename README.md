@@ -26,7 +26,7 @@ Docs 🚧
 > [!WARNING]
 > **Logikon `/\/`** is currently in early beta. The API is subject to change. Please be patient, and report any issues you encounter.
 
-# Installation
+## Installation
 
 ```sh
 pip install git+https://github.com/logikon-ai/logikon@v0.0.1-dev1
@@ -34,7 +34,7 @@ pip install git+https://github.com/logikon-ai/logikon@v0.0.1-dev1
 
 See [examples folder](./examples) for more details.
 
-# Highlights
+## Highlights
 
 ### Analyze and score completions with one extra line of code
 
@@ -74,17 +74,17 @@ config = logikon.ScoreConfig(
 score = logikon.score(config=config, prompt=prompt, completion=completion)
 ```
 
-# Analytics
+## Analytics
 
-## Artifacts
-
-ToDo
-
-## Scores and Metrics
+### Artifacts
 
 ToDo
 
-# Examples
+### Scores and Metrics
+
+ToDo
+
+## Examples
 
 * Basic usage
 * ...
@@ -93,7 +93,7 @@ See [examples folder](./examples) for details and more.
 
 
 
-# Stay tuned for
+## Stay tuned for
 
 * Integrations with MLOps tools [#2](https://github.com/logikon-ai/logikon/issues/2)
 * Model benchmarks and validation
