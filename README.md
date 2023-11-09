@@ -32,7 +32,7 @@ Docs 🚧
 pip install git+https://github.com/logikon-ai/logikon@v0.0.1-dev1
 ```
 
-See also [examples](./examples) for more details.
+See [examples folder](./examples) for more details.
 
 # Highlights
 
@@ -89,7 +89,7 @@ ToDo
 * Basic usage
 * ...
 
-See [examples folder](./examples) for details and more examples.
+See [examples folder](./examples) for details and more.
 
 
 
