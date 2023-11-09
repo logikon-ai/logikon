@@ -78,11 +78,11 @@ score = logikon.score(config=config, prompt=prompt, completion=completion)
 
 ### Artifacts
 
-ToDo
+See [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
 
 ### Scores and Metrics
 
-ToDo
+See [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
 
 ## Examples
 
