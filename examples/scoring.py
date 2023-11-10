@@ -60,23 +60,14 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--artifacts",
         nargs="+",
-        default=["fuzzy_argmap_nx"],
+        default=None,
         help="Artifacts to create.",
     )
     parser.add_argument(
         "--metrics",
         nargs="+",
-        default=[
-            "argmap_size",
-            "n_root_nodes",
-            "argmap_avg_katz_centrality",
-            "argmap_attack_ratio",
-            "mean_root_support",
-            "mean_absolute_root_support",
-            "global_balance",
-            "mean_reason_strength",
-        ],
-        help="Artifacts to create.",
+        default=None,
+        help="Metrics to calculate.",
     )
     parser.add_argument(
         "--expert-model-path",
@@ -164,12 +155,14 @@ def sanity_check_files(args: argparse.Namespace):
     if not os.path.isfile(args.reasoning_traces_file):
         msg = f"Reasoning traces file {args.reasoning_traces_file} does not exist."
         logging.error(msg)
+        sys.stderr.write(msg)
         sys.exit(1)
-    if not args.reasoning_traces_file.endswith(".jsonl") or not len(args.reasoning_traces_file.endswith) > len(
+    if not args.reasoning_traces_file.endswith(".jsonl") or not len(args.reasoning_traces_file) > len(
         ".jsonl"
     ):
         msg = f"Reasoning traces file {args.reasoning_traces_file} must be a jsonl file."
         logging.error(msg)
+        sys.stderr.write(msg)
         sys.exit(1)
     if not args.output_file:
         root = os.path.splitext(os.path.basename(args.reasoning_traces_file))[0]
@@ -180,6 +173,7 @@ def sanity_check_files(args: argparse.Namespace):
             f"Please delete it or choose another output file."
         )
         logging.error(msg)
+        sys.stderr.write(msg)
         sys.exit(1)
 
 
@@ -194,6 +188,7 @@ def load_reasoning_traces_file(reasoning_traces_file: str) -> pd.DataFrame:
             f"Found column names: {df_traces.columns}"
         )
         logging.error(msg)
+        sys.stderr.write(msg)
         sys.exit(1)
     if "completion" not in df_traces.columns:
         msg = (
@@ -201,6 +196,7 @@ def load_reasoning_traces_file(reasoning_traces_file: str) -> pd.DataFrame:
             f"Found column names: {df_traces.columns}"
         )
         logging.error(msg)
+        sys.stderr.write(msg)
         sys.exit(1)
     return df_traces
 
@@ -208,11 +204,11 @@ def load_reasoning_traces_file(reasoning_traces_file: str) -> pd.DataFrame:
 def save_results(eval_results: list[dict], output_dir: str, output_file: str):
     "save the scoring results"
 
+    os.makedirs(output_dir, exist_ok=True)
+
     with open(os.path.join(output_dir, output_file), "w") as f:
         for record in eval_results:
-            f.write(json.dumps(dataclasses.asdict(record)).encode("utf-8"))
-            f.write(b"\n")
-        f.flush()
+            f.write(json.dumps(record) + "\n")
 
         logging.info(f"Saved {len(eval_results)} eval results to {output_file}.")
 
