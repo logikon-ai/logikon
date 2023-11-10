@@ -86,7 +86,7 @@ See [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8
 
 ## Examples
 
-* Basic usage
+* [Quickstart](./examples/quickstart.ipynb)
 * ...
 
 See [examples folder](./examples) for details and more.
