@@ -189,6 +189,7 @@ class GlobalBalanceScorer(AbstractBalanceScorer):
     __pdescription__ = (
         "The argument map's global balance (assumes mutually exclusive and collectively exhaustive root claims)"
     )
+    # TODO: rename to "global_imbalance"?
     __product__ = "global_balance"
 
     def _get_mrs_star(self, mrs: dict[str, dict[str, float | None]]) -> dict[str, dict[str, float]]:
