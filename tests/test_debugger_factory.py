@@ -3,6 +3,7 @@
 from logikon.analysts.base import AbstractArtifactAnalyst, AbstractScoreAnalyst
 from logikon.analysts.director import Director, get_analyst_registry
 from logikon.analysts.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
+from logikon.analysts.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
 from logikon.schemas.configs import ScoreConfig
 
 
@@ -73,3 +74,29 @@ def test_altern_requirements():
     assert callable(pipeline)
     assert chain
     assert any(isinstance(analyst, FuzzyArgMapBuilder) for analyst in chain)
+
+
+def test_analyst_config():
+    config = ScoreConfig(
+        artifacts=["svg_argmap"],
+        global_kwargs={
+            "expert_model": "text-ada-002",
+            "llm_framework": "OpenAI",
+        },
+        analyst_configs = {
+            "ProsConsBuilderLMQL": {
+                "lmql_query_timeout": 420,
+            }
+        }
+    )
+    _, chain = Director().create(config)
+
+    proscons_builder = next(
+        (
+            analyst for analyst in chain
+            if isinstance(analyst, ProsConsBuilderLMQL)
+        ),
+        None
+    )
+
+    assert proscons_builder._lmql_query_timeout == 420
