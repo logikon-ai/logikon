@@ -87,6 +87,7 @@ See [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8
 ## Examples
 
 * [Quickstart](./examples/quickstart.ipynb)
+* [Critical Thinking Zoo](./examples/metrics_artifacts_zoo.ipynb)
 * ...
 
 See [examples folder](./examples) for details and more.
