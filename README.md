@@ -99,7 +99,7 @@ Score the balance of arguments in the reasoning trace.
 
 > **What for?**
 >
-> 👉 Detect if your (recently updated) advanced LLM app suddenly produces biased reasoning—which may indicate flawed reasoning that reduces your app's performance.
+> 👉 Detect whether your (recently updated) advanced LLM app suddenly produces biased reasoning—which may indicate flawed reasoning that reduces your app's performance.
 
 ### Argumentation clarity metrics 🚧
 
@@ -112,10 +112,10 @@ Score the presentation of arguments in the reasoning trace.
 
 > **What for?**
 >
-> 👉 Detect if your LLM fails to render its reasoning in comprehensible ways—which may impair human-AI interaction, or prevent other AI agents from taking the reasoning fully into account.
+> 👉 Detect whether your LLM fails to render its reasoning in comprehensible ways—which may impair human-AI interaction, or prevent other AI agents from taking the reasoning fully into account.
 
 
-For more technical info on our metrics, see also our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
+For more technical info on our metrics, see our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
 
 
 ### Argument mapping artifacts
@@ -149,7 +149,7 @@ Annotate reasons, arguments and argumentative relations in LLM-generated argumen
 
 
 
-For more technical info on our artifacts, see also our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
+For more technical info on our artifacts, see our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
 
 
 ## Examples
@@ -173,7 +173,7 @@ See [examples folder](./examples) for details and more.
 * Model benchmarks and validation
 * More metrics and artifacts
 * Speedups and optimizations
-* **Logikon `/\/`** Cloud
+* **Logikon `/\/` Cloud**
 
 
 
