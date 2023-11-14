@@ -134,7 +134,20 @@ Reveal, represent or visualize the argumentation, based on a charitable and syst
 
 
 
-### Argumentative text annotation artifacts
+### Argumentative text annotation artifacts 🚧
+
+Annotate reasons, arguments and argumentative relations in LLM-generated argumentative texts.
+
+- [ ] argumentative entity annotation
+- [ ] argumentative relation annotation
+
+
+> **What for?**
+>
+> 👉 Check visualizations rather then read lengthy reasoning traces when debugging your LLM app. <br/>
+> 👉 Build your own metrics and evaluations exploiting our annotations of LLM-generated texts.
+
+
 
 For more technical info on our artifacts, see also our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
 
