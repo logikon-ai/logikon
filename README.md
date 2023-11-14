@@ -96,6 +96,7 @@ Score the balance of arguments in the reasoning trace.
 
 * [x] mean support/attack bias averaged over all central claims
 * [x] global support/attack balance
+* [x] naive pros/cons ratio
 
 > **🤔 What for?**
 >
