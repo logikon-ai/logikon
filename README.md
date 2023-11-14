@@ -84,6 +84,7 @@ Score the quantity of arguments in the reasoning trace.
 * [x] number of arguments
 * [x] number of central claims
 * [x] density of argumentation network
+* [x] mean strength of arguments
 
 > **🤔 What for?**
 >
