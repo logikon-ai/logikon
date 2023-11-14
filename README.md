@@ -85,7 +85,7 @@ Score the quantity of arguments in the reasoning trace.
 * [x] number of central claims
 * [x] density of argumentation network
 
-> **What for?**
+> **🤔 What for?**
 >
 > 👉 Detect where your LLM fails to generate (sufficiently many) reasons when deliberating a decision or justifying an answer it has given—which may lead to poor AI decision-making and undermine AI explainability.
 
@@ -97,7 +97,7 @@ Score the balance of arguments in the reasoning trace.
 * [x] mean support/attack bias averaged over all central claims
 * [x] global support/attack balance
 
-> **What for?**
+> **🤔 What for?**
 >
 > 👉 Detect whether your (recently updated) advanced LLM app suddenly produces biased reasoning—which may indicate flawed reasoning that reduces your app's performance.
 
@@ -110,7 +110,7 @@ Score the presentation of arguments in the reasoning trace.
 * [ ] ambiguity of argument articulation
 * [ ] veracity of surface logical structure 
 
-> **What for?**
+> **🤔 What for?**
 >
 > 👉 Detect whether your LLM fails to render its reasoning in comprehensible ways—which may impair human-AI interaction, or prevent other AI agents from taking the reasoning fully into account.
 
@@ -127,7 +127,7 @@ Reveal, represent or visualize the argumentation, based on a charitable and syst
 - [x] argument map as svg
 - [x] nested pros cons sunburst 
 
-> **What for?**
+> **🤔 What for?**
 >
 > 👉 Check visualizations rather then read lengthy reasoning traces when debugging your LLM app. <br/>
 > 👉 Build your own metrics and evaluations exploiting the deep structure revealed by our artifacts.
@@ -142,7 +142,7 @@ Annotate reasons, arguments and argumentative relations in LLM-generated argumen
 - [ ] argumentative relation annotation
 
 
-> **What for?**
+> **🤔 What for?**
 >
 > 👉 Check visualizations rather then read lengthy reasoning traces when debugging your LLM app. <br/>
 > 👉 Build your own metrics and evaluations exploiting our annotations of LLM-generated texts.
