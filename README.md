@@ -76,9 +76,8 @@ score = logikon.score(config=config, prompt=prompt, completion=completion)
 
 ## Analytics
 
-### Metrics
 
-#### Argumentation quantity
+### Argumentation quantity metrics
 
 Score the quantity of arguments in the reasoning trace.
 
@@ -88,10 +87,10 @@ Score the quantity of arguments in the reasoning trace.
 
 > **What for?**
 >
-> 👉 Detect where your LLM fails to generate (sufficiently many) reasons when deliberating a decision or justifying an answer it has given. (For example.)
+> 👉 Detect where your LLM fails to generate (sufficiently many) reasons when deliberating a decision or justifying an answer it has given—which may lead to poor AI decision-making and undermine AI explainability.
 
 
-#### Argumentative bias
+### Argumentative bias metrics
 
 Score the balance of arguments in the reasoning trace.
 
@@ -100,26 +99,42 @@ Score the balance of arguments in the reasoning trace.
 
 > **What for?**
 >
-> 👉 Detect if your updated advanced LLM app suddenly produces biased reasoning. (For example.)
+> 👉 Detect if your (recently updated) advanced LLM app suddenly produces biased reasoning—which may indicate flawed reasoning that reduces your app's performance.
 
-#### Argumentation clarity 
+### Argumentation clarity metrics 🚧
 
 Score the presentation of arguments in the reasoning trace.
 
 * [ ] transparency of exposition 
 * [ ] redundancy of presentation
-* [ ] explicitness of argument articulation
+* [ ] ambiguity of argument articulation
 * [ ] veracity of surface logical structure 
 
 > **What for?**
 >
-> 👉 Detect if your LLM fails to render its reasoning in comprehensible ways, which may impair human-AI interaction, or prevent other AI agents from taking reasoning fully into account. (For example.)
+> 👉 Detect if your LLM fails to render its reasoning in comprehensible ways—which may impair human-AI interaction, or prevent other AI agents from taking the reasoning fully into account.
 
 
 For more technical info on our metrics, see also our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
 
 
-### Artifacts
+### Argument mapping artifacts
+
+Reveal, represent or visualize the argumentation, based on a charitable and systematic reconstruction of the reasoning trace.
+
+- [x] pros and cons list
+- [x] ✨fuzzy✨ argument map
+- [x] argument map as svg
+- [x] nested pros cons sunburst 
+
+> **What for?**
+>
+> 👉 Check visualizations rather then read lengthy reasoning traces when debugging your LLM app. <br/>
+> 👉 Build your own metrics and evaluations exploiting the deep structure revealed by our artifacts.
+
+
+
+### Argumentative text annotation artifacts
 
 For more technical info on our artifacts, see also our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
 
