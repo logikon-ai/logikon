@@ -82,11 +82,12 @@ score = logikon.score(config=config, prompt=prompt, completion=completion)
 
 Score the quantity of arguments in the reasoning trace.
 
-* [+] number of arguments
-* [+] number of central claims
-* [+] density of argumentation network
+* [x] number of arguments
+* [x] number of central claims
+* [x] density of argumentation network
 
-> [What for?]
+> **What for?**
+>
 > 👉 Detect where your LLM fails to generate (sufficiently many) reasons when deliberating a decision or justifying an answer it has given. (For example.)
 
 
@@ -94,8 +95,12 @@ Score the quantity of arguments in the reasoning trace.
 
 Score the balance of arguments in the reasoning trace.
 
-* [+] mean support/attack bias averaged over all central claims
-* [+] global support/attack balance
+* [x] mean support/attack bias averaged over all central claims
+* [x] global support/attack balance
+
+> **What for?**
+>
+> 👉 Detect if your updated advanced LLM app suddenly produces biased reasoning. (For example.)
 
 #### Argumentation clarity 
 
@@ -105,6 +110,10 @@ Score the presentation of arguments in the reasoning trace.
 * [ ] redundancy of presentation
 * [ ] explicitness of argument articulation
 * [ ] veracity of surface logical structure 
+
+> **What for?**
+>
+> 👉 Detect if your LLM fails to render its reasoning in comprehensible ways, which may impair human-AI interaction, or prevent other AI agents from taking reasoning fully into account. (For example.)
 
 
 For more technical info on our metrics, see also our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
