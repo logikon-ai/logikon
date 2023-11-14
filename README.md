@@ -1,7 +1,7 @@
 
 <div align="center">
 
-<img src="./docs/logo_logikon.png" alt="Logikon Logo" width=100></img>
+<img src="./docs/logo_logikon_notext_withborder.png" alt="Logikon Logo" width=100></img>
 
 # Logikon
 
