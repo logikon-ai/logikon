@@ -164,8 +164,8 @@ See [examples folder](./examples) for details and more.
 
 ## Known limitations
 
+* Ability to correctly relate individual reasons to each other scales with model size and is severely limited for 7B expert models.
 * ...
-
 
 ## Stay tuned for
 
