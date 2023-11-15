@@ -202,11 +202,11 @@ def load_reasoning_traces_file(reasoning_traces_file: str) -> pd.DataFrame:
 
 
 def save_results(eval_results: list[dict], output_dir: str, output_file: str):
-    "save the scoring results"
+    "save the scoring results by appending them to file"
 
     os.makedirs(output_dir, exist_ok=True)
 
-    with open(os.path.join(output_dir, output_file), "w") as f:
+    with open(os.path.join(output_dir, output_file), "a") as f:
         for record in eval_results:
             f.write(json.dumps(record) + "\n")
 
@@ -314,11 +314,12 @@ def main():
             else:
                 result_record[artifact_id] = artifact.data if artifact else None
 
+        # save new result
+        save_results([result_record], args.output_dir, args.output_file)
+
         results.append(result_record)
 
-    # save results
-    save_results(results, args.output_dir, args.output_file)
-
+    logging.info(f"Completed scoring {len(df_traces)} examples, created {len(results)} result records.")
 
 if __name__ == "__main__":
     main()
