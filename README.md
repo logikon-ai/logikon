@@ -157,7 +157,7 @@ For more technical info on our artifacts, see our [Critical Thinking Zoo noteboo
 ## Examples
 
 * [Quickstart](./examples/quickstart.ipynb)
-* [Critical Thinking Zoo](./examples/metrics_artifacts_zoo.ipynb)
+* [Metrics & Artifacts Gallery](./examples/metrics_artifacts_zoo.ipynb)
 * [Monitor Advanced CoT App](./examples/monitor_cot_workflow.ipynb)
 * ...
 
