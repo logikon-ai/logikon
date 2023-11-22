@@ -159,6 +159,7 @@ For more technical info on our artifacts, see our [Critical Thinking Zoo noteboo
 * [Quickstart](./examples/quickstart.ipynb)
 * [Metrics & Artifacts Gallery](./examples/metrics_artifacts_zoo.ipynb)
 * [Monitor Advanced CoT App](./examples/monitor_cot_workflow.ipynb)
+* [Detect Legal Hallucinations](./examples/legal_hallucination_detection.ipynb)
 * ...
 
 See [examples folder](./examples) for details and more.
