@@ -29,7 +29,7 @@ Docs 🚧
 ## Installation
 
 ```sh
-pip install git+https://github.com/logikon-ai/logikon@v0.0.1-dev1
+pip install git+https://github.com/logikon-ai/logikon@v0.1.0
 ```
 
 See [examples folder](./examples) for more details.
