@@ -43,7 +43,7 @@ See [examples folder](./examples) for more details.
 prompt = "Vim or Emacs? Reason carefully before submitting your choice."
 completion = llm.predict(prompt)
 
-# Debug and score reasoning 🚀
+# Analyze and score reasoning 🚀
 import logikon
 
 score = logikon.score(prompt=prompt, completion=completion)
