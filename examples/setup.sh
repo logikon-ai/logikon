@@ -28,7 +28,7 @@ fi
 
 # logikon release tag
 if [ -z "${LGK_RELEASE}" ]; then
-  RELEASE="v0.0.1-dev1"  # default
+  RELEASE="v0.1.0"  # default
 else
   RELEASE="${LGK_RELEASE}"
 fi
@@ -86,7 +86,12 @@ if [ "$FRAMEWORK" = "transformers" ]; then
     pip install accelerate bitsandbytes
 fi
 
-pip install -U git+https://${GH_ACCESS_TOKEN}@github.com/logikon-ai/logikon.git@${RELEASE}
+if [ $GH_ACCESS_TOKEN -gt 0 ]; then
+    pip install -U git+https://${GH_ACCESS_TOKEN}@github.com/logikon-ai/logikon.git@${RELEASE}
+else
+    pip install -U git+https://github.com/logikon-ai/logikon.git@${RELEASE}
+fi
+
 
 
 ## DOWNLOADS ##
