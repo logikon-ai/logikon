@@ -75,22 +75,23 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">Any</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">MutableMapping</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="n">_model_registry</span><span class="p">:</span> <span class="n">MutableMapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="n">_model_registry</span><span class="p">:</span> <span class="n">MutableMapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="k">def</span> <span class="nf">register_model</span><span class="p">(</span><span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="k">if</span> <span class="n">model_id</span> <span class="ow">in</span> <span class="n">_model_registry</span><span class="p">:</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>            <span class="sa">f</span><span class="s2">&quot;Duplicate model id. Model of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">_model_registry</span><span class="p">[</span><span class="n">model_id</span><span class="p">])</span><span class="si">}</span><span class="s2"> already registered under id </span><span class="si">{</span><span class="n">model_id</span><span class="si">}</span><span class="s2">.&quot;</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="k">def</span> <span class="nf">register_model</span><span class="p">(</span><span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="k">if</span> <span class="n">model_id</span> <span class="ow">in</span> <span class="n">_model_registry</span><span class="p">:</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>            <span class="sa">f</span><span class="s2">&quot;Duplicate model id. Model of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">_model_registry</span><span class="p">[</span><span class="n">model_id</span><span class="p">])</span><span class="si">}</span><span class="s2"> &quot;</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>            <span class="sa">f</span><span class="s2">&quot;already registered under id </span><span class="si">{</span><span class="n">model_id</span><span class="si">}</span><span class="s2">.&quot;</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="p">)</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="n">_model_registry</span><span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">_model_registry</span><span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="k">def</span> <span class="nf">get_registry_model</span><span class="p">(</span><span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">return</span> <span class="n">_model_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="k">def</span> <span class="nf">get_registry_model</span><span class="p">(</span><span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="k">return</span> <span class="n">_model_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -106,12 +107,14 @@
 
     </div>
     <a class="headerlink" href="#register_model"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="register_model-10"><a href="#register_model-10"><span class="linenos">10</span></a><span class="k">def</span> <span class="nf">register_model</span><span class="p">(</span><span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
-</span><span id="register_model-11"><a href="#register_model-11"><span class="linenos">11</span></a>    <span class="k">if</span> <span class="n">model_id</span> <span class="ow">in</span> <span class="n">_model_registry</span><span class="p">:</span>
-</span><span id="register_model-12"><a href="#register_model-12"><span class="linenos">12</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span id="register_model-13"><a href="#register_model-13"><span class="linenos">13</span></a>            <span class="sa">f</span><span class="s2">&quot;Duplicate model id. Model of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">_model_registry</span><span class="p">[</span><span class="n">model_id</span><span class="p">])</span><span class="si">}</span><span class="s2"> already registered under id </span><span class="si">{</span><span class="n">model_id</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="register_model-9"><a href="#register_model-9"><span class="linenos"> 9</span></a><span class="k">def</span> <span class="nf">register_model</span><span class="p">(</span><span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+</span><span id="register_model-10"><a href="#register_model-10"><span class="linenos">10</span></a>    <span class="k">if</span> <span class="n">model_id</span> <span class="ow">in</span> <span class="n">_model_registry</span><span class="p">:</span>
+</span><span id="register_model-11"><a href="#register_model-11"><span class="linenos">11</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="register_model-12"><a href="#register_model-12"><span class="linenos">12</span></a>            <span class="sa">f</span><span class="s2">&quot;Duplicate model id. Model of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">_model_registry</span><span class="p">[</span><span class="n">model_id</span><span class="p">])</span><span class="si">}</span><span class="s2"> &quot;</span>
+</span><span id="register_model-13"><a href="#register_model-13"><span class="linenos">13</span></a>            <span class="sa">f</span><span class="s2">&quot;already registered under id </span><span class="si">{</span><span class="n">model_id</span><span class="si">}</span><span class="s2">.&quot;</span>
 </span><span id="register_model-14"><a href="#register_model-14"><span class="linenos">14</span></a>        <span class="p">)</span>
-</span><span id="register_model-15"><a href="#register_model-15"><span class="linenos">15</span></a>    <span class="n">_model_registry</span><span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+</span><span id="register_model-15"><a href="#register_model-15"><span class="linenos">15</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="register_model-16"><a href="#register_model-16"><span class="linenos">16</span></a>    <span class="n">_model_registry</span><span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
 </span></pre></div>
 
 
@@ -129,8 +132,8 @@
 
     </div>
     <a class="headerlink" href="#get_registry_model"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_registry_model-18"><a href="#get_registry_model-18"><span class="linenos">18</span></a><span class="k">def</span> <span class="nf">get_registry_model</span><span class="p">(</span><span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="get_registry_model-19"><a href="#get_registry_model-19"><span class="linenos">19</span></a>    <span class="k">return</span> <span class="n">_model_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_registry_model-19"><a href="#get_registry_model-19"><span class="linenos">19</span></a><span class="k">def</span> <span class="nf">get_registry_model</span><span class="p">(</span><span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="get_registry_model-20"><a href="#get_registry_model-20"><span class="linenos">20</span></a>    <span class="k">return</span> <span class="n">_model_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
 </span></pre></div>
 
 

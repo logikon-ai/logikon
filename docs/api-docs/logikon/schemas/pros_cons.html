@@ -109,24 +109,22 @@
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="k">class</span> <span class="nc">Claim</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="k">class</span> <span class="nc">RootClaim</span><span class="p">(</span><span class="n">Claim</span><span class="p">):</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="n">pros</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Claim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">cons</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Claim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="k">class</span> <span class="nc">ProsConsList</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">roots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RootClaim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="k">class</span> <span class="nc">Claim</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="k">class</span> <span class="nc">RootClaim</span><span class="p">(</span><span class="n">Claim</span><span class="p">):</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="n">pros</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Claim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># noqa: RUF012</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">cons</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Claim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># noqa: RUF012</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="k">class</span> <span class="nc">ProsConsList</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">roots</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RootClaim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">options</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">[]</span>
 </span></pre></div>
 
 
@@ -142,9 +140,9 @@
 
     </div>
     <a class="headerlink" href="#Claim"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Claim-11"><a href="#Claim-11"><span class="linenos">11</span></a><span class="k">class</span> <span class="nc">Claim</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="Claim-12"><a href="#Claim-12"><span class="linenos">12</span></a>    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="Claim-13"><a href="#Claim-13"><span class="linenos">13</span></a>    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Claim-9"><a href="#Claim-9"><span class="linenos"> 9</span></a><span class="k">class</span> <span class="nc">Claim</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="Claim-10"><a href="#Claim-10"><span class="linenos">10</span></a>    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="Claim-11"><a href="#Claim-11"><span class="linenos">11</span></a>    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
 </span></pre></div>
 
 
@@ -206,9 +204,9 @@
 
     </div>
     <a class="headerlink" href="#RootClaim"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RootClaim-16"><a href="#RootClaim-16"><span class="linenos">16</span></a><span class="k">class</span> <span class="nc">RootClaim</span><span class="p">(</span><span class="n">Claim</span><span class="p">):</span>
-</span><span id="RootClaim-17"><a href="#RootClaim-17"><span class="linenos">17</span></a>    <span class="n">pros</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Claim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="RootClaim-18"><a href="#RootClaim-18"><span class="linenos">18</span></a>    <span class="n">cons</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Claim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RootClaim-14"><a href="#RootClaim-14"><span class="linenos">14</span></a><span class="k">class</span> <span class="nc">RootClaim</span><span class="p">(</span><span class="n">Claim</span><span class="p">):</span>
+</span><span id="RootClaim-15"><a href="#RootClaim-15"><span class="linenos">15</span></a>    <span class="n">pros</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Claim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># noqa: RUF012</span>
+</span><span id="RootClaim-16"><a href="#RootClaim-16"><span class="linenos">16</span></a>    <span class="n">cons</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Claim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># noqa: RUF012</span>
 </span></pre></div>
 
 
@@ -216,7 +214,7 @@
 
                             <div id="RootClaim.pros" class="classattr">
                                 <div class="attr variable">
-            <span class="name">pros</span><span class="annotation">: List[<a href="#Claim">Claim</a>]</span>
+            <span class="name">pros</span><span class="annotation">: list[<a href="#Claim">Claim</a>]</span>
 
         
     </div>
@@ -227,7 +225,7 @@
                             </div>
                             <div id="RootClaim.cons" class="classattr">
                                 <div class="attr variable">
-            <span class="name">cons</span><span class="annotation">: List[<a href="#Claim">Claim</a>]</span>
+            <span class="name">cons</span><span class="annotation">: list[<a href="#Claim">Claim</a>]</span>
 
         
     </div>
@@ -275,9 +273,9 @@
 
     </div>
     <a class="headerlink" href="#ProsConsList"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ProsConsList-21"><a href="#ProsConsList-21"><span class="linenos">21</span></a><span class="k">class</span> <span class="nc">ProsConsList</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="ProsConsList-22"><a href="#ProsConsList-22"><span class="linenos">22</span></a>    <span class="n">roots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RootClaim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="ProsConsList-23"><a href="#ProsConsList-23"><span class="linenos">23</span></a>    <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ProsConsList-19"><a href="#ProsConsList-19"><span class="linenos">19</span></a><span class="k">class</span> <span class="nc">ProsConsList</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="ProsConsList-20"><a href="#ProsConsList-20"><span class="linenos">20</span></a>    <span class="n">roots</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RootClaim</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="ProsConsList-21"><a href="#ProsConsList-21"><span class="linenos">21</span></a>    <span class="n">options</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">[]</span>
 </span></pre></div>
 
 
@@ -285,7 +283,7 @@
 
                             <div id="ProsConsList.roots" class="classattr">
                                 <div class="attr variable">
-            <span class="name">roots</span><span class="annotation">: List[<a href="#RootClaim">RootClaim</a>]</span>
+            <span class="name">roots</span><span class="annotation">: list[<a href="#RootClaim">RootClaim</a>]</span>
 
         
     </div>
@@ -296,7 +294,7 @@
                             </div>
                             <div id="ProsConsList.options" class="classattr">
                                 <div class="attr variable">
-            <span class="name">options</span><span class="annotation">: Optional[List[str]]</span>
+            <span class="name">options</span><span class="annotation">: list[str] | None</span>
 
         
     </div>

@@ -89,7 +89,7 @@
                                 <a class="variable" href="#ArgMapNode.annotations">annotations</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ArgMapNode.nodeType">nodeType</a>
+                                <a class="variable" href="#ArgMapNode.node_type">node_type</a>
                         </li>
                 </ul>
 
@@ -171,62 +171,61 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="n">CENTRAL_CLAIM</span> <span class="o">=</span> <span class="s2">&quot;central_claim&quot;</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="n">REASON</span> <span class="o">=</span> <span class="s2">&quot;reason&quot;</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="n">ATTACK</span> <span class="o">=</span> <span class="s2">&quot;attack&quot;</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="n">SUPPORT</span> <span class="o">=</span> <span class="s2">&quot;support&quot;</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="n">CENTRAL_CLAIM</span> <span class="o">=</span> <span class="s2">&quot;central_claim&quot;</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="n">REASON</span> <span class="o">=</span> <span class="s2">&quot;reason&quot;</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="n">ATTACK</span> <span class="o">=</span> <span class="s2">&quot;attack&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">SUPPORT</span> <span class="o">=</span> <span class="s2">&quot;support&quot;</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="n">IN_FOREST</span> <span class="o">=</span> <span class="s2">&quot;in_forest&quot;</span>  <span class="c1"># name of edge attribute indicating that edge is in argument maps spanning tree (forest)</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="n">IN_FOREST</span> <span class="o">=</span> <span class="s2">&quot;in_forest&quot;</span>  <span class="c1"># name of edge attribute indicating that edge is in argument maps spanning tree (forest)</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="k">class</span> <span class="nc">AnnotationSpan</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">int</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="k">class</span> <span class="nc">ArgMapNode</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="n">annotations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnnotationSpan</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="n">nodeType</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REASON</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="k">class</span> <span class="nc">ArgMapEdge</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="n">valence</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="k">class</span> <span class="nc">InformalArgMap</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="n">nodelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="n">edgelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapEdge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="k">class</span> <span class="nc">FuzzyArgMapEdge</span><span class="p">(</span><span class="n">ArgMapEdge</span><span class="p">):</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>    <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="k">class</span> <span class="nc">FuzzyArgMap</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>    <span class="n">nodelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="n">edgelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FuzzyArgMapEdge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgMapNode</span><span class="p">:</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node by node id.&quot;&quot;&quot;</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span><span class="p">:</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">node_id</span><span class="p">:</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>                <span class="k">return</span> <span class="n">node</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Node with id </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    <span class="k">def</span> <span class="nf">get_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node type by node id.&quot;&quot;&quot;</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">nodeType</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="k">class</span> <span class="nc">AnnotationSpan</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="k">class</span> <span class="nc">ArgMapNode</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># noqa: A003</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="n">annotations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnnotationSpan</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="n">node_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REASON</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="k">class</span> <span class="nc">ArgMapEdge</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="n">valence</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="k">class</span> <span class="nc">InformalArgMap</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="n">nodelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="n">edgelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapEdge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="k">class</span> <span class="nc">FuzzyArgMapEdge</span><span class="p">(</span><span class="n">ArgMapEdge</span><span class="p">):</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="k">class</span> <span class="nc">FuzzyArgMap</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="n">nodelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="n">edgelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FuzzyArgMapEdge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgMapNode</span><span class="p">:</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node by node id.&quot;&quot;&quot;</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span><span class="p">:</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">node_id</span><span class="p">:</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>                <span class="k">return</span> <span class="n">node</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Node with id </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2"> not found.&quot;</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="k">def</span> <span class="nf">get_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node type by node id.&quot;&quot;&quot;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">node_type</span>
 </span></pre></div>
 
 
@@ -302,9 +301,9 @@
 
     </div>
     <a class="headerlink" href="#AnnotationSpan"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="AnnotationSpan-17"><a href="#AnnotationSpan-17"><span class="linenos">17</span></a><span class="k">class</span> <span class="nc">AnnotationSpan</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="AnnotationSpan-18"><a href="#AnnotationSpan-18"><span class="linenos">18</span></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span>
-</span><span id="AnnotationSpan-19"><a href="#AnnotationSpan-19"><span class="linenos">19</span></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">int</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="AnnotationSpan-15"><a href="#AnnotationSpan-15"><span class="linenos">15</span></a><span class="k">class</span> <span class="nc">AnnotationSpan</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="AnnotationSpan-16"><a href="#AnnotationSpan-16"><span class="linenos">16</span></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="AnnotationSpan-17"><a href="#AnnotationSpan-17"><span class="linenos">17</span></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">int</span>
 </span></pre></div>
 
 
@@ -366,12 +365,12 @@
 
     </div>
     <a class="headerlink" href="#ArgMapNode"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ArgMapNode-22"><a href="#ArgMapNode-22"><span class="linenos">22</span></a><span class="k">class</span> <span class="nc">ArgMapNode</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="ArgMapNode-23"><a href="#ArgMapNode-23"><span class="linenos">23</span></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="ArgMapNode-24"><a href="#ArgMapNode-24"><span class="linenos">24</span></a>    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="ArgMapNode-25"><a href="#ArgMapNode-25"><span class="linenos">25</span></a>    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="ArgMapNode-26"><a href="#ArgMapNode-26"><span class="linenos">26</span></a>    <span class="n">annotations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnnotationSpan</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="ArgMapNode-27"><a href="#ArgMapNode-27"><span class="linenos">27</span></a>    <span class="n">nodeType</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REASON</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ArgMapNode-20"><a href="#ArgMapNode-20"><span class="linenos">20</span></a><span class="k">class</span> <span class="nc">ArgMapNode</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="ArgMapNode-21"><a href="#ArgMapNode-21"><span class="linenos">21</span></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># noqa: A003</span>
+</span><span id="ArgMapNode-22"><a href="#ArgMapNode-22"><span class="linenos">22</span></a>    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="ArgMapNode-23"><a href="#ArgMapNode-23"><span class="linenos">23</span></a>    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="ArgMapNode-24"><a href="#ArgMapNode-24"><span class="linenos">24</span></a>    <span class="n">annotations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnnotationSpan</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="ArgMapNode-25"><a href="#ArgMapNode-25"><span class="linenos">25</span></a>    <span class="n">node_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">REASON</span>
 </span></pre></div>
 
 
@@ -421,13 +420,13 @@
     
 
                             </div>
-                            <div id="ArgMapNode.nodeType" class="classattr">
+                            <div id="ArgMapNode.node_type" class="classattr">
                                 <div class="attr variable">
-            <span class="name">nodeType</span><span class="annotation">: str</span>
+            <span class="name">node_type</span><span class="annotation">: str</span>
 
         
     </div>
-    <a class="headerlink" href="#ArgMapNode.nodeType"></a>
+    <a class="headerlink" href="#ArgMapNode.node_type"></a>
     
     
 
@@ -466,10 +465,10 @@
 
     </div>
     <a class="headerlink" href="#ArgMapEdge"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ArgMapEdge-30"><a href="#ArgMapEdge-30"><span class="linenos">30</span></a><span class="k">class</span> <span class="nc">ArgMapEdge</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="ArgMapEdge-31"><a href="#ArgMapEdge-31"><span class="linenos">31</span></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="ArgMapEdge-32"><a href="#ArgMapEdge-32"><span class="linenos">32</span></a>    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="ArgMapEdge-33"><a href="#ArgMapEdge-33"><span class="linenos">33</span></a>    <span class="n">valence</span><span class="p">:</span> <span class="nb">str</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ArgMapEdge-28"><a href="#ArgMapEdge-28"><span class="linenos">28</span></a><span class="k">class</span> <span class="nc">ArgMapEdge</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="ArgMapEdge-29"><a href="#ArgMapEdge-29"><span class="linenos">29</span></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="ArgMapEdge-30"><a href="#ArgMapEdge-30"><span class="linenos">30</span></a>    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="ArgMapEdge-31"><a href="#ArgMapEdge-31"><span class="linenos">31</span></a>    <span class="n">valence</span><span class="p">:</span> <span class="nb">str</span>
 </span></pre></div>
 
 
@@ -542,9 +541,9 @@
 
     </div>
     <a class="headerlink" href="#InformalArgMap"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="InformalArgMap-36"><a href="#InformalArgMap-36"><span class="linenos">36</span></a><span class="k">class</span> <span class="nc">InformalArgMap</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="InformalArgMap-37"><a href="#InformalArgMap-37"><span class="linenos">37</span></a>    <span class="n">nodelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="InformalArgMap-38"><a href="#InformalArgMap-38"><span class="linenos">38</span></a>    <span class="n">edgelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapEdge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="InformalArgMap-34"><a href="#InformalArgMap-34"><span class="linenos">34</span></a><span class="k">class</span> <span class="nc">InformalArgMap</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="InformalArgMap-35"><a href="#InformalArgMap-35"><span class="linenos">35</span></a>    <span class="n">nodelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="InformalArgMap-36"><a href="#InformalArgMap-36"><span class="linenos">36</span></a>    <span class="n">edgelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapEdge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span></pre></div>
 
 
@@ -606,8 +605,8 @@
 
     </div>
     <a class="headerlink" href="#FuzzyArgMapEdge"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="FuzzyArgMapEdge-41"><a href="#FuzzyArgMapEdge-41"><span class="linenos">41</span></a><span class="k">class</span> <span class="nc">FuzzyArgMapEdge</span><span class="p">(</span><span class="n">ArgMapEdge</span><span class="p">):</span>
-</span><span id="FuzzyArgMapEdge-42"><a href="#FuzzyArgMapEdge-42"><span class="linenos">42</span></a>    <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="FuzzyArgMapEdge-39"><a href="#FuzzyArgMapEdge-39"><span class="linenos">39</span></a><span class="k">class</span> <span class="nc">FuzzyArgMapEdge</span><span class="p">(</span><span class="n">ArgMapEdge</span><span class="p">):</span>
+</span><span id="FuzzyArgMapEdge-40"><a href="#FuzzyArgMapEdge-40"><span class="linenos">40</span></a>    <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span>
 </span></pre></div>
 
 
@@ -664,21 +663,22 @@
 
     </div>
     <a class="headerlink" href="#FuzzyArgMap"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="FuzzyArgMap-45"><a href="#FuzzyArgMap-45"><span class="linenos">45</span></a><span class="k">class</span> <span class="nc">FuzzyArgMap</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="FuzzyArgMap-46"><a href="#FuzzyArgMap-46"><span class="linenos">46</span></a>    <span class="n">nodelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="FuzzyArgMap-47"><a href="#FuzzyArgMap-47"><span class="linenos">47</span></a>    <span class="n">edgelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FuzzyArgMapEdge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="FuzzyArgMap-48"><a href="#FuzzyArgMap-48"><span class="linenos">48</span></a>
-</span><span id="FuzzyArgMap-49"><a href="#FuzzyArgMap-49"><span class="linenos">49</span></a>    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgMapNode</span><span class="p">:</span>
-</span><span id="FuzzyArgMap-50"><a href="#FuzzyArgMap-50"><span class="linenos">50</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node by node id.&quot;&quot;&quot;</span>
-</span><span id="FuzzyArgMap-51"><a href="#FuzzyArgMap-51"><span class="linenos">51</span></a>        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span><span class="p">:</span>
-</span><span id="FuzzyArgMap-52"><a href="#FuzzyArgMap-52"><span class="linenos">52</span></a>            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">node_id</span><span class="p">:</span>
-</span><span id="FuzzyArgMap-53"><a href="#FuzzyArgMap-53"><span class="linenos">53</span></a>                <span class="k">return</span> <span class="n">node</span>
-</span><span id="FuzzyArgMap-54"><a href="#FuzzyArgMap-54"><span class="linenos">54</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Node with id </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
-</span><span id="FuzzyArgMap-55"><a href="#FuzzyArgMap-55"><span class="linenos">55</span></a>
-</span><span id="FuzzyArgMap-56"><a href="#FuzzyArgMap-56"><span class="linenos">56</span></a>    <span class="k">def</span> <span class="nf">get_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="FuzzyArgMap-57"><a href="#FuzzyArgMap-57"><span class="linenos">57</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node type by node id.&quot;&quot;&quot;</span>
-</span><span id="FuzzyArgMap-58"><a href="#FuzzyArgMap-58"><span class="linenos">58</span></a>        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
-</span><span id="FuzzyArgMap-59"><a href="#FuzzyArgMap-59"><span class="linenos">59</span></a>        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">nodeType</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="FuzzyArgMap-43"><a href="#FuzzyArgMap-43"><span class="linenos">43</span></a><span class="k">class</span> <span class="nc">FuzzyArgMap</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="FuzzyArgMap-44"><a href="#FuzzyArgMap-44"><span class="linenos">44</span></a>    <span class="n">nodelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ArgMapNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="FuzzyArgMap-45"><a href="#FuzzyArgMap-45"><span class="linenos">45</span></a>    <span class="n">edgelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FuzzyArgMapEdge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="FuzzyArgMap-46"><a href="#FuzzyArgMap-46"><span class="linenos">46</span></a>
+</span><span id="FuzzyArgMap-47"><a href="#FuzzyArgMap-47"><span class="linenos">47</span></a>    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgMapNode</span><span class="p">:</span>
+</span><span id="FuzzyArgMap-48"><a href="#FuzzyArgMap-48"><span class="linenos">48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node by node id.&quot;&quot;&quot;</span>
+</span><span id="FuzzyArgMap-49"><a href="#FuzzyArgMap-49"><span class="linenos">49</span></a>        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span><span class="p">:</span>
+</span><span id="FuzzyArgMap-50"><a href="#FuzzyArgMap-50"><span class="linenos">50</span></a>            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">node_id</span><span class="p">:</span>
+</span><span id="FuzzyArgMap-51"><a href="#FuzzyArgMap-51"><span class="linenos">51</span></a>                <span class="k">return</span> <span class="n">node</span>
+</span><span id="FuzzyArgMap-52"><a href="#FuzzyArgMap-52"><span class="linenos">52</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Node with id </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2"> not found.&quot;</span>
+</span><span id="FuzzyArgMap-53"><a href="#FuzzyArgMap-53"><span class="linenos">53</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="FuzzyArgMap-54"><a href="#FuzzyArgMap-54"><span class="linenos">54</span></a>
+</span><span id="FuzzyArgMap-55"><a href="#FuzzyArgMap-55"><span class="linenos">55</span></a>    <span class="k">def</span> <span class="nf">get_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="FuzzyArgMap-56"><a href="#FuzzyArgMap-56"><span class="linenos">56</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node type by node id.&quot;&quot;&quot;</span>
+</span><span id="FuzzyArgMap-57"><a href="#FuzzyArgMap-57"><span class="linenos">57</span></a>        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+</span><span id="FuzzyArgMap-58"><a href="#FuzzyArgMap-58"><span class="linenos">58</span></a>        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">node_type</span>
 </span></pre></div>
 
 
@@ -717,12 +717,13 @@
 
     </div>
     <a class="headerlink" href="#FuzzyArgMap.get_node"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="FuzzyArgMap.get_node-49"><a href="#FuzzyArgMap.get_node-49"><span class="linenos">49</span></a>    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgMapNode</span><span class="p">:</span>
-</span><span id="FuzzyArgMap.get_node-50"><a href="#FuzzyArgMap.get_node-50"><span class="linenos">50</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node by node id.&quot;&quot;&quot;</span>
-</span><span id="FuzzyArgMap.get_node-51"><a href="#FuzzyArgMap.get_node-51"><span class="linenos">51</span></a>        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span><span class="p">:</span>
-</span><span id="FuzzyArgMap.get_node-52"><a href="#FuzzyArgMap.get_node-52"><span class="linenos">52</span></a>            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">node_id</span><span class="p">:</span>
-</span><span id="FuzzyArgMap.get_node-53"><a href="#FuzzyArgMap.get_node-53"><span class="linenos">53</span></a>                <span class="k">return</span> <span class="n">node</span>
-</span><span id="FuzzyArgMap.get_node-54"><a href="#FuzzyArgMap.get_node-54"><span class="linenos">54</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Node with id </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="FuzzyArgMap.get_node-47"><a href="#FuzzyArgMap.get_node-47"><span class="linenos">47</span></a>    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgMapNode</span><span class="p">:</span>
+</span><span id="FuzzyArgMap.get_node-48"><a href="#FuzzyArgMap.get_node-48"><span class="linenos">48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node by node id.&quot;&quot;&quot;</span>
+</span><span id="FuzzyArgMap.get_node-49"><a href="#FuzzyArgMap.get_node-49"><span class="linenos">49</span></a>        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span><span class="p">:</span>
+</span><span id="FuzzyArgMap.get_node-50"><a href="#FuzzyArgMap.get_node-50"><span class="linenos">50</span></a>            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">node_id</span><span class="p">:</span>
+</span><span id="FuzzyArgMap.get_node-51"><a href="#FuzzyArgMap.get_node-51"><span class="linenos">51</span></a>                <span class="k">return</span> <span class="n">node</span>
+</span><span id="FuzzyArgMap.get_node-52"><a href="#FuzzyArgMap.get_node-52"><span class="linenos">52</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Node with id </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2"> not found.&quot;</span>
+</span><span id="FuzzyArgMap.get_node-53"><a href="#FuzzyArgMap.get_node-53"><span class="linenos">53</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -742,10 +743,10 @@
 
     </div>
     <a class="headerlink" href="#FuzzyArgMap.get_node_type"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="FuzzyArgMap.get_node_type-56"><a href="#FuzzyArgMap.get_node_type-56"><span class="linenos">56</span></a>    <span class="k">def</span> <span class="nf">get_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="FuzzyArgMap.get_node_type-57"><a href="#FuzzyArgMap.get_node_type-57"><span class="linenos">57</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node type by node id.&quot;&quot;&quot;</span>
-</span><span id="FuzzyArgMap.get_node_type-58"><a href="#FuzzyArgMap.get_node_type-58"><span class="linenos">58</span></a>        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
-</span><span id="FuzzyArgMap.get_node_type-59"><a href="#FuzzyArgMap.get_node_type-59"><span class="linenos">59</span></a>        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">nodeType</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="FuzzyArgMap.get_node_type-55"><a href="#FuzzyArgMap.get_node_type-55"><span class="linenos">55</span></a>    <span class="k">def</span> <span class="nf">get_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="FuzzyArgMap.get_node_type-56"><a href="#FuzzyArgMap.get_node_type-56"><span class="linenos">56</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get node type by node id.&quot;&quot;&quot;</span>
+</span><span id="FuzzyArgMap.get_node_type-57"><a href="#FuzzyArgMap.get_node_type-57"><span class="linenos">57</span></a>        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+</span><span id="FuzzyArgMap.get_node_type-58"><a href="#FuzzyArgMap.get_node_type-58"><span class="linenos">58</span></a>        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">node_type</span>
 </span></pre></div>
 
 
