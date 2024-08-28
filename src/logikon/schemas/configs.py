@@ -8,7 +8,7 @@ import yaml
 from pydantic import BaseModel
 
 from logikon.analysts.interface import Analyst, AnalystConfig
-from logikon.schemas.results import Artifact, Score
+from logikon.schemas.results import INPUT_KWS, Artifact, Score
 
 
 class ScoreConfig(BaseModel):
@@ -29,9 +29,10 @@ class ScoreConfig(BaseModel):
     artifacts: list[str | type[Analyst]] = []
     report_to: list[str] = []
     global_kwargs: dict[str, Any] = {
-        "expert_model": "openai/gpt-3.5-turbo-instruct",
-        "llm_framework": "OpenAI",
-        "generation_kwargs": {"max_len": 3072},
+        "expert_model": "openchat/openchat_3.5",
+        "inference_server_url": "http://localhost:8000/v1",
+        "api_key": "EMPTY",
+        "generation_kwargs": {"max_tokens": 3072},
     }
     analyst_configs: dict[str | type[Analyst], dict[str, Any] | AnalystConfig] = {}
 
@@ -138,7 +139,7 @@ class ScoreConfig(BaseModel):
             if isinstance(self.analyst_configs[analyst], dict):
                 config_data.update(self.analyst_configs[analyst])
             elif isinstance(self.analyst_configs[analyst], AnalystConfig):
-                config_data.update(self.analyst_configs[analyst].dict())  # type: ignore
+                config_data.update(self.analyst_configs[analyst].model_dump())  # type: ignore
             else:
                 msg = (
                     f"Invalid configuration. Analyst config {self.analyst_configs[analyst]} "
@@ -153,6 +154,30 @@ class ScoreConfig(BaseModel):
             raise ValueError(msg) from e
 
         return analyst_config
+
+    @staticmethod
+    def add_prompt_completion(prompt: str | None, completion: str | None, config: ScoreConfig) -> ScoreConfig:
+        """Add prompt and completion as input artifacts to config"""
+        config = copy.deepcopy(config)
+        if prompt is not None:
+            if any(inpt.id == INPUT_KWS.prompt for inpt in config.inputs):
+                msg = (
+                    "Inconsistent configuration. Prompt provided as kwargs for score() "
+                    "but already present in config inputs."
+                )
+                raise ValueError(msg)
+            config.inputs.append(Artifact(id=INPUT_KWS.prompt, description="Prompt", data=prompt, dtype="str"))
+        if completion is not None:
+            if any(inpt.id == INPUT_KWS.completion for inpt in config.inputs):
+                msg = (
+                    "Inconsistent configuration. Completion provided as kwargs for score() "
+                    "but already present in config inputs."
+                )
+                raise ValueError(msg)
+            config.inputs.append(
+                Artifact(id=INPUT_KWS.completion, description="Completion", data=completion, dtype="str")
+            )
+        return config
 
     @property
     def logger(self) -> logging.Logger:

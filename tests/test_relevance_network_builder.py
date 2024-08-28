@@ -1,9 +1,9 @@
 import pytest
 
 import logikon.schemas.argument_mapping as am
-from logikon.analysts.reconstruction.relevance_network_builder_lmql import (
+from logikon.analysts.reconstruction.relevance_network_builder_lcel import (
     RelevanceNetworkBuilderConfig,
-    RelevanceNetworkBuilderLMQL,
+    RelevanceNetworkBuilderLCEL,
 )
 
 
@@ -30,10 +30,10 @@ def map1() -> am.FuzzyArgMap:
 
 def test_dialectic_equivalence(map1: am.FuzzyArgMap):
     config = RelevanceNetworkBuilderConfig(
-        llm_framework="transformers",
+        inference_server_url="localhost",
         expert_model="gpt2",
     )
-    analyst = RelevanceNetworkBuilderLMQL(config)
+    analyst = RelevanceNetworkBuilderLCEL(config)
 
     assert analyst._dialectically_equivalent(map1, map1.nodelist[2], map1.nodelist[3])
 

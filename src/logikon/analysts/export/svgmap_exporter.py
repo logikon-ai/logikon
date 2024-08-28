@@ -154,7 +154,7 @@ class SVGMapExporter(AbstractArtifactAnalyst):
 
         return svg
 
-    def _analyze(self, analysis_state: AnalysisState):
+    async def _analyze(self, analysis_state: AnalysisState):
         """Reconstruct reasoning as argmap."""
 
         networkx_graph: nx.DiGraph | None = next(

@@ -15,7 +15,7 @@ class Director:
     """Factory for creating a analyst pipeline based on a config."""
 
     @staticmethod
-    def run_pipeline(
+    async def run_pipeline(
         chain: Iterable[Analyst], inputs: list[Artifact] | None = None, analysis_state: AnalysisState | None = None
     ):
         """runs analysts pipeline"""
@@ -44,7 +44,7 @@ class Director:
 
         # iterate over analysts
         for analyst in chain:
-            state = analyst(analysis_state=state)
+            state = await analyst(analysis_state=state)
 
         return state
 

@@ -1,0 +1,384 @@
+---
+title: |
+    | *Guided Reasoning*
+    | A Non-Technical Introduction
+    | [Logikon Version `v0.2.0`]
+author:
+  - name: Gregor Betz (Logikon AI, KIT)
+date: 01/08/2024
+format: 
+  pdf:
+    keep-tex: true
+    include-in-header: 
+       text: |
+         \usepackage{fvextra}
+         \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+         \DefineVerbatimEnvironment{OutputCode}{Verbatim}{breaklines,commandchars=\\\{\}}
+bibliography: bib_all.bib
+---
+
+
+**Abstract.** We introduce the concept and a default implementation of _Guided Reasoning_. A multi-agent system is a Guided Reasoning system iff one agent (the guide) primarily interacts with other agents in order to improve reasoning quality. We describe Logikon's default implementation of Guided Reasoning in non-technical terms. This is a living document we'll gradually enrich with more detailed information and examples.
+
+Code: [github.com/logikon-ai/logikon](https://github.com/logikon-ai/logikon)
+
+Demo: [huggingface.co/spaces/logikon/benjamin-chat](https://huggingface.co/spaces/logikon/benjamin-chat)
+
+
+# Introduction
+
+Definition Guided Reasoning (general).
+:  A multi-agent system that comprises a *guide agent* and at least one *client agent* is a Guided Reasoning system iff the guide systematically and primarily interacts with the clients in order to elicit and shape client reasoning such that it complies with a given _method M_.
+
+The reasoning method _M_ might be specified in the form of standards and criteria, paradigmatic examples, or detailed rules and instructions.
+
+So, a coach that helps a business unit to carry out a SWOT analysis, a kid assisting their granny to solve a crossword puzzle, or a Socratic dialog [@Nelson2002] are **examples** of Guided Reasoning systems. Rule-based consumer software can be part of a Guided Reasoning system, too, for example when a small enterprise uses an accounting software to set up its tax return, or to comply with financial regulation. Vice versa, humans may figure as guides when supervising and steering advanced GenAI systems (human in the loop).
+
+<!--
+Dijkstra:
+On the use of computerised decision aids: an investigation into the expert system as persuasive communicator
+E.W.Dijkstra Archive: Towards correct programs
+-->
+
+The **prima facie case** for AI-AI Guided Reasoning rests on the following assumptions:
+
+1. AI systems ought to give and explain correct answers.
+2. AI systems can only faithfully explain their answers if the latter are based on explicit reasoning.
+3. Poor reasoning undermines the ability of AI systems to give correct answers.
+4. Strong domain experts are not necessarily able to follow advanced reasoning methods. 
+
+In order to create explainable and accurate AI systems under these assumptions, the principle of cognitive specialization suggests to build extra AI experts for reasoning methods (meta-reasoning specialists), which can work together with different domain experts. Guided Reasoning is a promising design pattern for advanced GenAI apps because it allows for effective division of cognitive labour.
+
+This non-technical report presents Logikon's default implementation of Guided Reasoning, where client agents, when facing a decision problem, are steered towards exploring and systematically evaluating pro and con arguments.
+
+The report gives, in the next section, a [high-level overview of how users may interact with a Guided Reasoning system](#user-interactions-with-an-ai-guided-reasoning-system), subsequently unpacks [Logikon's default implementation of Guided Reasoning](#guiding-client-reasoners-in-balancing-pros-and-cons) (balancing pros and cons), and finally describes the [AI argument mapping workflow](#informal-argument-mapping-workflow) that is part of the balancing process. Moreover, we provide some pointers to [related work](#related-work). 
+
+
+
+# User Interactions with an AI Guided Reasoning System
+
+```{mermaid}
+%%| label: fig-global-gr
+%%| fig-cap: "User interactions with a Guided Reasoning systems."
+%%| fig-width: 6.5
+sequenceDiagram
+    autonumber
+    actor User
+    participant C as 🤖 Client LLM
+    User->>+C: Problem statement
+    participant G as 🧭 Guide
+    Note over C,G: Start Guided Reasoning
+    C->>+G: Problem statement
+    loop 
+        G->>+C: Instructions...
+        C->>+G: Reasoning traces...
+        G->>+G: Evaluation
+    end
+    G->>+C: Answer + Protocol
+    Note over C,G: End Guided Reasoning
+    C->>+User: Answer (and Protocol)
+    User->>+C: Why?
+    C->>+User: Explanation (based on Protocol)
+```
+
+
+@fig-global-gr shows how users may interact with a Guided Reasoning system, and sketches the interactions between client and guide within that system. Let's walk through these interactions step by step.
+
+Let's suppose the user submits the following query to the client LLM (step 1):
+
+```
+User: My friend Mo, who has been diagnosed Klinefelter, is drinking a glass
+  of vine once a week. Should he stop?
+```
+
+The submission of the user query kick-starts the Guided Reasoning process. (This could be done automatically, or by means of a tool-use call by the client model, or upon an explicit request from the user.) The client hands over the problem statement to the guide (step 2), which is in charge of organizing the reasoning process on which the answer will be based (loop 3-5). The guide may prompt the client (step 3) and receives intermediate answers (step 4), which are further processed and evaluated (step 5). The guide is fully in charge of structuring the reasoning process and controls -- statically or dynamically -- the workflow.
+
+So, _for the purpose of illustration_, let's consider a simplistic *suspension guide* which, via self-consistency, helps the client in determining whether and how to suspend judgment. Upon receiving the problem statement (step 2), the hypothetical guide paraphrases the problem in different ways. It then lets the client solve (with chain-of-thought) the alternative problem statements independently of each other (step 3 and 4). Comparing the alternative answers (step 5), the guide concludes that the client does (or doesn't) understand the problem and ought to respond correspondingly. The accordingly drafted answer together with a summary of the reasoning process (protocol) is submitted to the client (step 6).
+
+Assuming that the AI has failed to come up with consistent reasoning traces and answers to equivalent problem formulations, the client might reply to the initial user query (step 7):
+
+```
+AI: I'm sorry, I fail to understand the problem.
+```
+
+With the *guided reasoning protocol being available to the client* (either in-context or via RAG), the client is now able to **faithfully explain** its internal deliberation, and the user may start a conversation that unfolds the reasons that have led the client to give the above answer (step 8 and 9). For example:
+
+```
+User: What exactly did you fail to understand?
+AI: I failed to see that Klinefelter is a chromosomal variation with an extra
+  X chromosome, because I answered two equivalent formulations of the 
+  problem in entirely different ways.
+User: I see. What was the second formulation of the problem you answered
+  differently?
+AI: It read "My friend Mo, who has an extra X chromosome, is drinking a glass
+  of vine once a week. Should he stop?"
+User: What was your specific answer to this way of putting the problem?
+AI: It's ok for him to have a glass of vine per week.
+User: And what was your reasoning behind this?
+AI: I figured that ...
+```
+
+All this may help the user to get a better understanding of the AI system's proficiency and trustworthiness, and may even enable them to use the system, e.g. by adding further information in the user queries, in a more reliable way. 
+
+
+
+# Guiding Client Reasoners in Balancing Pros and Cons
+
+Identifying and evaluating pros and cons is a basic and universal decision making strategy. Logikon's default implementation of Guided Reasoning assists a client AI to identify, discern, organize, and systematically evaluate pro and con arguments. It also helps the client to use the argumentation for drafting a response.
+
+Let's have a closer look at each step in this Guided Reasoning process, which is depicted in @fig-global-gr.
+
+```{mermaid}
+%%| label: fig-focus-gr
+%%| fig-cap: "Default Pros-Cons-Balancing implementation of Guided Reasoning"
+%%| fig-width: 6
+sequenceDiagram
+    autonumber
+    participant C as 🤖 Client LLM
+    participant G as 🧭 Guide
+    C->>+G: Problem statement
+    G->>+C: Brainstorming instruction
+    C->>+G: Brainstorming reasoning trace
+    G->>+G: Argument mapping
+    loop Iterate over argument map
+        G->>+C: Scripted balancing query
+        C->>+G: Plausibility assessment
+    end
+    G->>+C: In-conclusion query 
+    C->>+G: Final answer draft
+    G->>+C: Answer + protocol + argument map
+```
+
+Having received the problem statement (step 1), the guide instructs the client to come up with alternative answers to the problem, and to brainstorm the pros and cons for each rival answer (step 2). The guide uses the accordingly generated brainstorming trace (step 3) as base material for further analysis: In particular, it produces, in a [multi-step reconstruction process described below](#informal-argument-mapping-workflow), an informal argument map that clarifies the individual arguments advanced during brainstorming and explicates their direct or indirect relations to the rivaling answer options (step 4). In the informal argument map, each argument is itself represented by a single claim.
+
+Next, the guide uses the argument map to systematically elicit argument evaluations from the client (steps 5 and 6): The client is asked to assess the plausibility of a claim _C_ taking into account all pros and cons targeting _C_ that have been assessed as plausible before. This recursive, argument-wise evaluation starts with the leaf nodes in the argument map and ends with the plausibility assessment of the central claim(s). To illustrate this process, let's assume the argumentation analysis yields an argument map with one central node and six additional arguments as shown in @fig-abstract-am. The recursive evaluation may proceed as follows:
+
+1. Unconditional evaluation of the leaf nodes by client. E.g.: Claims E, F, G are assessed as plausible, Claim B is assessed as implausible.
+2. Conditional evaluation of Claim C, given that Claim C is supported by plausible Claim E. E.g.: Claim C is assessed as plausible.
+3. Conditional evaluation of Claim D, given that Claim D is supported by plausible Claim G and disconfirmed by plausible Claim F. E.g.: Claim D is assessed as implausible.
+4. Conditional evaluation of Claim A, given that Claim A is disconfirmed by plausible Claim C. (Note that Claims B and D are ignored at this stage, for having being assessed as implausible before.) E.g.: Claim A is assessed as implausible.
+
+```{mermaid}
+%%| label: fig-abstract-am
+%%| fig-cap: "Illustrative abstract argument map."
+%%| fig-width: 4
+flowchart TD
+    B(Claim B):::con -. con .-> A(Claim A)
+    C(Claim C):::con -. con .-> A
+    D(Claim D) -- pro --> A
+    E(Claim E):::con -- pro --> C
+    F(Claim F):::con -. con .-> D
+    G(Claim G) -- pro --> D
+    classDef con fill:#f96
+```
+
+
+Having evaluated the argumentation accordingly, the client is instructed to draft an answer to the original problem statement that reflects the reasoning process so far (steps 7 and 8). The answer, the reasoning protocol, and the argument map reconstructed in step 4 (SVG) are finally send to the client (step 9).
+
+The [appendix](#appendix) contains illustrative examples for a guided reasoning process.  
+
+
+# Informal Argument Mapping Workflow
+
+@fig-am-workflow visualizes the modular workflow for reconstructing a controversial argumentation as an informal (fuzzy) argument map, which is part of [Logikon's default implementation](#guiding-client-reasoners-in-balancing-pros-and-cons) of guided reasoning as balancing pros and cons. Each step corresponds to a separate _analyst_ class in the `logikon` Python module. The _analyst_ classes mostly implement internal LLM-workflows (not fully documented here, check the code base for details) to produce the desired logical artifacts.
+
+```{mermaid}
+%%| label: fig-am-workflow
+%%| fig-cap: "Argument mapping workflow"
+%%| fig-width: 4.5
+flowchart 
+    classDef p fill:#f96
+    RT[Brainstorming reasoning trace]:::p
+    IB(IssueBuilder)
+    PCB(ProsConsBuilder)
+    RNB(RelevanceNetworkBuilder)
+    FAMB(FuzzyArgmapBuilder)
+    EX(Exporters)
+    NX[NetworkX Graph]:::p
+    SVG[SVG argument map]:::p
+
+    RT --> IB 
+    IB --> ci[Brief description of central issue discussed]:::p --> PCB
+    RT --> PCB
+    PCB --> pc[Pros and cons lists with one or several root claims]:::p --> RNB
+    RNB --> rn[Complete directed graph with weighted attack/support between any two reasons]:::p --> FAMB
+    FAMB--> fam[Fuzzy argument map with weighted support and attack relations]:::p --> EX
+    EX --> NX
+    EX --> SVG
+```
+
+The `IssueBuilder` takes the raw brainstorming reasoning trace and, using expert LLMs, describes the central issue addressed in the text, which is typically a reformulation of the original problem statement.
+
+The `ProsConsBuilder` reconstructs, from the reasoning trace, a multi-root pros and cons list which addresses the central issue identified before. This process is itself composed of several steps: First of all, all reason statements that are relevant for the issue are extracted from the reasoning trace -- irrespective of their valence. In a second step, these reasons are organized in one or several pros and cons list. It's only at this step that the central root claims are identified and added. The resulting pros and cons lists are checked for redundancies and completeness (given initially identified reasons), and revised if necessary. 
+
+The `RelevanceNetworkBuilder` uses a series of prompt templates to assess the pairwise probabilistic relevance for any two reason statements, and for any pair consisting of one reason statement and a central claim. This gives us a complete graph on all reason statements and central claims with weighted support and attack relations. (It is assumed that any two root claims maximally disconfirm each other.)
+
+The `FuzzyArgmapBuilder` uses an [optimal branching algorithm](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.tree.branchings.maximum_branching.html) to extract a tree from the complete graph that connects all argument nodes with maximally strong edges. It then adds additional edges with weights above a given threshold. This yields a fuzzy argument map, which is finally exported in various convenient formats.
+
+
+# Related work
+
+#### Explainability and Safety
+
+Scholars and scientists associated with _Anthropic_ have consistently pursued and advanced the idea of "AI Safety via Debate" [@irving2018ai;@Michael2023DebateHS;@Khan2024DebatingWM].
+
+@Ehsan2024HumanCenteredEA recognize that the principal ability of LLM-based systems to explain their actions in natural language [@rajani-etal-2019-explain], systematically exploited by AI startups as [Wayve](https://wayve.ai/science/lingo/), may disrupt the XAI debate. But LLMs do not necessarily produce faithful self-explanations [@turpin2023language;@paul2024making].  In a conceptual paper, @Baum2022FromRT show in detail why good reasoning is required for reliable AI explainability. Similarly, @leofante2024contestable have argued recently that *contestable* AI systems must be able to rationally respond to objections and counter-arguments, which in turn requires argumentative skills. @bezouvrakatseli2024dialogues suggest to increase AI safety through integrative epistemic inquiries that involve both AI agents and humans. 
+
+
+#### Guiding AI Reasoning
+
+@pan2023automatically review the vast landscape of self-check systems for chain-of-thought, which steer LLM reasoning by providing feedback.
+
+@hong2024argmedagentsexplainableclinicaldecision build an AI Guided Reasoning system that constrains the reasoning of AI medical expert systems by informal argumentation schemes.
+
+
+#### AI Argumentation Analysis
+
+@LawrenceReed2020 give a gentle introduction to the field of argument mining. 
+
+@EinDor2020CorpusWA have proven the feasibility of argument retrieval from large text corpora with LLMs.
+
+@Betz2021DeepA2AM have presented, implemented and verified an LLM-based system design for deep logical reconstruction of natural language arguments. 
+
+# Appendix
+
+#### A. Illustrative Problem Statement and Answer {#appendix-example-problem}
+
+An illustrative problem statement and answer based on guided deliberation (screenshot from demo app, with [illustrative configuration](#appendix-sys-config)):
+
+![](figs/illustrative_problem_and_answer.png)
+
+
+#### B. Illustrative Guided Reasoning Protocol
+
+The following reasoning protocol summarizes the guided deliberation for the [example problem statement](#appendix-example-problem):
+
+```markdown
+Let's start by brainstorming relevant considerations and think through the problem I've been given.
+When considering whether Bob should buy a Mercedes for his reliable and cheap car needs, it's essential to weigh the pros and cons of this decision. Here are some factors to consider:
+
+Pros of Buying a Mercedes:
+
+Reliability: Mercedes is known for producing reliable cars, which could make it a good choice for Bob's needs.
+Luxury: Mercedes cars are luxurious and come with various features that could make Bob's driving experience more comfortable and enjoyable.
+Resale Value: Mercedes cars hold their value well over time, making it a good investment for Bob if he plans to sell the car in the future.
+Cons of Buying a Mercedes:
+
+Cost: Mercedes cars are expensive, which could make it challenging for Bob to find a cheap option that meets his needs.
+Maintenance: Mercedes cars require regular maintenance, which could add to the overall cost of ownership.
+Insurance: Mercedes cars are expensive to insure, which could make it more expensive for Bob to protect his investment.
+Alternative Solutions:
+
+Buy a Used Mercedes: Bob could consider buying a used Mercedes instead of a new one. This could help him find a more affordable option that still meets his needs for reliability and luxury.
+Buy a Different Brand: Bob could consider exploring other car brands that offer reliable and affordable options. Some popular brands for this include Toyota, Honda, and Subaru.
+Lease a Car: Bob could consider leasing a car instead of buying one. This could help him save money on the upfront cost of a car and potentially lower his monthly payments.
+After weighing the pros and cons and exploring alternative solutions, it's essential to make a decision that aligns with Bob's priorities and budget. While a Mercedes could be a good choice for its reliability and luxury, it may not be the most affordable option for Bob's needs. Exploring alternative solutions like buying a used Mercedes or leasing a car could help him find a more affordable option that still meets his needs. Ultimately, the decision will depend on Bob's specific circumstances and preferences.
+
+Now, let's reconsider this step by step, and systematically balance the different reasons.
+
+In view of the initial problem description, the claim '[Reliability]: Bob needs a car that is reliable.' is assessed as very plausible.
+
+In view of the above considerations, the claim '[Reliability]: Mercedes is known for producing reliable cars, which could make it a good choice for Bob's needs.' is assessed as rather plausible, since it is supported by the following plausible reasons:
+
+[Reliability]: Bob needs a car that is reliable.
+and disconfirmed by the following plausible reasons:
+None.
+
+In view of the initial problem description, the claim '[Luxury]: Mercedes cars are luxurious.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Comfort and Enjoyment]: Mercedes cars come with various features that could make Bob's driving experience more comfortable and enjoyable.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Resale Value]: Mercedes cars hold their value well over time.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Luxury]: Bob needs a car that is luxurious.' is assessed as rather implausible.
+
+For lack of plausibility, this claim will not be considered when balancing pros and cons below.
+
+In view of the initial problem description, the claim '[Affordability]: Buying a used Mercedes could be more affordable for Bob.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Expensiveness]: Mercedes cars are expensive.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Future Sale]: Bob plans to sell the car in the future.' is assessed as rather plausible.
+
+In view of the above considerations, the claim '[Alternative Brands]: Bob could consider Toyota as an alternative car brand.' is assessed as rather plausible, since it is supported by the following plausible reasons:
+
+[Future Sale]: Bob plans to sell the car in the future.
+and disconfirmed by the following plausible reasons:
+None.
+
+In view of the initial problem description, the claim '[Alternative Brands]: Bob could consider Honda as an alternative car brand.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Alternative Brands]: Bob could consider Subaru as an alternative car brand.' is assessed as rather plausible.
+
+In view of the above considerations, the claim '[Difficulty in finding a cheap option]: Bob may find it challenging to find a cheap option that meets his needs.' is assessed as rather plausible, since it is supported by the following plausible reasons:
+
+[Alternative Brands]: Bob could consider Toyota as an alternative car brand.
+[Alternative Brands]: Bob could consider Honda as an alternative car brand.
+[Alternative Brands]: Bob could consider Subaru as an alternative car brand.
+and disconfirmed by the following plausible reasons:
+None.
+
+In view of the initial problem description, the claim '[Maintenance Cost]: Mercedes cars require regular maintenance.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Cost of Ownership]: Regular maintenance could add to the overall cost of ownership.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Insurance Cost]: Mercedes cars are expensive to insure.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Protecting Investment]: Bob wants to protect his investment.' is assessed as very plausible.
+
+In view of the above considerations, the claim '[Buy a Mercedes]: Bob should buy a Mercedes.' is assessed as rather implausible, since it is supported by the following plausible reasons:
+
+[Reliability]: Mercedes is known for producing reliable cars, which could make it a good choice for Bob's needs.
+[Luxury]: Mercedes cars are luxurious.
+[Comfort and Enjoyment]: Mercedes cars come with various features that could make Bob's driving experience more comfortable and enjoyable.
+[Resale Value]: Mercedes cars hold their value well over time.
+[Affordability]: Buying a used Mercedes could be more affordable for Bob.
+and disconfirmed by the following plausible reasons:
+
+[Expensiveness]: Mercedes cars are expensive.
+[Difficulty in finding a cheap option]: Bob may find it challenging to find a cheap option that meets his needs.
+[Maintenance Cost]: Mercedes cars require regular maintenance.
+[Cost of Ownership]: Regular maintenance could add to the overall cost of ownership.
+[Insurance Cost]: Mercedes cars are expensive to insure.
+[Protecting Investment]: Bob wants to protect his investment.
+For lack of plausibility, this claim will not be considered when balancing pros and cons below.
+
+So, all in all, the central claim '[Buy a Mercedes]: Bob should buy a Mercedes.' is assessed as rather implausible.
+
+In view of the initial problem description, the claim '[Consider Alternative Brands]: Bob should consider exploring other car brands that offer reliable and affordable options, such as Toyota, Honda, and Subaru.' is assessed as rather plausible.
+
+So, all in all, the central claim '[Consider Alternative Brands]: Bob should consider exploring other car brands that offer reliable and affordable options, such as Toyota, Honda, and Subaru.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Reason 1]: Leasing a car could help Bob save money on the upfront cost of a car.' is assessed as rather plausible.
+
+In view of the initial problem description, the claim '[Reason 2]: Leasing a car could help Bob potentially lower his monthly payments.' is assessed as rather plausible.
+
+In view of the above considerations, the claim '[Lease a Car]: Bob should lease a car.' is assessed as rather plausible, since it is supported by the following plausible reasons:
+
+[Reason 1]: Leasing a car could help Bob save money on the upfront cost of a car.
+[Reason 2]: Leasing a car could help Bob potentially lower his monthly payments.
+and disconfirmed by the following plausible reasons:
+None.
+```
+
+#### C. Illustrative Argument Map
+
+Argument map for the [example problem statement](#appendix-example-problem) (from demo app):
+
+![](figs/illustrative_argumentmap.png)
+
+#### D. Illustrative System Configuration {#appendix-sys-config}
+
+Client LLM:
+
+* Model ID: HuggingFaceH4/zephyr-7b-beta
+* Decoding: Sampling, Temperature = 0.6
+
+Expert LLM (underpinning Logikon Guide):
+
+* Model ID: meta-llama/Meta-Llama-3-70B-Instruct
+
+# References
+
+::: {#refs}
+:::

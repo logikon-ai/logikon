@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = 'Debugging and Scoring Reasoning Traces of LLMs'
 readme = "README.md"
 requires-python = ">=3.7"
-license = "MIT"
+license = "AGPL-3.0-only"
 keywords = []
 authors = [
   { name = "Gregor Betz", email = "3662782+ggbetz@users.noreply.github.com" },
@@ -25,17 +25,27 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "langchain",
-  "openai",
-  "tqdm",
-  "lmql==0.7.0",
-  "huggingface_hub",
-  "pydantic>=1.10.0",
   "graphviz>=0.20.1",
-  "Unidecode>=1.3.6",
+  "huggingface_hub",
+  "langchain",
+  "langchain_openai",
+  "langchain_community==0.2.12",
   "networkx>=3.1",
-  "seaborn",
   "plotly",
+  "pydantic>=1.10.0",
+  "seaborn",
+  "tenacity",
+  "transformers",
+  "tqdm",
+  "Unidecode>=1.3.6",
+]
+
+[project.optional-dependencies]
+vllm = [
+  "vllm>=0.3.3",
+  "flash-attn>=2.5.6",
+  "hf_transfer",
+  "python-dotenv",
 ]
 
 [project.urls]
@@ -48,13 +58,16 @@ path = "src/logikon/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
+  "langchain",
+  "langchain_openai",
   "coverage[toml]>=6.5",
-  "pydantic==1.10.12",
+  "pydantic>=2.0.0",
   "typer",
   "pytest",
   "python-dotenv",
   "pdoc",
   "pydocstyle",
+  "transformers",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
@@ -77,9 +90,10 @@ cov = [
 [[tool.hatch.envs.all.matrix]]
 python = ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
-[tool.hatch.envs.cuda]
+[tool.hatch.envs.vllm]
 dependencies = [
-  "vllm",
+  "vllm>=0.3.3",
+  "hf_transfer",
   "python-dotenv",
 ]
 
@@ -87,12 +101,12 @@ dependencies = [
 detached = true
 dependencies = [
   "langchain",
-  "openai",
+  "langchain_openai",
   "huggingface_hub",
-  "llama-cpp-python",
-  "pydantic>=1.10.12",
+  "pydantic>=2.0.0",
   "typing_extensions==4.7.1",
   "typing-inspect==0.9.0",
+  "types-requests",
   "Unidecode>=1.3.6",
   "networkx-stubs",
   "black>=23.1.0",
@@ -102,12 +116,12 @@ dependencies = [
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --ignore --install-types --non-interactive {args:src/logikon tests}"
 style = [
-  "ruff {args:.}",
+  "ruff check {args:.}",
   "black --check --diff {args:.}",
 ]
 fmt = [
   "black {args:.}",
-  "ruff --fix {args:.}",
+  "ruff check --fix {args:.}",
   "style",
 ]
 all = [
@@ -131,7 +145,7 @@ skip-string-normalization = true
 [tool.ruff]
 target-version = "py37"
 line-length = 120
-select = [
+lint.select = [
   "A",
   "ARG",
   "B",
@@ -158,28 +172,30 @@ select = [
   "W",
   "YTT",
 ]
-ignore = [
+lint.ignore = [
   # Allow non-abstract empty methods in abstract base classes
   "B027",
   # Allow boolean positional values in function calls, like `dict.get(... True)`
   "FBT003",
   # Ignore checks for possible passwords
   "S105", "S106", "S107",
+  # Ignore cryptography checks
+  "S311",
   # Ignore complexity
   "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
 ]
-unfixable = [
+lint.unfixable = [
   # Don't touch unused imports
   "F401",
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["logikon"]
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
 # LMQL queries may exceed the line length limit

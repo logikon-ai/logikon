@@ -17,7 +17,7 @@ INPUT_KWS = _InputKws()
 class BaseCTModel(BaseModel):
     """Base model for all entities processed or created through logical analysis."""
 
-    id: str  # noqa: A003
+    id: str
     description: str
     metadata: dict | None = None
 

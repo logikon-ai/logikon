@@ -170,7 +170,7 @@ class HTMLSunburstExporter(AbstractArtifactAnalyst):
 
         return html
 
-    def _analyze(self, analysis_state: AnalysisState):
+    async def _analyze(self, analysis_state: AnalysisState):
         """Reconstruct reasoning as argmap."""
 
         issue = next(a.data for a in analysis_state.artifacts if a.id == "issue")
