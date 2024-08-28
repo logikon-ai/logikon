@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import copy
 from typing import Any, Dict, Generator
 
 from logikon.analysts.director import Director
 from logikon.schemas.configs import ScoreConfig
-from logikon.schemas.results import INPUT_KWS, AnalysisState, Artifact, Score
+from logikon.schemas.results import AnalysisState, Artifact, Score
 
 
 class ScoreResult(Dict):
@@ -64,12 +65,12 @@ class ScoreResult(Dict):
 
 
 # TODO: Rename? score -> analyze?
-def score(
+async def ascore(
     prompt: str | None = None,
     completion: str | None = None,
     config: ScoreConfig | str | None = None,
 ) -> ScoreResult | None:
-    """Analyze and score the completion."""
+    """Async analyze and score the completion."""
 
     if config is None:
         if prompt is None and completion is None:
@@ -80,23 +81,8 @@ def score(
     else:
         config = copy.deepcopy(config)
 
-    # add prompt and completion as input artifacts to config
-    if prompt is not None:
-        if any(inpt.id == INPUT_KWS.prompt for inpt in config.inputs):
-            msg = (
-                "Inconsistent configuration. Prompt provided as kwargs for score() "
-                "but already present in config inputs."
-            )
-            raise ValueError(msg)
-        config.inputs.append(Artifact(id=INPUT_KWS.prompt, description="Prompt", data=prompt, dtype="str"))
-    if completion is not None:
-        if any(inpt.id == INPUT_KWS.completion for inpt in config.inputs):
-            msg = (
-                "Inconsistent configuration. Completion provided as kwargs for score() "
-                "but already present in config inputs."
-            )
-            raise ValueError(msg)
-        config.inputs.append(Artifact(id=INPUT_KWS.completion, description="Completion", data=completion, dtype="str"))
+    # Add prompt and completion as input artifacts to config
+    config = ScoreConfig.add_prompt_completion(prompt=prompt, completion=completion, config=config)
 
     # Dynamically create analyst pipeline based on config
     pipeline, _ = Director().create(config)
@@ -104,8 +90,18 @@ def score(
         return None
 
     # Analyze the completion
-    analysis_state = pipeline(inputs=config.inputs)
+    analysis_state = await pipeline(inputs=config.inputs)
 
     score_result = ScoreResult(config=config, state=analysis_state)
 
+    return score_result
+
+
+def score(
+    prompt: str | None = None,
+    completion: str | None = None,
+    config: ScoreConfig | str | None = None,
+) -> ScoreResult | None:
+    """Analyze and score the completion."""
+    score_result = asyncio.run(ascore(prompt=prompt, completion=completion, config=config))
     return score_result

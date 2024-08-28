@@ -8,6 +8,12 @@ from logikon.schemas.results import AnalysisState
 ARTIFACT = "ARTIFACT"
 SCORE = "SCORE"
 
+SYSTEM_MESSAGE_PROMPT = (
+    "You are a helpful, honest and knowledgeable AI assistant with expertise "
+    "in critical thinking and argumentation analysis. Always answer as helpfully as possible. "
+    "Be concise."
+)
+
 
 class AbstractAnalyst(Analyst):
     """
@@ -23,14 +29,14 @@ class AbstractAnalyst(Analyst):
         self._config = config
 
     @abstractmethod
-    def _analyze(self, analysis_state: AnalysisState):
+    async def _analyze(self, analysis_state: AnalysisState):
         """Analysis given state."""
         pass
 
-    def __call__(self, analysis_state: AnalysisState) -> AnalysisState:
+    async def __call__(self, analysis_state: AnalysisState) -> AnalysisState:
         """Carries out analysis associated with this analyst for given analysis_state."""
 
-        self._analyze(analysis_state=analysis_state)
+        await self._analyze(analysis_state=analysis_state)
 
         return analysis_state
 

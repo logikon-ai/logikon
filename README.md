@@ -5,183 +5,127 @@
 
 # Logikon
 
-Analytics for LLM Reasoning Traces.
+*AI Analytics for Natural Language Reasoning.*
 
-[Highlights](#highlights) •
-[Analytics](#analytics) •
-[Examples](#examples) •
-[Stay tuned](#stay-tuned-for) •
-Docs 🚧
+[Guided Reasoning™️ Demo](https://huggingface.co/spaces/logikon/benjamin-chat) | Technical Report (coming soon)
 
 </div>
 
+> [!NOTE]
+> 🎉&nbsp; We're excited to announce the release of `Logikon 0.2.0` –– a major update to our analytics toolbox for natural-language reasoning. 
 
-**Logikon `/\/`** is a library for analyzing and scoring the quality of plain-text reasoning traces produced by LLMs (or humans). It reveals the argumentative structure of LLM outputs, visualizes reasoning complexity, and evaluates its quality.
+Main changes: 
 
-**Logikon `/\/`** allows you to automatically supervise the AI agents in your advanced LLM apps. This can be used for debugging and monitoring your AI assistants, or for evaluating the quality of human–AI interaction.
+* All LLM-based argument analysis pipelines are now built with _LCEL/LangChain_ (and not with LMQL anymore).
+* We're introducing _Guided Reasoning™️_ (abstract interface and simple implementations) for walking arbitrary conversational AI agents through complex reasoning processes.
+* AGPL license.
 
-**Logikon `/\/`** is highly customizable and extensible. You can choose from a variety of metrics, artifacts, and evaluation methods, pick an expert LLM for logical analysis, and even build your own metrics on top of **Logikon**'s artifacts.
+Our *short-term priorities* are housekeeping, code cleaning, and documentation. Don't hesitate to reach out if you have any questions or feedback, or if you'd like to contribute to the project.
 
 
-> [!WARNING]
-> **Logikon `/\/`** is currently in early beta. The API is subject to change. Please be patient, and report any issues you encounter.
+## Installation 
 
-## Installation
-
-```sh
-pip install git+https://github.com/logikon-ai/logikon@v0.1.0
+```
+pip install git+https://github.com/logikon-ai/logikon@v0.2.0
 ```
 
-See [examples folder](./examples) for more details.
-
-## Highlights
-
-### Analyze and score completions with one extra line of code
+## Basic usage
 
 ```python
-# LLM generation
-prompt = "Vim or Emacs? Reason carefully before submitting your choice."
-completion = llm.predict(prompt)
+import os
+from logikon import ascore, ScoreConfig
 
-# Analyze and score reasoning 🚀
-import logikon
-
-score = logikon.score(prompt=prompt, completion=completion)
-
-#  >>> print(score.info())
-#  argmap_size: 13
-#  n_root_nodes: 3
-#  global_balance: -.23
-```
-
-
-### Configure metrics, artifacts and evaluation methods
-
-```python
-import logikon
-
-# Configure scoring methods
-config = logikon.ScoreConfig(
-    expert_model = "code-davinci-002",  # expert LLM for logical analysis
-    metrics = ["argmap_attack_ratio"],  # ratio of objections
-    artifacts = ["svg_argmap"],         # argument map as svg
+# 🔧 config 
+config = ScoreConfig(
+    global_kwargs={
+        "expert_model": "meta-llama/Meta-Llama-3-70B-Instruct",
+        "inference_server_url": "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-70B-Instruct",
+        "llm_backend": "HFChat",
+        "api_key": os.environ["HF_TOKEN"],
+        "classifier_kwargs": {
+            "model_id": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+            "inference_server_url": "https://api-inference.huggingface.co/models/MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+            "api_key": os.environ["HF_TOKEN"],
+            "batch_size": 8,
+        },
+    }
 )
 
-# LLM generation
-...
+# 📝 input to evaluate
+issue = "Should I eat animals?",
+reasoning = "No! Animals can suffer. Animal farming causes climate heating. Meat is not healthy.",
 
-# Debug and score reasoning
-score = logikon.score(config=config, prompt=prompt, completion=completion)
+# 🏃‍♀️ run argument analysis
+result = await ascore(
+    prompt = issue,
+    completion = reasoning,
+    config = config,
+)
 ```
 
-## Analytics
+## Guided Reasoning™️
 
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant C as Client LLM
+    User->>+C: Problem statement
+    create participant G as Guide LLM
+    C->>+G: Problem statement
+    loop 
+        G->>+C: Instructions...
+        C->>+G: Reasoning traces...
+        G->>+G: Evaluation
+    end
+    destroy G
+    G->>+C: Answer + Protocol
+    C->>+User: Answer (and Protocol)
+    User->>+C: Why?
+    C->>+User: Explanation (based on Protocol)
+```
 
-### Argumentation quantity metrics
+<!--
+## Quickstart
 
-Score the quantity of arguments in the reasoning trace.
+Start server.
 
-* [x] number of arguments
-* [x] number of central claims
-* [x] density of argumentation network
-* [x] mean strength of arguments
+```sh
+bash scripts/run_vllm_server.sh
+```
 
-> **🤔 What for?**
->
-> 👉 Detect where your LLM fails to generate (sufficiently many) reasons when deliberating a decision or justifying an answer it has given—which may lead to poor AI decision-making and undermine AI explainability.
+Run python client.
 
+```python
+from logikon import ascore
 
-### Argumentative bias metrics
+await ascore(
+    prompt="What are the main reasons for spending a week-end in New York?",
+    completion="""
+    The main reasons for spending a week-end in New York are:
+    1. You can do great shopping.
+    2. You can eat wonderful food.
+    3. You can meet many interesting people and friends.
+    """
+)
+```
 
-Score the balance of arguments in the reasoning trace.
+## Development
 
-* [x] mean support/attack bias averaged over all central claims
-* [x] global support/attack balance
-* [x] naive pros/cons ratio
+```sh
+# style check
+hatch run lint:style
 
-> **🤔 What for?**
->
-> 👉 Detect whether your (recently updated) advanced LLM app suddenly produces biased reasoning—which may indicate flawed reasoning that reduces your app's performance.
+# format code
+hatch run lint:fmt
 
-### Argumentation clarity metrics 🚧
+# check types (mypy)
+hatch run lint:typing
 
-Score the presentation of arguments in the reasoning trace.
+# run tests
+hatch run test
+```
 
-* [ ] transparency of exposition 
-* [ ] redundancy of presentation
-* [ ] ambiguity of argument articulation
-* [ ] veracity of surface logical structure 
-
-> **🤔 What for?**
->
-> 👉 Detect whether your LLM fails to render its reasoning in comprehensible ways—which may impair human-AI interaction, or prevent other AI agents from taking the reasoning fully into account.
-
-
-For more technical info on our metrics, see our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
-
-
-### Argument mapping artifacts
-
-Reveal, represent or visualize the argumentation, based on a charitable and systematic reconstruction of the reasoning trace.
-
-- [x] pros and cons list
-- [x] ✨fuzzy✨ argument map
-- [x] argument map as svg
-- [x] nested pros cons sunburst 
-
-> **🤔 What for?**
->
-> 👉 Check visualizations rather then read lengthy reasoning traces when debugging your LLM app. <br/>
-> 👉 Build your own metrics and evaluations exploiting the deep structure revealed by our artifacts.
-
-
-
-### Argumentative text annotation artifacts 🚧
-
-Annotate reasons, arguments and argumentative relations in LLM-generated argumentative texts.
-
-- [ ] argumentative entity annotation
-- [ ] argumentative relation annotation
-
-
-> **🤔 What for?**
->
-> 👉 Check visualizations rather then read lengthy reasoning traces when debugging your LLM app. <br/>
-> 👉 Build your own metrics and evaluations exploiting our annotations of LLM-generated texts.
-
-
-
-For more technical info on our artifacts, see our [Critical Thinking Zoo notebook](./examples/metrics_artifacts_zoo.ipynb) and the code's [analyst registry](https://github.com/logikon-ai/logikon/blob/eaa41db5763ce8aca24818fd3130078b20d8ed90/src/logikon/analysts/registry.py#L30).
-
-
-## Examples
-
-* [Quickstart](./examples/quickstart.ipynb)
-* [Metrics & Artifacts Gallery](./examples/metrics_artifacts_zoo.ipynb)
-* [Monitor Advanced CoT App](./examples/monitor_cot_workflow.ipynb)
-* [Detect Legal Hallucinations](./examples/legal_hallucination_detection.ipynb)
-* ...
-
-See [examples folder](./examples) for details and more.
-
-
-## Known limitations
-
-* Ability to correctly relate individual reasons to each other scales with model size and is severely limited for 7B expert models.
-* ...
-
-## Stay tuned for
-
-* More examples [#1](https://github.com/logikon-ai/logikon/issues/1)
-* Integrations with MLOps tools [#2](https://github.com/logikon-ai/logikon/issues/2)
-* Model benchmarks and validation
-* More metrics and artifacts
-* Speedups and optimizations
-* **Logikon `/\/` Cloud**
-
-
-
-
-
+-->
 
 

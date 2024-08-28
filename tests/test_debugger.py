@@ -1,4 +1,5 @@
 # test score function
+import asyncio
 from typing import ClassVar, Type
 
 from logikon.analysts.base import (
@@ -25,7 +26,7 @@ class DummyAnalyst1(AbstractArtifactAnalyst):
     __product__ = "dummy_artifact1"
     __configclass__: Type[ArtifcatAnalystConfig] = DummyAnalystConfig
 
-    def _analyze(self, analysis_state: AnalysisState):
+    async def _analyze(self, analysis_state: AnalysisState):
         prompt, completion = analysis_state.get_prompt_completion()
         """Concat prompt and completion."""
         data = prompt + completion if prompt and completion else "None"
@@ -45,7 +46,7 @@ class DummyAnalyst2(AbstractScoreAnalyst):
     __requirements__: ClassVar[list[str | set]] = ["dummy_artifact1"]
     __configclass__: Type[ScoreAnalystConfig] = DummyAnalystConfig2
 
-    def _analyze(self, analysis_state: AnalysisState):
+    async def _analyze(self, analysis_state: AnalysisState):
         """Length of prompt."""
         prompt, _ = analysis_state.get_prompt_completion()
         value = len(prompt) if prompt else 0
@@ -72,9 +73,13 @@ def test_analyst_pipeline():
     inputs.append(Artifact(id=INPUT_KWS.completion, description="Completion", data=completion, dtype="str"))
 
     # manual pipeline
-    results = AnalysisState(inputs=inputs)
-    results = analyst1(analysis_state=results)
-    results = analyst2(analysis_state=results)
+    async def pipeline(inputs):
+        results = AnalysisState(inputs=inputs)
+        results = await analyst1(analysis_state=results)
+        results = await analyst2(analysis_state=results)
+        return results
+
+    results = asyncio.run(pipeline(inputs))
 
     assert len(results.artifacts) == 1
     assert len(results.scores) == 1

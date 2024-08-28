@@ -14,7 +14,7 @@ class Analyst(ABC):
         pass
 
     @abstractmethod
-    def _analyze(self, analysis_state):
+    async def _analyze(self, analysis_state):
         """Carry out analysis given state."""
         pass
 

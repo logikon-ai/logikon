@@ -1,6 +1,6 @@
 # test score function
 
-from logikon.analysts.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
+from logikon.analysts.reconstruction.pros_cons_builder_lcel import ProsConsBuilderLCEL
 from logikon.analysts.registry import get_analyst_registry
 from logikon.schemas.configs import ScoreConfig
 
@@ -12,23 +12,23 @@ def test_configs():
 
     config = ScoreConfig(
         global_kwargs={
-            "expert_model": "text-ada-002",
-            "llm_framework": "OpenAI",
+            "inference_server_url": "localhost",
+            "expert_model": "gpt3",
         }
     )
-    assert config.global_kwargs["expert_model"] == "text-ada-002"
+    assert config.global_kwargs["expert_model"] == "gpt3"
 
 
 def test_config_overwrite_global():
     config = ScoreConfig(
         global_kwargs={
-            "expert_model": "text-ada-002",
-            "llm_framework": "OpenAI",
+            "inference_server_url": "localhost",
+            "expert_model": "gpt2",
         },
         analyst_configs={
-            "ProsConsBuilderLMQL": {"llm_framework": "transformers"},
+            "ProsConsBuilderLCEL": {"inference_server_url": "huggingface.co"},
         },
     )
     config = config.cast(get_analyst_registry())
 
-    assert config.get_analyst_config(ProsConsBuilderLMQL).llm_framework == "transformers"
+    assert config.get_analyst_config(ProsConsBuilderLCEL).inference_server_url == "huggingface.co"

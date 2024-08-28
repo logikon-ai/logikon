@@ -43,7 +43,7 @@ def reln1() -> FuzzyArgMap:
 
 def test_nx_exporter2(reln1: FuzzyArgMap):
     nx_exporter = RelevanceNetworkNXExporter(ArtifcatAnalystConfig())
-    nx_map = nx_exporter._to_nx(reln1.dict())
+    nx_map = nx_exporter._to_nx(reln1.model_dump())
 
     print(nx.node_link_data(nx_map))  # noqa: T201
 

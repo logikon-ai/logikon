@@ -29,7 +29,7 @@ class AbstractGraphScorer(AbstractScoreAnalyst):
     def _calculate_score(self, digraph: nx.DiGraph) -> tuple[str | float, str, dict | None]:
         pass
 
-    def _analyze(self, analysis_state: AnalysisState):
+    async def _analyze(self, analysis_state: AnalysisState):
         """Score the argmap."""
 
         networkx_graph: nx.DiGraph | None = next(

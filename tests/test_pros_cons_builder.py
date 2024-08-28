@@ -1,6 +1,6 @@
 # test score function
 
-from logikon.analysts.reconstruction.pros_cons_builder_lmql import (
+from logikon.analysts.reconstruction.pros_cons_builder_lcel import (
     EXAMPLES_ISSUE_PROSCONS,
     format_examples,
     format_proscons,

@@ -1,8 +1,0 @@
-lmql==0.7.0
-transformers==4.33.3
-huggingface_hub
-hf_transfer
-tokenizers
-seaborn
-pandas
-sentencepiece

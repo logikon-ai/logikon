@@ -15,7 +15,7 @@ import copy
 import uuid
 from typing import Any, ClassVar
 
-import networkx as nx
+import networkx as nx  # type: ignore
 import numpy as np
 
 import logikon.schemas.argument_mapping as am
@@ -25,12 +25,13 @@ from logikon.schemas.results import AnalysisState, Artifact
 _FIX_WEIGHT_INTRA_ROOTS = 1.0  # weight of intra-root edges in relevance graphs
 _DEFAULT_WEIGHT = 0  # default weight for edges in relevance graphs
 _MAX_OUT_DEGREE = 3  # maximum out degree of nodes in fuzzy argmap
+_THRSH_PERCENTILE = 80  # percentile for threshold weight calculation
 
 
 class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
     """FuzzyArgMapBuilder
 
-    This LMQLAnalyst is responsible for reducing a quasi-complete relevance network to a fuzzy argument map (nx graph).
+    This Analyst is responsible for reducing a quasi-complete relevance network to a fuzzy argument map (nx graph).
 
     """
 
@@ -150,8 +151,8 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
             if data["valence"] == am.ATTACK and not data.get("pseudo", False)
         ]
 
-        thrsh_support_w = np.median(support_weights) if support_weights else None
-        thrsh_attack_w = np.median(attack_weights) if attack_weights else None
+        thrsh_support_w = np.percentile(support_weights, _THRSH_PERCENTILE) if support_weights else None
+        thrsh_attack_w = np.percentile(attack_weights, _THRSH_PERCENTILE) if attack_weights else None
 
         self.logger.debug(f"Minimum support weight: {thrsh_support_w}")
         self.logger.debug(f"Minimum attack weight: {thrsh_attack_w}")
@@ -166,8 +167,8 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
         for u, v, edgedata in relevance_network.edges(data=True):
             if fuzzy_argmap.has_edge(u, v) or fuzzy_argmap.has_edge(v, u):
                 continue
-            # check out-degree
-            if fuzzy_argmap.out_degree(u) >= _MAX_OUT_DEGREE:
+            # check out-degree / we're use in-degree as we're operating on the reversed graph!
+            if fuzzy_argmap.in_degree(u) >= _MAX_OUT_DEGREE:
                 continue
             data = {**edgedata, am.IN_FOREST: False} if is_forest else edgedata
             if data["valence"] == am.SUPPORT and thrsh_support_w is not None and data["weight"] > thrsh_support_w:
@@ -180,7 +181,7 @@ class FuzzyArgMapBuilder(AbstractArtifactAnalyst):
 
         return edges_added
 
-    def _analyze(self, analysis_state: AnalysisState):
+    async def _analyze(self, analysis_state: AnalysisState):
         """Build fuzzy argmap from pros and cons.
 
         Args:

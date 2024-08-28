@@ -3,7 +3,7 @@
 from logikon.analysts.base import AbstractArtifactAnalyst, AbstractScoreAnalyst
 from logikon.analysts.director import Director, get_analyst_registry
 from logikon.analysts.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
-from logikon.analysts.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
+from logikon.analysts.reconstruction.pros_cons_builder_lcel import ProsConsBuilderLCEL
 from logikon.schemas.configs import ScoreConfig
 
 
@@ -27,8 +27,8 @@ def test_analyst_factory():
                 metrics=metrics,
                 artifacts=artifacts,
                 global_kwargs={
-                    "expert_model": "text-ada-002",
-                    "llm_framework": "OpenAI",
+                    "inference_server_url": "localhost",
+                    "expert_model": "gpt2",
                 },
             )
 
@@ -39,8 +39,8 @@ def test_analyst_factory():
 def test_analyst_factory2():
     config = ScoreConfig(
         global_kwargs={
-            "expert_model": "text-ada-002",
-            "llm_framework": "OpenAI",
+            "inference_server_url": "localhost",
+            "expert_model": "gpt2",
         }
     )
     pipeline, _ = Director().create(config)
@@ -51,8 +51,8 @@ def test_analyst_factory3():
     config = ScoreConfig(
         artifacts=["svg_argmap", "fuzzy_argmap_nx", "relevance_network_nx"],
         global_kwargs={
-            "expert_model": "text-ada-002",
-            "llm_framework": "OpenAI",
+            "inference_server_url": "localhost",
+            "expert_model": "gpt2",
         },
     )
     pipeline, _ = Director().create(config)
@@ -63,8 +63,8 @@ def test_altern_requirements():
     config = ScoreConfig(
         artifacts=["svg_argmap"],
         global_kwargs={
-            "expert_model": "text-ada-002",
-            "llm_framework": "OpenAI",
+            "inference_server_url": "localhost",
+            "expert_model": "gpt2",
         },
     )
     pipeline, chain = Director().create(config)
@@ -80,23 +80,17 @@ def test_analyst_config():
     config = ScoreConfig(
         artifacts=["svg_argmap"],
         global_kwargs={
-            "expert_model": "text-ada-002",
-            "llm_framework": "OpenAI",
+            "inference_server_url": "localhost",
+            "expert_model": "gpt2",
         },
-        analyst_configs = {
-            "ProsConsBuilderLMQL": {
-                "lmql_query_timeout": 420,
+        analyst_configs={
+            "ProsConsBuilderLCEL": {
+                "lcel_query_timeout": 420,
             }
-        }
+        },
     )
     _, chain = Director().create(config)
 
-    proscons_builder = next(
-        (
-            analyst for analyst in chain
-            if isinstance(analyst, ProsConsBuilderLMQL)
-        ),
-        None
-    )
+    proscons_builder = next((analyst for analyst in chain if isinstance(analyst, ProsConsBuilderLCEL)), None)
 
-    assert proscons_builder._lmql_query_timeout == 420
+    assert proscons_builder._lcel_query_timeout == 420

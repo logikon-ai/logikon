@@ -44,7 +44,7 @@ class AbstractNetworkXExporter(AbstractArtifactAnalyst):
 
         return digraph
 
-    def _analyze(self, analysis_state: AnalysisState):
+    async def _analyze(self, analysis_state: AnalysisState):
         """Reconstruct reasoning as argmap."""
 
         try:

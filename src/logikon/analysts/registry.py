@@ -7,9 +7,9 @@ from logikon.analysts.export.htmlsunburst_exporter import HTMLSunburstExporter
 from logikon.analysts.export.networkx_exporter import RelevanceNetworkNXExporter
 from logikon.analysts.export.svgmap_exporter import SVGMapExporter
 from logikon.analysts.reconstruction.fuzzy_argmap_builder import FuzzyArgMapBuilder
-from logikon.analysts.reconstruction.issue_builder_lmql import IssueBuilderLMQL
-from logikon.analysts.reconstruction.pros_cons_builder_lmql import ProsConsBuilderLMQL
-from logikon.analysts.reconstruction.relevance_network_builder_lmql import RelevanceNetworkBuilderLMQL
+from logikon.analysts.reconstruction.issue_builder_lcel import IssueBuilderLCEL
+from logikon.analysts.reconstruction.pros_cons_builder_lcel import ProsConsBuilderLCEL
+from logikon.analysts.reconstruction.relevance_network_builder_lcel import RelevanceNetworkBuilderLCEL
 from logikon.analysts.score.argmap_graph_scores import (
     ArgMapGraphAttackRatioScorer,
     ArgMapGraphAvgKatzCScorer,
@@ -28,9 +28,9 @@ from logikon.analysts.score.balance_scores import (
 
 # First class is treated as default analyst
 _ANALYST_REGISTRY: Mapping[str, list[type[Analyst]]] = {
-    "issue": [IssueBuilderLMQL],
-    "proscons": [ProsConsBuilderLMQL],
-    "relevance_network": [RelevanceNetworkBuilderLMQL],
+    "issue": [IssueBuilderLCEL],
+    "proscons": [ProsConsBuilderLCEL],
+    "relevance_network": [RelevanceNetworkBuilderLCEL],
     "relevance_network_nx": [RelevanceNetworkNXExporter],
     "fuzzy_argmap_nx": [FuzzyArgMapBuilder],
     "svg_argmap": [SVGMapExporter],
