@@ -7,7 +7,7 @@
 
 *AI Analytics for Natural Language Reasoning.*
 
-[Guided Reasoning™️ Demo](https://huggingface.co/spaces/logikon/benjamin-chat) | Technical Report (coming soon)
+🕹️ [Guided Reasoning™️ Demo](https://huggingface.co/spaces/logikon/benjamin-chat) | 📄 [Technical Report](https://arxiv.org/abs/2408.16331)
 
 </div>
 
