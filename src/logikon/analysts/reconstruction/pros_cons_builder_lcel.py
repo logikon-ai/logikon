@@ -142,7 +142,7 @@ EXAMPLES_ISSUE_PROSCONS = [
 def trunk_to_sentence(text: str) -> str:
     """Truncates text by cutting off incomplete sentences."""
     text = text.strip(" '\n")
-    if text[-1] not in [".", "!", "?"]:
+    if text and text[-1] not in [".", "!", "?"]:
         # remove preceding marks
         text = text.strip(".!? ")
         # split text at any of ".", "!", "?"
